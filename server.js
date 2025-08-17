@@ -80,7 +80,7 @@ app.use('/api', speedLimiter); // Apply speed limiting to API routes
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the Quote API!',
-    version: '1.0.0',
+    version: '1.1.0',
     endpoints: {
       'GET /api': 'Get a random quote from any category',
       'GET /api?type=<category>': 'Get a random quote from a specific category',
