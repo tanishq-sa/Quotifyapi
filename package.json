@@ -9,15 +9,21 @@
     "build": "echo 'Build complete - Express API ready for deployment'"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "@vercel/analytics": "^1.5.0",
     "cors": "^2.8.5",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-slow-down": "^2.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["api", "quotes", "express", "nodejs"],
+  "keywords": [
+    "api",
+    "quotes",
+    "express",
+    "nodejs"
+  ],
   "author": "",
   "license": "MIT"
-} 
+}

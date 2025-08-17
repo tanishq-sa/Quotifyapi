@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const { inject } = require('@vercel/analytics');
 const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('./quotes');
 
 const app = express();
@@ -79,6 +80,7 @@ app.use('/api', speedLimiter); // Apply speed limiting to API routes
 // Welcome route
 app.get('/', (req, res) => {
   res.json({
+    analytics: inject(),
     message: 'Welcome to the Quote API!',
     version: '1.1.0',
     endpoints: {
