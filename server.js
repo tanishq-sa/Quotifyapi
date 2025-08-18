@@ -76,6 +76,7 @@ app.use((req, res, next) => {
 app.use(generalLimiter); // Apply to all requests
 app.use('/api', apiLimiter); // Apply to API routes
 app.use('/api', speedLimiter); // Apply speed limiting to API routes
+app.use('/api', strictLimiter); // Apply strict rate limiting to API routes
 
 // Welcome route
 app.get('/', (req, res) => {
