@@ -15,6 +15,9 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from public directory
+app.use(express.static('public'));
+
 // General rate limiting - allows 1000 requests per 15 minutes per IP
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -59,7 +62,7 @@ const strictLimiter = rateLimit({
 const speedLimiter = slowDown({
   windowMs: 5 * 60 * 1000, // 5 minutes
   delayAfter: 100, // allow 100 requests per 5 minutes at full speed
-  delayMs: 100, // add 100ms delay per request after delayAfter
+  delayMs: () => 100, // add 100ms delay per request after delayAfter
   maxDelayMs: 5000, // maximum delay of 5 seconds
 });
 

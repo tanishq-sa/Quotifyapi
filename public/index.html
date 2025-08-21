@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote API - Beautiful Quote API Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'gradient': 'gradient 15s ease infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ensure dark background is enforced */
+        html, body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+            min-height: 100vh !important;
+        }
+        
+        /* Force dark theme on all elements */
+        * {
+            color-scheme: dark;
+        }
+        
+        /* Ensure content sections maintain dark theme */
+        .bg-slate-800\/50 {
+            background-color: rgba(30, 41, 59, 0.5) !important;
+        }
+        
+        .bg-slate-700\/50 {
+            background-color: rgba(51, 65, 85, 0.5) !important;
+        }
+        
+        /* Make code blocks completely non-interactive */
+        pre code {
+            cursor: default !important;
+            user-select: text !important;
+            pointer-events: none !important;
+        }
+        
+        pre {
+            cursor: default !important;
+            user-select: text !important;
+            pointer-events: none !important;
+        }
+        
+        /* Allow copy buttons to work */
+        .copy-btn {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+    </style>
+</head>
+
+<body
+    class="font-inter bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 min-h-screen text-slate-100 relative overflow-x-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;">
+    <!-- Animated background elements -->
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute top-3/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float"
+            style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-1/4 left-1/2 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-float"
+            style="animation-delay: -4s;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <header id="header"
+            class="relative bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 py-16 text-center border-b border-slate-600/30 mb-8 overflow-hidden">
+            <!-- Shimmer effect -->
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-gradient">
+            </div>
+
+            <div class="relative z-10">
+                <h1
+                    class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent animate-pulse-slow">
+                    💬 Quotify API
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto px-4">
+                    Beautiful, fast, and reliable quote API
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+                    <a href="#try-it"
+                        class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base">
+                        🚀 Try It Now
+                    </a>
+                    <a href="https://github.com/tanishq-sa/Quotifyapi"
+                        class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+                        target="_blank">
+                        📚 GitHub
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="sticky top-2 sm:top-4 z-50 mb-8 sm:mb-12 px-2">
+            <div class="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-3 sm:p-4 shadow-2xl">
+                <div class="flex flex-wrap gap-2 sm:gap-4 justify-center">
+                    <a href="#overview"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Overview</a>
+                    <a href="#endpoints"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Endpoints</a>
+                    <a href="#examples"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Examples</a>
+                    <a href="#try-it"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Try It</a>
+                    <a href="#rate-limits"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Rate Limits</a>
+                    <a href="#installation"
+                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Installation</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Overview Section -->
+            <section id="overview"
+                class="mb-12 sm:mb-16 p-4 sm:p-6 md:p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl shadow-2xl">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white relative">
+                    Overview
+                    <div
+                        class="absolute bottom-0 left-0 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
+                    </div>
+                </h2>
+                <p class="text-lg text-slate-300 mb-8 max-w-4xl">
+                    The Quote API provides a simple and elegant way to access inspirational quotes across multiple
+                    categories. Built with Express.js and designed for performance, it's perfect for developers building
+                    applications that need motivational content.
+                </p>
+                
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 mb-12 max-w-4xl mx-auto shadow-lg">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-500/30">
+                            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                                Important Notice
+                            </h4>
+                            <p class="text-amber-100 text-base leading-relaxed">
+                                <strong class="text-amber-300">Quotify API does not own the quotes</strong> provided through this service. All quotes are the intellectual property of their respective authors, creators, and copyright holders. This API serves as a collection and distribution platform only. Please respect the original authors' rights and ensure proper attribution when using these quotes in your applications.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div
+                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🚀</div>
+                        <h3 class="text-xl font-semibold mb-3 text-white">Fast & Reliable</h3>
+                        <p class="text-slate-300">Built with Express.js and optimized for performance</p>
+                    </div>
+                    <div
+                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🛡️</div>
+                        <h3 class="text-xl font-semibold mb-3 text-white">Secure</h3>
+                        <p class="text-slate-300">Rate limiting, security headers, and abuse protection</p>
+                    </div>
+                    <div
+                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">📚</div>
+                        <h3 class="text-xl font-semibold mb-3 text-white">Rich Content</h3>
+                        <p class="text-slate-300">Multiple categories: happy, sad, love, motivational, wisdom</p>
+                    </div>
+                    <div
+                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🌐</div>
+                        <h3 class="text-xl font-semibold mb-3 text-white">Easy Integration</h3>
+                        <p class="text-slate-300">Simple REST API with comprehensive documentation</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Endpoints Section -->
+            <section id="endpoints" class="mb-12 sm:mb-16 p-4 sm:p-6 md:p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
+                    API Endpoints
+                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                </h2>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
+                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api</code>
+                                <span class="text-slate-300 font-medium">Get a random quote</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-slate-300 mb-4">Returns a random quote from any available category.</p>
+                            <h4 class="text-lg font-semibold text-white mb-3">Query Parameters:</h4>
+                            <ul class="list-disc list-inside text-slate-300 space-y-1">
+                                <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">type</code> (optional) - Filter by category: happy, sad, love, motivational, wisdom</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
+                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api/types</code>
+                                <span class="text-slate-300 font-medium">Get available categories</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-slate-300">Returns all available quote categories and their counts.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
+                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api/stats</code>
+                                <span class="text-slate-300 font-medium">Get quote statistics</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-slate-300">Returns detailed statistics about quotes in each category.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples Section -->
+            <section id="examples" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
+                    Examples
+                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                </h2>
+
+                <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
+                    <div class="flex flex-wrap bg-slate-800/80 border-b border-slate-600/50">
+                        <button class="tab-btn active px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-blue-400 text-sm sm:text-base" data-tab="curl">cURL</button>
+                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="javascript">JavaScript</button>
+                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="python">Python</button>
+                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="php">PHP</button>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="tab-pane active" id="curl">
+                            <h4 class="text-lg font-semibold text-white mb-3">Get a random quote:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api</code></pre>
+                            </div>
+
+                            <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get a specific category:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api?type=motivational')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl "https://quotifyapi.vercel.app/api?type=motivational"</code></pre>
+                            </div>
+
+                            <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get available types:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api/types')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api/types</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane hidden" id="javascript">
+                            <h4 class="text-lg font-semibold text-white mb-3">Using fetch:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\nfetch(\'https://quotifyapi.vercel.app/api\')\n  .then(response => response.json())\n  .then(data => console.log(data));\n\n// Get motivational quote\nfetch(\'https://quotifyapi.vercel.app/api?type=motivational\')\n  .then(response => response.json())\n  .then(data => console.log(data));')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-javascript">// Get random quote
+fetch('https://quotifyapi.vercel.app/api')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Get motivational quote
+fetch('https://quotifyapi.vercel.app/api?type=motivational')
+  .then(response => response.json())
+  .then(data => console.log(data));</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane hidden" id="python">
+                            <h4 class="text-lg font-semibold text-white mb-3">Using requests:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('import requests\n\n# Get random quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api\')\nquote = response.json()\nprint(quote)\n\n# Get love quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api?type=love\')\nquote = response.json()\nprint(quote)')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-python">import requests
+
+# Get random quote
+response = requests.get('https://quotifyapi.vercel.app/api')
+quote = response.json()
+print(quote)
+
+# Get love quote
+response = requests.get('https://quotifyapi.vercel.app/api?type=love')
+quote = response.json()
+print(quote)</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane hidden" id="php">
+                            <h4 class="text-lg font-semibold text-white mb-3">Using cURL:</h4>
+                            <div class="relative group">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, \'https://quotifyapi.vercel.app/api\');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\n\n$quote = json_decode($response, true);\necho $quote[\'quote\'][\'text\'];')">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-php">// Get random quote
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, 'https://quotifyapi.vercel.app/api');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+
+$quote = json_decode($response, true);
+echo $quote['quote']['text'];</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Try It Section -->
+            <section id="try-it" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
+                    Try It Now
+                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                </h2>
+                <p class="text-lg text-slate-300 mb-8">Test the API directly from this page:</p>
+
+                <div class="p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold mb-4 text-white">🧪 Interactive API Tester</h3>
+                        <p class="text-lg text-slate-300">Test any endpoint directly from this page</p>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-8">
+                        <div class="flex-1">
+                            <div class="grid grid-cols-1 sm:grid-cols-4 items-center bg-slate-900/80 border border-slate-600/50 rounded-2xl p-3 gap-3">
+                                <span class="px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg whitespace-nowrap flex items-center justify-center h-[44px] min-w-[60px]">GET</span>
+                                <span class="text-slate-400 text-sm sm:text-base whitespace-nowrap flex items-center h-[44px] px-2">https://quotifyapi.vercel.app</span>
+                                <div class="relative">
+                                    <button id="dropdown-trigger" 
+                                        class="w-full h-[44px] bg-slate-800 text-white border border-slate-600/50 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 min-w-0 flex items-center justify-between hover:bg-slate-700/80">
+                                        <span id="selected-option">/api (Random Quote)</span>
+                                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    
+                                    <div id="dropdown-menu" class="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-600/50 rounded-lg shadow-2xl z-50 opacity-0 invisible transform -translate-y-2 transition-all duration-300">
+                                        <div class="py-2">
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api" data-label="/api (Random Quote)">/api (Random Quote)</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=happy" data-label="/api?type=happy">/api?type=happy</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=sad" data-label="/api?type=sad">/api?type=sad</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=love" data-label="/api?type=love">/api?type=love</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=motivational" data-label="/api?type=motivational">/api?type=motivational</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=wisdom" data-label="/api?type=wisdom">/api?type=wisdom</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api/types" data-label="/api/types">/api/types</div>
+                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api/stats" data-label="/api/stats">/api/stats</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button id="test-btn"
+                                    class="w-full px-6 sm:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 h-[44px] leading-none">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                    <span class="text-sm sm:text-base">Send Request</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                        <div class="p-6 border-b border-slate-600/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="text-xl font-semibold text-white">API Response</h3>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span id="response-status"
+                                        class="px-3 py-1 bg-slate-600 text-slate-300 text-sm font-medium rounded-lg">Ready</span>
+                                    <button id="view-toggle" 
+                                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                                        title="Toggle between pretty and raw view">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                        </svg>
+                                        Pretty
+                                    </button>
+                                    <button id="copy-response" 
+                                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2 hidden"
+                                        title="Copy response to clipboard">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div id="response-body" class="min-h-[200px]">
+                                <div class="text-slate-400 text-center py-8">
+                                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <p class="text-slate-300">Click "Send Request" to test the API</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rate Limits Section -->
+            <section id="rate-limits" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
+                    Rate Limits
+                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                </h2>
+                <p class="text-lg text-slate-300 mb-8">To ensure fair usage and protect against abuse, the following rate limits are enforced:</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
+                        <h4 class="text-xl font-semibold mb-4 text-white">General Requests</h4>
+                        <div class="mb-4">
+                            <span class="block text-4xl font-bold text-blue-400 mb-2">1,000</span>
+                            <span class="text-slate-300">per 15 minutes</span>
+                        </div>
+                        <p class="text-slate-300">Applies to all requests to the API</p>
+                    </div>
+
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
+                        <h4 class="text-xl font-semibold mb-4 text-white">API Endpoints</h4>
+                        <div class="mb-4">
+                            <span class="block text-4xl font-bold text-purple-400 mb-2">500</span>
+                            <span class="text-slate-300">per 15 minutes</span>
+                        </div>
+                        <p class="text-slate-300">Applies to all /api routes</p>
+                    </div>
+
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
+                        <h4 class="text-xl font-semibold mb-4 text-white">Strict Limit</h4>
+                        <div class="mb-4">
+                            <span class="block text-4xl font-bold text-red-400 mb-2">50</span>
+                            <span class="text-slate-300">per minute</span>
+                        </div>
+                        <p class="text-slate-300">Additional protection for API routes</p>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
+                    <h4 class="text-xl font-semibold mb-4 text-white">Rate Limit Headers</h4>
+                    <p class="text-slate-300 mb-4">The API includes rate limit information in response headers:</p>
+                    <ul class="list-disc list-inside text-slate-300 space-y-2">
+                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Limit</code> - Maximum requests per window</li>
+                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Remaining</code> - Remaining requests in current window</li>
+                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Reset</code> - Time when the rate limit resets</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Installation Section -->
+            <section id="installation" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
+                    Installation & Usage
+                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
+                        <h4 class="text-xl font-semibold mb-4 text-white">NPM Package</h4>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install quotifyapi')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">npm install quotifyapi</code></pre>
+                        </div>
+                        <p class="text-slate-300 mb-4">Install the package and use it in your Node.js applications.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-3 text-white">Usage Example:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'const quotify = require(\'quotifyapi\');\n\n// Get a random quote\nquotify.getRandomQuote()\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));\n\n// Get quote by type\nquotify.getQuoteByType(\'motivational\')\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));\n\n// Get available types\nquotify.getAvailableTypes()\n  .then(types => console.log(types))\n  .catch(err => console.error(err));')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-javascript">const quotify = require('quotifyapi');
+
+// Get a random quote
+quotify.getRandomQuote()
+  .then(quote => console.log(quote))
+  .catch(err => console.error(err));
+
+// Get quote by type
+quotify.getQuoteByType('motivational')
+  .then(quote => console.log(quote))
+  .catch(err => console.error(err));
+
+// Get available types
+quotify.getAvailableTypes()
+  .then(types => console.log(types))
+  .catch(err => console.error(err));</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
+                        <h4 class="text-xl font-semibold mb-4 text-white">CLI Tool</h4>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install -g quotifyapi')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">npm install -g quotifyapi</code></pre>
+                        </div>
+                        <p class="text-slate-300 mb-4">Install globally to use the command-line interface.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-3 text-white">CLI Commands:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get a random quote\nquotifyapi\n\n# Get quote by type\nquotifyapi --type motivational\nquotifyapi --type love\nquotifyapi --type wisdom\n\n# Get available types\nquotifyapi --types\n\n# Get API stats\nquotifyapi --stats\n\n# Help\nquotifyapi --help')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Get a random quote
+quotifyapi
+
+# Get quote by type
+quotifyapi --type motivational
+quotifyapi --type love
+quotifyapi --type wisdom
+
+# Get available types
+quotifyapi --types
+
+# Get API stats
+quotifyapi --stats
+
+# Help
+quotifyapi --help</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
+                        <h4 class="text-xl font-semibold mb-4 text-white">Direct API</h4>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Base URL: https://quotifyapi.vercel.app')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Base URL: https://quotifyapi.vercel.app</code></pre>
+                        </div>
+                        <p class="text-slate-300 mb-4">Make HTTP requests directly to the API endpoints.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-3 text-white">cURL Examples:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get random quote\ncurl https://quotifyapi.vercel.app/api\n\n# Get motivational quote\ncurl https://quotifyapi.vercel.app/api?type=motivational\n\n# Get available types\ncurl https://quotifyapi.vercel.app/api/types\n\n# Get API stats\ncurl https://quotifyapi.vercel.app/api/stats')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Get random quote
+curl https://quotifyapi.vercel.app/api
+
+# Get motivational quote
+curl https://quotifyapi.vercel.app/api?type=motivational
+
+# Get available types
+curl https://quotifyapi.vercel.app/api/types
+
+# Get API stats
+curl https://quotifyapi.vercel.app/api/stats</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
+                        <h4 class="text-xl font-semibold mb-4 text-white">Self-Hosted</h4>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'git clone https://github.com/tanishq-sa/Quotifyapi\ncd quotifyapi\nnpm install\nnpm start')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">git clone https://github.com/tanishq-sa/Quotifyapi
+cd quotifyapi
+npm install
+npm start</code></pre>
+                        </div>
+                        <p class="text-slate-300 mb-4">Clone the repository and run your own instance.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-3 text-white">Environment Setup:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Copy environment file\ncp env.example .env\n\n# Edit configuration\nnano .env\n\n# Start development server\nnpm run dev\n\n# Start production server\nnpm start')">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Copy environment file
+cp env.example .env
+
+# Edit configuration
+nano .env
+
+# Start development server
+npm run dev
+
+# Start production server
+npm start</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 py-12 bg-slate-800/80 backdrop-blur-xl border-t border-slate-700/50 rounded-t-3xl">
+            <div class="text-center">
+                <p class="text-slate-300 mb-6">&copy; 2025 Quotify API. Built with ❤️ and Express.js</p>
+                
+                <div class="bg-slate-700/50 border border-slate-600/50 rounded-xl p-4 mb-6 max-w-2xl mx-auto">
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        <strong>Copyright Notice:</strong> Quotify API is a service that provides access to quotes. 
+                        <strong>We do not own, create, or claim ownership</strong> of any quotes provided through this API. 
+                        All quotes are the intellectual property of their respective authors, creators, and copyright holders. 
+                        This service operates as a collection and distribution platform only.
+                    </p>
+                </div>
+                
+                <div class="flex gap-6 justify-center flex-wrap">
+                    <a href="https://github.com/tanishq-sa/Quotifyapi" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">GitHub</a>
+                    <a href="https://github.com/tanishq-sa/Quotifyapi/issues" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">Issues</a>
+                    <a href="https://github.com/tanishq-sa/Quotifyapi/blob/main/LICENSE" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">License</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

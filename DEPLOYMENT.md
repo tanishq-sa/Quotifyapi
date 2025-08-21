@@ -42,7 +42,7 @@ Vercel is the easiest option for deploying Node.js/Express applications.
    git add .
    git commit -m "Initial commit"
    git branch -M main
-   git remote add origin https://github.com/yourusername/quote-api.git
+   git remote add origin https://github.com/tanishq-sa/Quotifyapi.git
    git push -u origin main
    ```
 

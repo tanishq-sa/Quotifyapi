@@ -1,12 +1,19 @@
 {
-  "name": "quote-api",
-  "version": "1.0.0",
-  "description": "A simple quote API that returns quotes based on type or random quotes",
+  "name": "quotifyapi",
+  "version": "1.1.0",
+  "description": "A beautiful, fast, and reliable quote API with comprehensive documentation",
   "main": "server.js",
+  "bin": {
+    "quotifyapi": "./cli.js"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'Build complete - Express API ready for deployment'"
+    "build": "echo 'Build complete - Express API ready for deployment'",
+    "docs": "echo 'Documentation available at https://quotifyapi.vercel.app'",
+    "test": "echo 'No tests specified yet'",
+    "lint": "echo 'No linter configured yet'",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
@@ -22,8 +29,38 @@
     "api",
     "quotes",
     "express",
-    "nodejs"
+    "nodejs",
+    "motivational",
+    "inspirational",
+    "wisdom",
+    "love",
+    "happiness",
+    "sadness",
+    "rest-api",
+    "rate-limiting",
+    "security",
+    "quotify",
+    "vercel"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Dazzelr <dazzelr@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tanishq-sa/Quotifyapi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tanishq-sa/Quotifyapi/issues"
+  },
+  "homepage": "https://quotifyapi.vercel.app",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "server.js",
+    "quotes.js",
+    "quotes/",
+    "public/",
+    "README.md",
+    "LICENSE"
+  ]
 }
