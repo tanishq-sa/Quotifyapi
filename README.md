@@ -175,7 +175,7 @@ npm start
 npm run dev
 ```
 
-The API will be available at `http://localhost:3000`
+The API will be available at `https://quotifyapi.vercel.app`
 
 ## 📚 Documentation Website
 
@@ -188,7 +188,7 @@ A beautiful, interactive documentation website is included and automatically ser
 - 🎨 Modern dark theme
 - ⌨️ Keyboard shortcuts
 
-Visit `http://localhost:3000` to explore the documentation.
+Visit `https://quotifyapi.vercel.app` to explore the documentation.
 
 ## 🔧 Configuration
 
@@ -250,7 +250,6 @@ quotifyapi/
 │   └── wisdom.js
 ├── public/            # Documentation website
 │   ├── index.html
-│   ├── styles.css
 │   └── script.js
 ├── package.json
 ├── README.md
