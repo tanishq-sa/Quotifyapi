@@ -1,6 +1,6 @@
 {
   "name": "quotifyapi",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A beautiful, fast, and reliable quote API with comprehensive documentation",
   "main": "quotes.js",
   "bin": {
@@ -47,7 +47,7 @@
     "quotify",
     "vercel"
   ],
-  "author": "Dazzelr <dazzelr@example.com>",
+  "author": "Tanishq Saini",
   "license": "MIT",
   "repository": {
     "type": "git",
