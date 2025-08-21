@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from public directory
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // General rate limiting - allows 1000 requests per 15 minutes per IP
 const generalLimiter = rateLimit({
@@ -84,28 +84,34 @@ app.use('/api', strictLimiter); // Apply strict rate limiting to API routes
 
 // Welcome route
 app.get('/', (req, res) => {
-  res.json({
-    analytics: inject(),
-    message: 'Welcome to the Quote API!',
-    version: '1.1.0',
-    endpoints: {
-      'GET /api': 'Get a random quote from any category',
-      'GET /api?type=<category>': 'Get a random quote from a specific category',
-      'GET /api/types': 'Get all available quote categories',
-      'GET /api/stats': 'Get quote statistics by category'
-    },
-    availableTypes: getAvailableTypes(),
-    totalQuotes: getQuotesCount().total,
-    rateLimits: {
-      general: '1000 requests per 15 minutes',
-      api: '500 API requests per 15 minutes',
-      note: 'Rate limit headers are included in responses'
-    },
-    security: {
-      message: 'This API is protected against abuse and DDoS attacks',
-      features: ['Rate limiting', 'Request throttling', 'Security headers']
-    }
-  });
+  // Check if this is an API request
+  if (req.headers.accept && req.headers.accept.includes('application/json')) {
+    return res.json({
+      analytics: inject(),
+      message: 'Welcome to the Quote API!',
+      version: '1.1.1',
+      endpoints: {
+        'GET /api': 'Get a random quote from any category',
+        'GET /api?type=<category>': 'Get a random quote from a specific category',
+        'GET /api/types': 'Get all available quote categories',
+        'GET /api/stats': 'Get quote statistics by category'
+      },
+      availableTypes: getAvailableTypes(),
+      totalQuotes: getQuotesCount().total,
+      rateLimits: {
+        general: '1000 requests per 15 minutes',
+        api: '500 API requests per 15 minutes',
+        note: 'Rate limit headers are included in responses'
+      },
+      security: {
+        message: 'This API is protected against abuse and DDoS attacks',
+        features: ['Rate limiting', 'Request throttling', 'Security headers']
+      }
+    });
+  }
+  
+  // Serve the main HTML file for browser requests
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Main quote API endpoint
@@ -161,6 +167,16 @@ app.get('/api/stats', (req, res) => {
   res.json({
     message: 'Quote statistics by category',
     counts: getQuotesCount()
+  });
+});
+
+// Debug route to check static file serving
+app.get('/debug/static', (req, res) => {
+  res.json({
+    message: 'Static file serving debug',
+    publicPath: path.join(__dirname, 'public'),
+    files: ['index.html', 'script.js'],
+    timestamp: new Date().toISOString()
   });
 });
 
