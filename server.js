@@ -180,7 +180,16 @@ app.get('/debug/static', (req, res) => {
   });
 });
 
-// Serve the main application for non-API routes (SPA support)
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Error:', error);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: 'Something went wrong on the server'
+  });
+});
+
+// Serve the main application for non-API routes (SPA support) - MUST BE LAST
 app.get('*', (req, res) => {
   // Don't serve HTML for API routes
   if (req.path.startsWith('/api')) {
@@ -192,15 +201,6 @@ app.get('*', (req, res) => {
   
   // Serve the main HTML file for all other routes
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Error handling middleware
-app.use((error, req, res, next) => {
-  console.error('Error:', error);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: 'Something went wrong on the server'
-  });
 });
 
 // Start the server (for local development)
