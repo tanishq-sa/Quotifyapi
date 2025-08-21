@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const path = require('path');
 const { inject } = require('@vercel/analytics');
 const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('./quotes');
 
@@ -163,12 +164,18 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
-// Handle 404 for unknown routes
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Route not found',
-    message: 'The requested endpoint does not exist'
-  });
+// Serve the main application for non-API routes (SPA support)
+app.get('*', (req, res) => {
+  // Don't serve HTML for API routes
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({
+      error: 'Route not found',
+      message: 'The requested API endpoint does not exist'
+    });
+  }
+  
+  // Serve the main HTML file for all other routes
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Error handling middleware

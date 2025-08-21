@@ -1,6 +1,6 @@
 {
   "name": "quotifyapi",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A beautiful, fast, and reliable quote API with comprehensive documentation",
   "main": "server.js",
   "bin": {
@@ -10,6 +10,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo 'Build complete - Express API ready for deployment'",
+    "vercel-build": "echo 'Vercel build complete'",
     "docs": "echo 'Documentation available at https://quotifyapi.vercel.app'",
     "test": "echo 'No tests specified yet'",
     "lint": "echo 'No linter configured yet'",
