@@ -1,10 +1,14 @@
 {
   "name": "quotifyapi",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A beautiful, fast, and reliable quote API with comprehensive documentation",
-  "main": "server.js",
+  "main": "quotes.js",
   "bin": {
     "quotifyapi": "./cli.js"
+  },
+  "exports": {
+    ".": "./quotes.js",
+    "./server": "./server.js"
   },
   "scripts": {
     "start": "node server.js",
@@ -53,6 +57,9 @@
     "url": "https://github.com/tanishq-sa/Quotifyapi/issues"
   },
   "homepage": "https://quotifyapi.vercel.app",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=14.0.0"
   },
