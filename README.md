@@ -302,9 +302,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=
-/quotifyapi&type=Date)](https://star-history.com/#tanishq-sa/quotifyapi&Date)
-
+[![Star History Chart](https://api.star-history.com/svg?repos=tanishq-sa/quotifyapi&type=Timeline)](https://www.star-history.com/#tanishq-sa/quotifyapi&Timeline)
 ---
 
 Made with ❤️ by [Tanishq Saini](https://github.com/tanishq-sa)
