@@ -23,20 +23,17 @@ protection_rules:
       - "Deploy to Vercel / test (20.x)"
       - "Status Check / status"
       - "Test and Quality Check / quality-check"
-  
-  # Restrict who can deploy
-  deployment_branch_policy:
-    protected_branches: true
-    custom_branch_policies: false
-  
-  # Environment variables (optional)
-  environment_variables:
-    NODE_ENV: "production"
-    DEPLOYMENT_ENV: "production"
+
+# Environment variables for production
+environment_variables:
+  NODE_ENV: "production"
+  DEPLOYMENT_ENV: "production"
+  PRODUCTION_FLAG: "true"
+  LOG_LEVEL: "info"
 
 # Deployment settings
 deployment_settings:
-  # Auto-deploy on push to main (optional)
+  # Auto-deploy disabled (manual approval required)
   auto_deploy: false
   
   # Deployment timeout (in minutes)
@@ -45,8 +42,23 @@ deployment_settings:
   # Rollback on failure
   rollback_on_failure: true
   
+  # Health checks
+  health_check:
+    enabled: true
+    timeout: 300
+    retries: 3
+  
   # Notifications
   notifications:
     on_success: true
     on_failure: true
     on_cancellation: true
+    on_approval_required: true
+    on_approval_granted: true
+  
+  # Security settings
+  security:
+    require_2fa: true
+    require_code_review: true
+    block_force_push: true
+    block_deletion: true

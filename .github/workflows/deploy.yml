@@ -37,6 +37,20 @@ jobs:
     - name: Build project
       run: npm run build
 
+  pr-approval:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    environment: pr-approval
+    
+    steps:
+    - name: Wait for PR approval
+      run: |
+        echo "All tests have passed!"
+        echo "Waiting for your approval to proceed..."
+        echo "Please approve this deployment in the Actions tab"
+        echo "After approval, the PR will be ready for merge"
+
   quick-check:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
