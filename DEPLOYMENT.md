@@ -73,9 +73,20 @@ If you need environment variables in production:
 
 ## Deployment Process
 
-1. **Push to main/master branch**: Automatically triggers deployment
+### 🚀 Automatic Staging Deployment
+1. **Push to main/master branch**: Automatically deploys to staging environment
 2. **Create pull request**: Runs tests but doesn't deploy
-3. **Merge pull request**: Automatically deploys to production
+3. **Merge pull request**: Automatically deploys to staging
+
+### 🔒 Manual Production Deployment
+1. **Go to Actions tab** in your GitHub repository
+2. **Click "Deploy to Vercel"** workflow
+3. **Click "Run workflow"** button
+4. **Select "production"** from the environment dropdown
+5. **Click "Run workflow"** to start deployment
+6. **Review and approve** the deployment when prompted
+
+**Note**: Production deployments require manual approval and only happen when you explicitly trigger them!
 
 ## Monitoring
 
