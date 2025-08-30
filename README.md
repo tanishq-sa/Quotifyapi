@@ -72,7 +72,7 @@ This project uses GitHub Actions for automated testing, quality checks, and depl
 ### 🔄 Automated Workflows
 
 - **Test & Quality Check** - Runs on every push and pull request
-- **Deploy to Vercel** - Automatically deploys to production on main branch
+- **Deploy to Vercel** - Automatically deploys to staging, manual approval for production
 - **Release Management** - Creates GitHub releases and publishes to npm on version tags
 - **Dependabot** - Automatically checks for dependency updates weekly
 
