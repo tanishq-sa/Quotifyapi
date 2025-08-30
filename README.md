@@ -65,6 +65,37 @@ npx quotifyapi stats
 npx quotifyapi help
 ```
 
+## 🚀 GitHub Actions & CI/CD
+
+This project uses GitHub Actions for automated testing, quality checks, and deployment. The following workflows are configured:
+
+### 🔄 Automated Workflows
+
+- **Test & Quality Check** - Runs on every push and pull request
+- **Deploy to Vercel** - Automatically deploys to production on main branch
+- **Release Management** - Creates GitHub releases and publishes to npm on version tags
+- **Dependabot** - Automatically checks for dependency updates weekly
+
+### 📋 Required GitHub Secrets
+
+To enable automatic deployment, add these secrets to your repository:
+
+| Secret Name | Description | How to Get |
+|-------------|-------------|------------|
+| `VERCEL_TOKEN` | Vercel deployment token | [Vercel Account Settings](https://vercel.com/account/tokens) |
+| `ORG_ID` | Vercel team/organization ID | Vercel Dashboard → Settings → General |
+| `PROJECT_ID` | Vercel project ID | Vercel Project Dashboard → Settings → General |
+| `NPM_TOKEN` | NPM publish token (optional) | [NPM Account Settings](https://www.npmjs.com/settings/tokens) |
+
+### 🏗️ Workflow Details
+
+- **Matrix Testing**: Tests against Node.js 16.x, 18.x, and 20.x
+- **Security Audits**: Runs `npm audit` to check for vulnerabilities
+- **Quality Gates**: All tests must pass before deployment
+- **Automatic Releases**: Push a tag like `v1.2.1` to trigger a release
+
+For detailed setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+
 ## 🌐 API Endpoints
 
 ### Base URL

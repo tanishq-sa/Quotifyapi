@@ -1,160 +1,126 @@
 # Deployment Guide
 
-Your Quote API can be easily deployed to both Vercel and Cloudflare. Here are the step-by-step instructions for both platforms.
+This guide explains how to deploy the QuoteAPI using GitHub Actions and Vercel.
 
-## 🚀 Vercel Deployment (Recommended)
+## Prerequisites
 
-Vercel is the easiest option for deploying Node.js/Express applications.
+- GitHub repository with your code
+- Vercel account
+- Node.js 16+ installed locally
 
-### Method 1: Deploy via Vercel CLI
+## Setup Steps
 
-1. **Install Vercel CLI:**
-   ```bash
-   npm install -g vercel
-   ```
+### 1. GitHub Repository Setup
 
-2. **Login to Vercel:**
-   ```bash
-   vercel login
-   ```
+1. Push your code to GitHub
+2. Ensure your main branch is named `main` or `master`
 
-3. **Deploy your project:**
-   ```bash
-   vercel
-   ```
-   
-4. **Follow the prompts:**
-   - Set up and deploy? `Y`
-   - Which scope? Choose your account
-   - Link to existing project? `N`
-   - What's your project's name? `quote-api` (or any name you prefer)
-   - In which directory is your code located? `./`
-   - Want to override the settings? `N`
+### 2. Vercel Setup
 
-5. **Your API will be live!** Vercel will provide you with a URL like:
-   `https://quote-api-your-username.vercel.app`
+1. Go to [vercel.com](https://vercel.com) and sign in
+2. Create a new project and import your GitHub repository
+3. Configure the project settings:
+   - **Framework Preset**: Node.js
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `.`
+   - **Install Command**: `npm install`
 
-### Method 2: Deploy via GitHub (Recommended)
+### 3. GitHub Secrets Configuration
 
-1. **Create a GitHub repository:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/tanishq-sa/Quotifyapi.git
-   git push -u origin main
-   ```
+You need to add the following secrets to your GitHub repository:
 
-2. **Connect to Vercel:**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your GitHub repository
-   - Click "Deploy"
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+2. Add the following repository secrets:
 
-3. **Automatic deployments:** Every push to main branch will auto-deploy!
+#### `VERCEL_TOKEN`
+- Go to [Vercel Account Settings](https://vercel.com/account/tokens)
+- Create a new token
+- Copy the token value
+- Add it as `VERCEL_TOKEN` in GitHub secrets
 
-### Vercel Environment Variables
+#### `ORG_ID`
+- In your Vercel dashboard, go to Settings → General
+- Copy the "Team ID" (this is your ORG_ID)
+- Add it as `ORG_ID` in GitHub secrets
 
-If you need environment variables, add them in Vercel dashboard:
-- Go to your project settings
-- Navigate to "Environment Variables"
-- Add: `NODE_ENV` = `production`
+#### `PROJECT_ID`
+- In your Vercel project dashboard, go to Settings → General
+- Copy the "Project ID"
+- Add it as `PROJECT_ID` in GitHub secrets
 
----
+### 4. GitHub Actions Workflow
 
-## ☁️ Cloudflare Pages Deployment
+The workflow file `.github/workflows/deploy.yml` is already configured and will:
 
-Cloudflare Pages is great for static sites, but for APIs we'll use Cloudflare Workers.
+- **Test Job**: Run on all pushes and pull requests
+  - Test multiple Node.js versions (16.x, 18.x, 20.x)
+  - Install dependencies
+  - Run linting
+  - Run tests
+  - Build the project
 
-### Using Cloudflare Workers
+- **Deploy Job**: Run only on main/master branch pushes
+  - Deploy to Vercel production environment
+  - Only runs after tests pass
 
-1. **Install Wrangler CLI:**
-   ```bash
-   npm install -g wrangler
-   ```
+### 5. Environment Variables (Optional)
 
-2. **Login to Cloudflare:**
-   ```bash
-   wrangler login
-   ```
+If you need environment variables in production:
 
-3. **Create wrangler.toml:**
-   ```toml
-   name = "quote-api"
-   main = "worker.js"
-   compatibility_date = "2023-12-01"
-   
-   [env.production]
-   name = "quote-api-production"
-   ```
+1. Go to your Vercel project dashboard
+2. Navigate to Settings → Environment Variables
+3. Add any required environment variables
 
-4. **Create a Cloudflare Worker version** (worker.js):
-   ```javascript
-   // This would need to be adapted for Cloudflare Workers
-   // Cloudflare Workers don't support Express directly
-   ```
+## Deployment Process
 
-**Note:** Cloudflare Workers require significant code changes as they don't support Express.js directly. Vercel is much easier for your current setup.
+1. **Push to main/master branch**: Automatically triggers deployment
+2. **Create pull request**: Runs tests but doesn't deploy
+3. **Merge pull request**: Automatically deploys to production
 
----
+## Monitoring
 
-## 🌐 Testing Your Deployed API
+- **GitHub Actions**: Check the Actions tab in your repository
+- **Vercel**: Monitor deployments in your Vercel dashboard
+- **Logs**: View deployment logs in both GitHub Actions and Vercel
 
-Once deployed, your API endpoints will be:
+## Troubleshooting
 
-```
-https://your-app-name.vercel.app/api
-https://your-app-name.vercel.app/api?type=sad
-https://your-app-name.vercel.app/api?type=happy
-https://your-app-name.vercel.app/api/types
-https://your-app-name.vercel.app/api/stats
-```
+### Common Issues
 
-### Test with curl:
+1. **Build failures**: Check the build logs in GitHub Actions
+2. **Deployment failures**: Verify your Vercel secrets are correct
+3. **Node version issues**: Ensure your code is compatible with Node 16+
+
+### Debugging
+
+1. Check GitHub Actions logs for detailed error messages
+2. Verify all required secrets are set correctly
+3. Test your build command locally: `npm run build`
+
+## Manual Deployment
+
+If you need to deploy manually:
+
 ```bash
-curl https://your-app-name.vercel.app/api
-curl "https://your-app-name.vercel.app/api?type=love"
+# Install Vercel CLI
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy
+vercel --prod
 ```
 
-### Test in browser:
-Just visit the URLs directly in your browser!
+## Security Notes
 
----
+- Never commit sensitive information like API keys
+- Use GitHub secrets for all sensitive configuration
+- Regularly rotate your Vercel token
+- Review deployment logs for any security concerns
 
-## 📝 Post-Deployment Tips
+## Support
 
-1. **Custom Domain:** Both platforms support custom domains
-2. **HTTPS:** Automatic HTTPS is provided
-3. **Global CDN:** Your API will be fast worldwide
-4. **Monitoring:** Check logs in respective dashboards
-5. **Analytics:** Both platforms provide usage analytics
-
----
-
-## 🔧 Troubleshooting
-
-### Common Issues:
-
-1. **Build fails:** Check your `package.json` dependencies
-2. **Function timeout:** Increase timeout in `vercel.json`
-3. **CORS errors:** Already handled in your code with `cors` middleware
-4. **Environment variables:** Set them in platform dashboard
-
-### Support:
-- **Vercel:** Check [vercel.com/docs](https://vercel.com/docs)
-- **Cloudflare:** Check [developers.cloudflare.com](https://developers.cloudflare.com)
-
----
-
-## ✅ Recommended Choice
-
-**For your Quote API, we recommend Vercel because:**
-- ✅ Zero configuration needed
-- ✅ Perfect for Express.js apps
-- ✅ Automatic HTTPS and CDN
-- ✅ Easy GitHub integration
-- ✅ Generous free tier
-- ✅ Excellent developer experience
-
-Your API is ready to deploy! 🚀 
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Vercel Documentation](https://vercel.com/docs)
+- [Vercel Support](https://vercel.com/support) 
