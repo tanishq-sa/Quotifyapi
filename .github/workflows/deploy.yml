@@ -1,16 +1,6 @@
 name: Deploy to Vercel
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-        - staging
-        - production
   push:
     branches: [ main, master ]
   pull_request:
@@ -74,11 +64,13 @@ jobs:
         vercel-org-id: ${{ secrets.ORG_ID }}
         vercel-project-id: ${{ secrets.PROJECT_ID }}
 
-  deploy-production:
+  prepare-production:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     environment: production
+    outputs:
+      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
     
     steps:
     - name: Checkout code
@@ -96,10 +88,23 @@ jobs:
     - name: Build project
       run: npm run build
     
-    - name: Deploy to Vercel (Production)
-      uses: amondnet/vercel-action@v25
+    - name: Create deployment
+      id: deployment
+      uses: actions/deploy-to-vercel@v1
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
         vercel-org-id: ${{ secrets.ORG_ID }}
         vercel-project-id: ${{ secrets.PROJECT_ID }}
         vercel-args: '--prod'
+
+  deploy-production:
+    needs: prepare-production
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Deploy to Production
+      run: |
+        echo "Production deployment approved!"
+        echo "Deployment ID: ${{ needs.prepare-production.outputs.deployment_id }}"
+        echo "Your app is now live in production!"

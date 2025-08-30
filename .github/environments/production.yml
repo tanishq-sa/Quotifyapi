@@ -1,0 +1,52 @@
+name: production
+
+# Protection rules for the production environment
+protection_rules:
+  # Required reviewers before deployment
+  required_reviewers:
+    - tanishq-sa
+  
+  # Wait time before deployment (in minutes)
+  wait_timer: 5
+  
+  # Deployment branch policy
+  deployment_branch_policy:
+    protected_branches: true
+    custom_branch_policies: false
+  
+  # Required status checks
+  required_status_checks:
+    strict: true
+    contexts:
+      - "Deploy to Vercel / test (16.x)"
+      - "Deploy to Vercel / test (18.x)"
+      - "Deploy to Vercel / test (20.x)"
+      - "Status Check / status"
+      - "Test and Quality Check / quality-check"
+  
+  # Restrict who can deploy
+  deployment_branch_policy:
+    protected_branches: true
+    custom_branch_policies: false
+  
+  # Environment variables (optional)
+  environment_variables:
+    NODE_ENV: "production"
+    DEPLOYMENT_ENV: "production"
+
+# Deployment settings
+deployment_settings:
+  # Auto-deploy on push to main (optional)
+  auto_deploy: false
+  
+  # Deployment timeout (in minutes)
+  timeout_minutes: 30
+  
+  # Rollback on failure
+  rollback_on_failure: true
+  
+  # Notifications
+  notifications:
+    on_success: true
+    on_failure: true
+    on_cancellation: true
