@@ -100,7 +100,7 @@ For detailed setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ### Base URL
 ```
-https://quotifyapi.vercel.app
+https://quotify.dazzelr.tech
 ```
 
 ### Get Random Quote
@@ -206,7 +206,7 @@ npm start
 npm run dev
 ```
 
-The API will be available at `https://quotifyapi.vercel.app`
+The API will be available at `https://quotify.dazzelr.tech`
 
 ## 📚 Documentation Website
 
@@ -219,7 +219,7 @@ A beautiful, interactive documentation website is included and automatically ser
 - 🎨 Modern dark theme
 - ⌨️ Keyboard shortcuts
 
-Visit `https://quotifyapi.vercel.app` to explore the documentation.
+Visit `https://quotify.dazzelr.tech` to explore the documentation.
 
 ## 🔧 Configuration
 
@@ -327,7 +327,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 🐛 **Issues**: [GitHub Issues](https://github.com/tanishq-sa/Quotifyapi/issues)
-- 📖 **Documentation**: [API Docs](https://quotifyapi.vercel.app)
+- 📖 **Documentation**: [API Docs](https://quotify.dazzelr.tech)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/tanishq-sa/Quotifyapi/discussions)
 
 ## 🌟 Star History
