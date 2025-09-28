@@ -278,54 +278,54 @@
                         <div class="tab-pane active" id="curl">
                             <h4 class="text-lg font-semibold text-white mb-3">Get a random quote:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotify.dazzelr.tech/api')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api</code></pre>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotify.dazzelr.tech/api</code></pre>
                             </div>
 
                             <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get a specific category:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api?type=motivational')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotify.dazzelr.tech/api?type=motivational')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl "https://quotifyapi.vercel.app/api?type=motivational"</code></pre>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl "https://quotify.dazzelr.tech/api?type=motivational"</code></pre>
                             </div>
 
                             <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get available types:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api/types')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotify.dazzelr.tech/api/types')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api/types</code></pre>
+                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotify.dazzelr.tech/api/types</code></pre>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="javascript">
                             <h4 class="text-lg font-semibold text-white mb-3">Using fetch:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\nfetch(\'https://quotifyapi.vercel.app/api\')\n  .then(response => response.json())\n  .then(data => console.log(data));\n\n// Get motivational quote\nfetch(\'https://quotifyapi.vercel.app/api?type=motivational\')\n  .then(response => response.json())\n  .then(data => console.log(data));')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\nfetch(\'https://quotify.dazzelr.tech/api\')\n  .then(response => response.json())\n  .then(data => console.log(data));\n\n// Get motivational quote\nfetch(\'https://quotify.dazzelr.tech/api?type=motivational\')\n  .then(response => response.json())\n  .then(data => console.log(data));')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
                                 <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-javascript">// Get random quote
-fetch('https://quotifyapi.vercel.app/api')
+fetch('https://quotify.dazzelr.tech/api')
   .then(response => response.json())
   .then(data => console.log(data));
 
 // Get motivational quote
-fetch('https://quotifyapi.vercel.app/api?type=motivational')
+fetch('https://quotify.dazzelr.tech/api?type=motivational')
   .then(response => response.json())
   .then(data => console.log(data));</code></pre>
                             </div>
@@ -334,7 +334,7 @@ fetch('https://quotifyapi.vercel.app/api?type=motivational')
                         <div class="tab-pane hidden" id="python">
                             <h4 class="text-lg font-semibold text-white mb-3">Using requests:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('import requests\n\n# Get random quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api\')\nquote = response.json()\nprint(quote)\n\n# Get love quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api?type=love\')\nquote = response.json()\nprint(quote)')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('import requests\n\n# Get random quote\nresponse = requests.get(\'https://quotify.dazzelr.tech/api\')\nquote = response.json()\nprint(quote)\n\n# Get love quote\nresponse = requests.get(\'https://quotify.dazzelr.tech/api?type=love\')\nquote = response.json()\nprint(quote)')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
@@ -343,12 +343,12 @@ fetch('https://quotifyapi.vercel.app/api?type=motivational')
                                 <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-python">import requests
 
 # Get random quote
-response = requests.get('https://quotifyapi.vercel.app/api')
+response = requests.get('https://quotify.dazzelr.tech/api')
 quote = response.json()
 print(quote)
 
 # Get love quote
-response = requests.get('https://quotifyapi.vercel.app/api?type=love')
+response = requests.get('https://quotify.dazzelr.tech/api?type=love')
 quote = response.json()
 print(quote)</code></pre>
                             </div>
@@ -357,7 +357,7 @@ print(quote)</code></pre>
                         <div class="tab-pane hidden" id="php">
                             <h4 class="text-lg font-semibold text-white mb-3">Using cURL:</h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, \'https://quotifyapi.vercel.app/api\');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\n\n$quote = json_decode($response, true);\necho $quote[\'quote\'][\'text\'];')">
+                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, \'https://quotify.dazzelr.tech/api\');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\n\n$quote = json_decode($response, true);\necho $quote[\'quote\'][\'text\'];')">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
@@ -365,7 +365,7 @@ print(quote)</code></pre>
                                 </button>
                                 <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-php">// Get random quote
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://quotifyapi.vercel.app/api');
+curl_setopt($ch, CURLOPT_URL, 'https://quotify.dazzelr.tech/api');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($ch);
 curl_close($ch);
@@ -396,7 +396,7 @@ echo $quote['quote']['text'];</code></pre>
                         <div class="flex-1">
                             <div class="grid grid-cols-1 sm:grid-cols-4 items-center bg-slate-900/80 border border-slate-600/50 rounded-2xl p-3 gap-3">
                                 <span class="px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg whitespace-nowrap flex items-center justify-center h-[44px] min-w-[60px]">GET</span>
-                                <span class="text-slate-400 text-sm sm:text-base whitespace-nowrap flex items-center h-[44px] px-2">https://quotifyapi.vercel.app</span>
+                                <span class="text-slate-400 text-sm sm:text-base whitespace-nowrap flex items-center h-[44px] px-2">https://quotify.dazzelr.tech</span>
                                 <div class="relative">
                                     <button id="dropdown-trigger" 
                                         class="w-full h-[44px] bg-slate-800 text-white border border-slate-600/50 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 min-w-0 flex items-center justify-between hover:bg-slate-700/80">
@@ -617,35 +617,35 @@ quotifyapi --help</code></pre>
                     <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
                         <h4 class="text-xl font-semibold mb-4 text-white">Direct API</h4>
                         <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Base URL: https://quotifyapi.vercel.app')">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Base URL: https://quotify.dazzelr.tech')">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 Copy
                             </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Base URL: https://quotifyapi.vercel.app</code></pre>
+                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Base URL: https://quotify.dazzelr.tech</code></pre>
                         </div>
                         <p class="text-slate-300 mb-4">Make HTTP requests directly to the API endpoints.</p>
                         
                         <h5 class="text-lg font-semibold mb-3 text-white">cURL Examples:</h5>
                         <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get random quote\ncurl https://quotifyapi.vercel.app/api\n\n# Get motivational quote\ncurl https://quotifyapi.vercel.app/api?type=motivational\n\n# Get available types\ncurl https://quotifyapi.vercel.app/api/types\n\n# Get API stats\ncurl https://quotifyapi.vercel.app/api/stats')">
+                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get random quote\ncurl https://quotify.dazzelr.tech/api\n\n# Get motivational quote\ncurl https://quotify.dazzelr.tech/api?type=motivational\n\n# Get available types\ncurl https://quotify.dazzelr.tech/api/types\n\n# Get API stats\ncurl https://quotify.dazzelr.tech/api/stats')">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 Copy
                             </button>
                             <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Get random quote
-curl https://quotifyapi.vercel.app/api
+curl https://quotify.dazzelr.tech/api
 
 # Get motivational quote
-curl https://quotifyapi.vercel.app/api?type=motivational
+curl https://quotify.dazzelr.tech/api?type=motivational
 
 # Get available types
-curl https://quotifyapi.vercel.app/api/types
+curl https://quotify.dazzelr.tech/api/types
 
 # Get API stats
-curl https://quotifyapi.vercel.app/api/stats</code></pre>
+curl https://quotify.dazzelr.tech/api/stats</code></pre>
                         </div>
                     </div>
 
