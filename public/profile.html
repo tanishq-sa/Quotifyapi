@@ -50,9 +50,9 @@
         }
     </script>
     <style>
-        /* Modern gradient background */
+        /* Solid black background */
         html, body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
+            background: #000000 !important;
             min-height: 100vh !important;
             overflow-x: hidden;
         }
@@ -337,7 +337,7 @@
                             <div class="grid grid-cols-3 gap-4">
                                 <div class="glass-dark rounded-xl p-6 text-center border border-white/10 hover:border-white/20 transition-all duration-300 group/stat">
                                     <div class="text-3xl font-bold text-blue-400 group-hover/stat:scale-110 transition-transform duration-200" id="totalRequests">0</div>
-                                    <div class="text-sm text-gray-400 mt-1">Total Requests</div>
+                                    <div class="text-sm text-gray-400 mt-1">Requests Left</div>
                                     <div class="text-xs text-gray-500 mt-1" id="totalLimitText">Free: 50/day</div>
                                     <div class="w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
                                         <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -474,7 +474,28 @@
                                             <!-- Plan badge will be added dynamically -->
                                         </div>
                                     </div>
+                                    <!-- Subscription Status (shown if canceled) -->
+                                    <div id="subscriptionStatus" class="hidden mt-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                                        <div class="flex items-center gap-2 text-orange-400 text-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="font-semibold">Subscription Canceled</span>
+                                        </div>
+                                        <p id="expiryMessage" class="text-xs text-orange-300 mt-1"></p>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <!-- Cancel Subscription Button (hidden by default, shown for paid plans) -->
+                            <div id="cancelSubscriptionSection" class="group/item hidden">
+                                <button id="cancelSubscriptionBtn" onclick="cancelSubscription()" class="w-full glass-dark hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-xl p-4 flex items-center justify-center gap-3 transition-all duration-300 group/cancel">
+                                    <svg class="w-5 h-5 text-red-400 group-hover/cancel:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    <span class="text-red-400 font-semibold">Cancel Subscription</span>
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2 text-center">Access continues until end of billing period</p>
                             </div>
                         </div>
 
@@ -669,32 +690,46 @@
                         const successRate = totalRequests > 0 ? 
                             Math.round((totalSuccessful / totalRequests) * 100) : 100;
                         
-                        // For free plan, show 50 as total limit, for pro show unlimited, otherwise show actual usage
+                        // Calculate requests left based on plan
                         const plan = usageData.plan || profileData.profile.plan || 'free';
-                        const totalLimit = plan === 'free' ? 50 : plan === 'pro' ? 'Unlimited' : totalRequests;
+                        const todayUsage = usageData.today_usage || 0;
+                        
+                        let requestsLeft;
+                        let dailyLimit;
+                        if (plan === 'free') {
+                            dailyLimit = 50;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'basic') {
+                            dailyLimit = 500;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'pro') {
+                            requestsLeft = 'Unlimited';
+                            dailyLimit = 'Unlimited';
+                        }
                         
                         console.log('API key path - Plan detection:', {
                             usageDataPlan: usageData.plan,
                             profileDataPlan: profileData.profile.plan,
                             finalPlan: plan,
-                            totalLimit: totalLimit,
-                            todayUsage: usageData.today_usage
+                            dailyLimit: dailyLimit,
+                            todayUsage: todayUsage,
+                            requestsLeft: requestsLeft
                         });
                         
-                        document.getElementById('totalRequests').textContent = totalLimit;
-                        document.getElementById('requestsToday').textContent = usageData.today_usage || 0;
+                        document.getElementById('totalRequests').textContent = requestsLeft;
+                        document.getElementById('requestsToday').textContent = todayUsage;
                         document.getElementById('successRate').textContent = `${successRate}%`;
                         
                         // Update progress bars
-                        updateProgressBars(plan, totalLimit, usageData.today_usage || 0, successRate);
+                        updateProgressBars(plan, requestsLeft, todayUsage, successRate);
                         
                         console.log('Updated usage stats (API key only):', {
-                            totalRequests: totalLimit,
-                            todayUsage: usageData.today_usage || 0,
+                            requestsLeft: requestsLeft,
+                            todayUsage: todayUsage,
                             successRate: `${successRate}%`
                         });
                     } else {
-                        // Fallback to plan-based limits
+                        // Fallback to plan-based limits (showing full limit as requests left since usage is 0)
                         const plan = profileData.profile.plan || 'free';
                         console.log('Fallback - Plan detection:', {
                             profileDataPlan: profileData.profile.plan,
@@ -898,28 +933,42 @@
                         const successRate = totalRequests > 0 ? 
                             Math.round((totalSuccessful / totalRequests) * 100) : 100;
                         
-                        // For free plan, show 50 as total limit, for pro show unlimited, otherwise show actual usage
+                        // Calculate requests left based on plan
                         const plan = usageData.plan || profileData.profile.plan || 'free';
-                        const totalLimit = plan === 'free' ? 50 : plan === 'pro' ? 'Unlimited' : totalRequests;
+                        const todayUsage = usageData.today_usage || 0;
+                        
+                        let requestsLeft;
+                        let dailyLimit;
+                        if (plan === 'free') {
+                            dailyLimit = 50;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'basic') {
+                            dailyLimit = 500;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'pro') {
+                            requestsLeft = 'Unlimited';
+                            dailyLimit = 'Unlimited';
+                        }
                         
                         console.log('Initial load - Plan detection:', {
                             usageDataPlan: usageData.plan,
                             profileDataPlan: profileData.profile.plan,
                             finalPlan: plan,
-                            totalLimit: totalLimit,
-                            todayUsage: usageData.today_usage
+                            dailyLimit: dailyLimit,
+                            todayUsage: todayUsage,
+                            requestsLeft: requestsLeft
                         });
                         
-                        document.getElementById('totalRequests').textContent = totalLimit;
-                        document.getElementById('requestsToday').textContent = usageData.today_usage || 0;
+                        document.getElementById('totalRequests').textContent = requestsLeft;
+                        document.getElementById('requestsToday').textContent = todayUsage;
                         document.getElementById('successRate').textContent = `${successRate}%`;
                         
                         // Update progress bars
-                        updateProgressBars(plan, totalLimit, usageData.today_usage || 0, successRate);
+                        updateProgressBars(plan, requestsLeft, todayUsage, successRate);
                         
                         console.log('Updated usage stats:', {
-                            totalRequests: totalLimit,
-                            todayUsage: usageData.today_usage || 0,
+                            requestsLeft: requestsLeft,
+                            todayUsage: todayUsage,
                             successRate: `${successRate}%`
                         });
                     }
@@ -1330,34 +1379,128 @@
             }
         }
 
-        // Function to update plan badge
-        function updatePlanBadge(plan) {
+        // Function to update plan badge and subscription status
+        function updatePlanBadge(plan, subscriptionStatus = null, expiryDate = null) {
             const badge = document.getElementById('planBadge');
             if (!badge) return;
             
             // Clear existing classes
             badge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide';
             
-            // Add plan-specific styling
+            const cancelSection = document.getElementById('cancelSubscriptionSection');
+            const statusSection = document.getElementById('subscriptionStatus');
+            const expiryMessage = document.getElementById('expiryMessage');
+            
+            // Check if subscription is canceled
+            const isCanceled = subscriptionStatus === 'canceled';
+            
+            // Show/hide subscription status
+            if (isCanceled && statusSection && expiryDate) {
+                statusSection.classList.remove('hidden');
+                const expiryDateObj = new Date(expiryDate);
+                if (expiryMessage) {
+                    expiryMessage.textContent = `Your ${plan} plan access will end on ${expiryDateObj.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}. You will then be moved to the Free plan.`;
+                }
+            } else if (statusSection) {
+                statusSection.classList.add('hidden');
+            }
+            
+            // Add plan-specific styling and show/hide cancel button
             switch(plan.toLowerCase()) {
                 case 'free':
                     badge.classList.add('bg-gray-500/20', 'text-gray-300', 'border', 'border-gray-400/30');
                     badge.textContent = 'Free';
+                    if (cancelSection) cancelSection.classList.add('hidden');
                     break;
                 case 'basic':
                     badge.classList.add('bg-blue-500/20', 'text-blue-300', 'border', 'border-blue-400/30');
                     badge.textContent = 'Basic';
+                    // Hide cancel button if already canceled
+                    if (cancelSection) {
+                        if (isCanceled) {
+                            cancelSection.classList.add('hidden');
+                        } else {
+                            cancelSection.classList.remove('hidden');
+                        }
+                    }
                     break;
                 case 'pro':
                     badge.classList.add('bg-gradient-to-r', 'from-purple-500/20', 'to-pink-500/20', 'text-purple-300', 'border', 'border-purple-400/30');
                     badge.textContent = 'Pro';
+                    // Hide cancel button if already canceled
+                    if (cancelSection) {
+                        if (isCanceled) {
+                            cancelSection.classList.add('hidden');
+                        } else {
+                            cancelSection.classList.remove('hidden');
+                        }
+                    }
                     break;
                 default:
                     badge.classList.add('bg-gray-500/20', 'text-gray-300', 'border', 'border-gray-400/30');
                     badge.textContent = plan;
+                    if (cancelSection) cancelSection.classList.add('hidden');
             }
             
             badge.classList.remove('hidden');
+        }
+
+        // Cancel subscription function
+        async function cancelSubscription() {
+            if (!confirm('Are you sure you want to cancel your subscription? You will be downgraded to the Free plan immediately.')) {
+                return;
+            }
+
+            const btn = document.getElementById('cancelSubscriptionBtn');
+            const originalContent = btn.innerHTML;
+            
+            try {
+                // Show loading state
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span class="text-red-400 font-semibold">Canceling...</span>
+                `;
+
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    throw new Error('Not authenticated');
+                }
+
+                const response = await fetch('/api/v1/payments/cancel-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to cancel subscription');
+                }
+
+                // Show success message
+                alert('✅ Subscription canceled successfully! You have been downgraded to the Free plan.');
+                
+                // Reload the page to reflect changes
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Error canceling subscription:', error);
+                alert('❌ Failed to cancel subscription: ' + error.message);
+                
+                // Restore button
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
         }
 
         // Auto-refresh usage statistics every 10 seconds
@@ -1389,27 +1532,41 @@
                     const successRate = totalRequests > 0 ? 
                         Math.round((totalSuccessful / totalRequests) * 100) : 100;
                     
-                    // Get user plan for display
+                    // Calculate requests left based on plan
                     const plan = usageData.plan || 'free';
-                    const totalLimit = plan === 'free' ? 50 : plan === 'pro' ? 'Unlimited' : totalRequests;
+                    const todayUsage = usageData.today_usage || 0;
+                    
+                    let requestsLeft;
+                    let dailyLimit;
+                    if (plan === 'free') {
+                        dailyLimit = 50;
+                        requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                    } else if (plan === 'basic') {
+                        dailyLimit = 500;
+                        requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                    } else if (plan === 'pro') {
+                        requestsLeft = 'Unlimited';
+                        dailyLimit = 'Unlimited';
+                    }
                     
                     console.log('Refresh - Plan detection:', {
                         usageDataPlan: usageData.plan,
                         finalPlan: plan,
-                        totalLimit: totalLimit,
-                        todayUsage: usageData.today_usage
+                        dailyLimit: dailyLimit,
+                        todayUsage: todayUsage,
+                        requestsLeft: requestsLeft
                     });
                     
                     // Update display
-                    document.getElementById('totalRequests').textContent = totalLimit;
+                    document.getElementById('totalRequests').textContent = requestsLeft;
                     document.getElementById('requestsToday').textContent = usageData.today_usage || 0;
                     document.getElementById('successRate').textContent = `${successRate}%`;
                     
                     // Update progress bars
-                    updateProgressBars(plan, totalLimit, usageData.today_usage || 0, successRate);
+                    updateProgressBars(plan, requestsLeft, usageData.today_usage || 0, successRate);
                     
                     console.log('Usage stats refreshed:', {
-                        totalRequests: totalLimit,
+                        requestsLeft: requestsLeft,
                         todayUsage: usageData.today_usage || 0,
                         successRate: `${successRate}%`
                     });

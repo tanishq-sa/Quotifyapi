@@ -54,9 +54,9 @@
         }
     </script>
     <style>
-        /* Modern gradient background */
+        /* Solid black background */
         html, body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
+            background: #000000 !important;
             min-height: 100vh !important;
             overflow-x: hidden;
         }
@@ -72,6 +72,21 @@
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Current plan styling */
+        .border-green-500\/50 {
+            position: relative;
+        }
+        
+        .border-green-500\/50::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2));
+            z-index: -1;
+            animation: pulse-slow 3s ease-in-out infinite;
         }
         
         /* Custom dropdown styling */
@@ -209,18 +224,13 @@
 
 <body class="font-inter min-h-screen text-white relative overflow-x-hidden">
     <!-- Animated background elements -->
-    <div class="fixed inset-0 -z-10">
+    <div class="fixed inset-0 -z-10 bg-black">
         <!-- Floating particles -->
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
-        
-        <!-- Gradient orbs -->
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"></div>
-        <div class="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-float" style="animation-delay: -2s;"></div>
-        <div class="absolute bottom-1/4 left-1/2 w-96 h-96 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-full blur-3xl animate-float" style="animation-delay: -4s;"></div>
         
         <!-- Grid pattern -->
         <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
@@ -275,12 +285,12 @@
                         </span>
                     </a>
                     
-                    <a href="https://github.com/tanishq-sa/Quotifyapi" target="_blank" class="group px-8 py-4 glass border border-white/20 text-white hover:border-white/40 font-semibold rounded-2xl transition-all duration-300 hover:bg-white/5">
+                    <a href="/profile" class="group px-8 py-4 glass border border-white/20 text-white hover:border-white/40 font-semibold rounded-2xl transition-all duration-300 hover:bg-white/5">
                         <span class="flex items-center gap-3">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
-                            View on GitHub
+                            Profile
                         </span>
                     </a>
                 </div>
@@ -1102,7 +1112,7 @@ echo $quote['quote']['text'];</code></pre>
                         </div>
                         
                         <p class="text-gray-400 mb-6 relative text-sm">Perfect for testing, learning, and small personal projects</p>
-                        <div class="glass-dark rounded-xl px-6 py-3 border border-white/10 hover:border-white/20 transition-all duration-300">
+                        <div data-plan="free" class="glass-dark rounded-xl px-6 py-3 border border-white/10 hover:border-white/20 transition-all duration-300">
                             <span class="text-green-400 font-semibold">Free Forever</span>
                         </div>
 
@@ -1591,131 +1601,77 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code>
         </main>
 
                 <!-- Footer -->
-        <footer class="mt-20 relative overflow-hidden">
-            <!-- Background Pattern -->
-            <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 opacity-50"></div>
-            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);"></div>
-            
-            <div class="relative z-10">
-                <!-- Main Footer Content -->
-                <div class="glass rounded-3xl mx-4 p-8 md:p-12">
-                    <!-- Logo and Tagline -->
-                    <div class="text-center mb-12">
-                        <div class="flex items-center justify-center gap-4 mb-6">
-                            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                                </svg>
-                        </div>
-                            <div>
-                                <h2 class="font-space text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">QuoteAPI</h2>
-                                <p class="text-gray-400 text-sm">Inspiring quotes for developers</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-300 text-lg mb-8">&copy; 2025 QuoteAPI. Built with ❤️ and Express.js</p>
-                    </div>
-                    
-                    <!-- Links Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                        <!-- Product -->
-                        <div>
-                            <h3 class="font-semibold text-white mb-6 text-lg">Product</h3>
-                            <div class="space-y-3">
-                                <a href="#overview" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Overview</a>
-                                <a href="#auth" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Authentication</a>
-                                <a href="#endpoints" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">API Endpoints</a>
-                                <a href="#examples" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Examples</a>
-                            </div>
-                        </div>
-                        
-                        <!-- Resources -->
-                        <div>
-                            <h3 class="font-semibold text-white mb-6 text-lg">Resources</h3>
-                            <div class="space-y-3">
-                                <a href="#rate-limits" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Rate Limits</a>
-                                <a href="#installation" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Installation</a>
-                                <a href="/login" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Login</a>
-                                <a href="/profile" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Profile</a>
-                            </div>
-                        </div>
-                        
-                        <!-- Support -->
-                        <div>
-                            <h3 class="font-semibold text-white mb-6 text-lg">Support</h3>
-                            <div class="space-y-3">
-                                <a href="/contact" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Contact Us</a>
-                                <a href="mailto:support@dazzelr.tech" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Email Support</a>
-                                <a href="/login" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Get API Key</a>
-                                <a href="/profile" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Account Management</a>
-                            </div>
-                        </div>
-                        
-                        <!-- Legal -->
-                        <div>
-                            <h3 class="font-semibold text-white mb-6 text-lg">Legal</h3>
-                            <div class="space-y-3">
-                                <a href="/privacy" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Privacy Policy</a>
-                                <a href="/terms" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Terms of Service</a>
-                                <a href="/refund" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Refund Policy</a>
-                                <a href="/cancellation" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Cancellation Policy</a>
-                                <a href="/shipping" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Digital Service Policy</a>
-                            </div>
-                        </div>
-                        
-                        <!-- Connect -->
-                        <div>
-                            <h3 class="font-semibold text-white mb-6 text-lg">Connect</h3>
-                            <div class="flex gap-3">
-                                <a href="mailto:support@dazzelr.tech" class="group relative">
-                                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center hover:from-green-400 hover:to-green-500 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                        </svg>
-                        </div>
-                                    <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Email</span>
-                                </a>
-                                <a href="/login" class="group relative">
-                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center hover:from-blue-400 hover:to-blue-500 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                                        </svg>
-                    </div>
-                                    <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Login</span>
-                                </a>
-                </div>
+        <footer class="mt-20 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 py-12">
+                <!-- Links Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                    <!-- Product -->
+                    <div>
+                        <h3 class="font-semibold text-white mb-4 text-sm">Product</h3>
+                        <div class="space-y-2">
+                            <a href="#overview" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Overview</a>
+                            <a href="#auth" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Authentication</a>
+                            <a href="#endpoints" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">API Endpoints</a>
+                            <a href="#examples" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Examples</a>
                         </div>
                     </div>
                     
-                    <!-- Copyright Notice -->
-                    <div class="glass-dark rounded-2xl p-6 mb-8">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-white mb-2">Copyright Notice</h4>
-                                <p class="text-gray-300 text-sm leading-relaxed">
-                                    QuoteAPI is a service that provides access to quotes. 
-                                    <strong class="text-white">We do not own, create, or claim ownership</strong> of any quotes provided through this API. 
-                        All quotes are the intellectual property of their respective authors, creators, and copyright holders. 
-                        This service operates as a collection and distribution platform only.
-                    </p>
-                            </div>
+                    <!-- Resources -->
+                    <div>
+                        <h3 class="font-semibold text-white mb-4 text-sm">Resources</h3>
+                        <div class="space-y-2">
+                            <a href="#rate-limits" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Rate Limits</a>
+                            <a href="/login" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Login</a>
+                            <a href="/profile" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Profile</a>
+                            <a href="/contact" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Contact</a>
                         </div>
+                    </div>
+                    
+                    <!-- Legal -->
+                    <div>
+                        <h3 class="font-semibold text-white mb-4 text-sm">Legal</h3>
+                        <div class="space-y-2">
+                            <a href="/privacy" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Privacy Policy</a>
+                            <a href="/terms" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Terms of Service</a>
+                            <a href="/refund" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Refund Policy</a>
+                            <a href="/cancellation" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Cancellation</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Connect -->
+                    <div>
+                        <h3 class="font-semibold text-white mb-4 text-sm">Connect</h3>
+                        <div class="space-y-2">
+                            <a href="mailto:support@dazzelr.tech" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Email Support</a>
+                            <a href="/login" class="block text-gray-400 hover:text-blue-400 transition-colors text-sm">Get API Key</a>
+                        </div>
+                    </div>
                 </div>
                 
-                    <!-- Bottom Bar -->
-                    <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 gap-4">
-                        <p class="text-gray-500 text-sm">Made with ❤️ by the QuoteAPI team</p>
-                        <div class="flex flex-wrap gap-6 text-sm">
-                            <a href="/contact" class="text-gray-500 hover:text-white transition-colors duration-300">Contact</a>
-                            <a href="/privacy" class="text-gray-500 hover:text-white transition-colors duration-300">Privacy</a>
-                            <a href="/terms" class="text-gray-500 hover:text-white transition-colors duration-300">Terms</a>
-                            <a href="/refund" class="text-gray-500 hover:text-white transition-colors duration-300">Refund</a>
-                            <a href="/login" class="text-gray-500 hover:text-white transition-colors duration-300">Login</a>
+                <!-- Copyright Notice -->
+                <div class="border-t border-gray-800 pt-8 mb-8">
+                    <div class="flex items-start gap-3 mb-4">
+                        <svg class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-white mb-2 text-sm">Copyright Notice</h4>
+                            <p class="text-gray-400 text-xs leading-relaxed max-w-3xl">
+                                QuoteAPI is a service that provides access to quotes. We do not own, create, or claim ownership of any quotes provided through this API. 
+                                All quotes are the intellectual property of their respective authors, creators, and copyright holders.
+                            </p>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Bar -->
+                <div class="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-gray-800 gap-4">
+                    <p class="text-gray-500 text-xs">&copy; 2025 QuoteAPI. Built with Express.js</p>
+                    <div class="flex gap-6 text-xs">
+                        <a href="/contact" class="text-gray-500 hover:text-blue-400 transition-colors">Contact</a>
+                        <a href="/privacy" class="text-gray-500 hover:text-blue-400 transition-colors">Privacy</a>
+                        <a href="/terms" class="text-gray-500 hover:text-blue-400 transition-colors">Terms</a>
+                        <a href="/login" class="text-gray-500 hover:text-blue-400 transition-colors">Login</a>
                     </div>
                 </div>
             </div>
@@ -1739,6 +1695,22 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code>
                         window.location.href = '/login';
                     }
                     return;
+                }
+
+                // Check if user is trying to upgrade to their current plan
+                const profileRes = await fetch('/api/v1/user/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const profileData = await profileRes.json();
+                
+                if (profileData.profile) {
+                    const currentPlan = (profileData.profile.plan || 'free').toLowerCase();
+                    const targetPlan = plan.toLowerCase();
+                    
+                    if (currentPlan === targetPlan) {
+                        alert('You are already subscribed to this plan!');
+                        return;
+                    }
                 }
                 
                 // Verify token is still valid by making a test request
@@ -1880,7 +1852,7 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code>
                             
                             if (verifyData.success) {
                                 const billingInfo = data.billingInfo || { period: 'monthly', duration: '10 years' };
-                                alert(`🎉 Subscription Successful! You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.\n\n₹${data.amount/100} will be charged monthly for ${billingInfo.duration}.`);
+                                alert(`🎉 Subscription Successful! You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.\n\n₹${data.amount/100} will be charged monthly.`);
                                 // Redirect to profile page to see updated plan
                                 window.location.href = '/profile';
                             } else {
@@ -1987,10 +1959,136 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code>
             }
         }
 
+        // Load user stats and current plan
+        async function loadUserStats() {
+            const token = localStorage.getItem('quotify_token');
+            if (!token) {
+                document.getElementById('userStatsSection').classList.add('hidden');
+                return;
+            }
+
+            try {
+                const [profileRes, usageRes] = await Promise.all([
+                    fetch('/api/v1/user/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch('/api/v1/user/usage', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                const profileData = await profileRes.json();
+                const usageData = await usageRes.json();
+
+                if (profileData.profile && usageData) {
+                    // Show stats section
+                    document.getElementById('userStatsSection').classList.remove('hidden');
+                    
+                    // Get user plan
+                    const userPlan = (profileData.profile.plan || 'free').toLowerCase();
+                    
+                    // Calculate stats
+                    const totalRequests = usageData.usage_stats ? 
+                        usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
+                    const totalSuccessful = usageData.usage_stats ? 
+                        usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
+                    const successRate = totalRequests > 0 ? 
+                        Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                    
+                    // Display stats
+                    document.getElementById('indexTotalRequests').textContent = totalRequests;
+                    document.getElementById('indexTodayRequests').textContent = usageData.today_usage || 0;
+                    document.getElementById('indexSuccessRate').textContent = `${successRate}%`;
+                    document.getElementById('indexSuccessBar').style.width = `${successRate}%`;
+                    
+                    // Display plan limit
+                    let planLimitText = '';
+                    if (userPlan === 'free') {
+                        planLimitText = 'Free: 50/day';
+                    } else if (userPlan === 'basic') {
+                        planLimitText = 'Basic: 500/day';
+                    } else if (userPlan === 'pro') {
+                        planLimitText = 'Pro: Unlimited';
+                    }
+                    document.getElementById('indexPlanLimit').textContent = planLimitText;
+                    
+                    // Mark current plan in pricing cards
+                    markCurrentPlan(userPlan);
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+                document.getElementById('userStatsSection').classList.add('hidden');
+            }
+        }
+
+        // Mark the current plan in pricing cards
+        function markCurrentPlan(userPlan) {
+            // Remove any existing badges
+            document.querySelectorAll('.current-plan-badge').forEach(badge => badge.remove());
+            
+            // Find the plan card to mark
+            const planElements = document.querySelectorAll('[data-plan]');
+            planElements.forEach(element => {
+                const cardPlan = element.getAttribute('data-plan');
+                const planCard = element.closest('.glass');
+                
+                if (cardPlan === userPlan) {
+                    // Add "Current Plan" badge
+                    const existingBadge = planCard.querySelector('.absolute.-top-3');
+                    if (existingBadge) {
+                        existingBadge.innerHTML = '<span class="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg current-plan-badge">✓ Current Plan</span>';
+                    }
+                    
+                    // Add visual border to current plan card
+                    planCard.classList.add('border-2', 'border-green-500/50');
+                    
+                    // Update the display element (button or div) to show it's current
+                    if (element.tagName === 'BUTTON') {
+                        element.disabled = true;
+                        element.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+                        element.classList.remove('hover:border-blue-500/50', 'hover:bg-blue-500/10', 'hover:border-purple-500/50', 'hover:bg-purple-500/10');
+                        element.innerHTML = `
+                            <div class="flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-green-400 font-semibold">Active Subscription</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Already subscribed</p>
+                        `;
+                        element.onclick = null;
+                    } else {
+                        // For free plan div
+                        element.classList.add('opacity-60', 'pointer-events-none');
+                        element.innerHTML = `
+                            <div class="flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-green-400 font-semibold">Active Plan</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Remove current plan styling from other cards
+                    planCard.classList.remove('border-2', 'border-green-500/50');
+                    
+                    // Re-enable buttons for other plans
+                    if (element.tagName === 'BUTTON') {
+                        element.disabled = false;
+                        element.classList.remove('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+                    }
+                }
+            });
+        }
+
         // Add hover effects to pricing buttons
         document.addEventListener('DOMContentLoaded', function() {
             // Check login status on page load
             checkLoginStatus();
+            
+            // Load user stats
+            loadUserStats();
             
             const pricingButtons = document.querySelectorAll('button[onclick^="initiatePayment"]');
             pricingButtons.forEach(button => {
@@ -2007,11 +2105,15 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code>
             window.addEventListener('storage', function(e) {
                 if (e.key === 'quotify_token') {
                     checkLoginStatus();
+                    loadUserStats();
                 }
             });
             
             // Check login status periodically (every 30 seconds)
-            setInterval(checkLoginStatus, 30000);
+            setInterval(() => {
+                checkLoginStatus();
+                loadUserStats();
+            }, 30000);
         });
     </script>
 </body>

@@ -79,6 +79,16 @@ async function authenticateFlexible(req, res, next) {
     try {
       const keyData = await database.validateApiKey(apiKey);
       if (keyData) {
+        // SECURITY: Prevent admins from using API keys
+        const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
+        if (keyData.email === ADMIN_EMAIL) {
+          console.log(`🚨 SECURITY ALERT: Admin attempted API key authentication: ${keyData.email} (IP: ${req.ip})`);
+          return res.status(403).json({
+            error: 'API key authentication not allowed',
+            message: 'Administrator accounts must use JWT authentication. Please login through the web interface.'
+          });
+        }
+        
         req.user = {
           id: keyData.user_id,
           email: keyData.email,
@@ -123,6 +133,16 @@ async function authenticateApiKey(req, res, next) {
       return res.status(403).json({
         error: 'Invalid API key',
         message: 'The provided API key is invalid or has been revoked'
+      });
+    }
+
+    // SECURITY: Prevent admins from using API keys
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
+    if (keyData.email === ADMIN_EMAIL) {
+      console.log(`🚨 SECURITY ALERT: Admin attempted API key authentication: ${keyData.email} (IP: ${req.ip})`);
+      return res.status(403).json({
+        error: 'API key authentication not allowed',
+        message: 'Administrator accounts must use JWT authentication. Please login through the web interface.'
       });
     }
 

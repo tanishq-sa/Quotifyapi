@@ -199,12 +199,15 @@ router.get('/users/:userId', validateUserId, async (req, res) => {
         name: user.name,
         plan: user.plan,
         role: user.role,
+        provider: user.provider || 'N/A',
         created_at: user.created_at,
-        updated_at: user.updated_at
+        updated_at: user.updated_at,
+        api_key_count: apiKeys ? apiKeys.length : 0,
+        today_requests: todayUsage || 0
       },
-      api_keys: apiKeys,
-      usage_stats: usageStats,
-      today_usage: todayUsage,
+      api_keys: apiKeys || [],
+      usage_stats: usageStats || [],
+      today_usage: todayUsage || 0,
       message: 'User details retrieved successfully'
     });
   } catch (error) {

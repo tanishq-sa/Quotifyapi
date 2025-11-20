@@ -50,9 +50,9 @@
         }
     </script>
     <style>
-        /* Modern gradient background */
+        /* Solid black background */
         html, body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
+            background: #000000 !important;
             min-height: 100vh !important;
             overflow-x: hidden;
         }
@@ -897,28 +897,28 @@
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">API Keys:</span>
-                                    <span class="text-white ml-2">${user.api_key_count !== null ? user.api_key_count : 'N/A'}</span>
+                                    <span class="text-white ml-2">${user.api_key_count !== undefined && user.api_key_count !== null ? user.api_key_count : 0}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    ${apiKeys.length > 0 ? `
-                        <div class="glass rounded-2xl p-6">
+                    ${apiKeys && apiKeys.length > 0 ? `
+                        <div class="glass rounded-2xl p-6 mt-6">
                             <h4 class="text-lg font-semibold text-white mb-4 font-space">API Keys</h4>
-                            <div class="space-y-3">
-                                                                    ${apiKeys.map(key => `
-                                    <div class="flex justify-between items-center bg-white/5 rounded-xl p-4">
-                                        <div>
-                                            <div class="text-white font-medium">${key.name}</div>
-                                            <div class="text-white/60 text-sm">${key.key_value}</div>
-                                            <div class="text-white/40 text-xs">Created: ${new Date(key.created_at).toLocaleDateString()}</div>
+                            <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                                ${apiKeys.map((key, index) => `
+                                    <div class="flex justify-between items-center bg-white/5 rounded-xl p-4 border border-white/10">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-white font-medium">${key.name || `API Key #${index + 1}`}</div>
+                                            <div class="text-white/60 text-sm font-mono break-all">${key.key_value || key.api_key || 'N/A'}</div>
+                                            <div class="text-white/40 text-xs mt-1">Created: ${new Date(key.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                                         </div>
-                                        <div class="flex items-center space-x-2">
-                                            <span class="px-2 py-1 rounded text-xs ${key.is_active ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}">
-                                                ${key.is_active ? 'Active' : 'Inactive'}
+                                        <div class="flex items-center space-x-2 ml-4">
+                                            <span class="px-3 py-1 rounded-lg text-xs font-semibold ${key.is_active || key.is_active === undefined ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}">
+                                                ${key.is_active || key.is_active === undefined ? 'Active' : 'Inactive'}
                                             </span>
-                                            <button onclick="copyToClipboard('${key.key_value}')" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded text-xs transition-colors">
+                                            <button onclick="copyToClipboard('${key.key_value || key.api_key}')" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs transition-colors border border-blue-500/30 hover:border-blue-400/50">
                                                 Copy
                                             </button>
                                         </div>
@@ -926,7 +926,17 @@
                                 `).join('')}
                             </div>
                         </div>
-                    ` : ''}
+                    ` : `
+                        <div class="glass rounded-2xl p-6 mt-6">
+                            <h4 class="text-lg font-semibold text-white mb-4 font-space">API Keys</h4>
+                            <div class="text-center py-8 text-white/60">
+                                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                                <p>No API keys found for this user</p>
+                            </div>
+                        </div>
+                    `}
                 `;
                 
                 // Show modal
