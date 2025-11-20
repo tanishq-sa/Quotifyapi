@@ -152,8 +152,18 @@
         
         /* Admin badge animation */
         .admin-badge {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
         }
         
         /* Table row hover effect */
@@ -188,26 +198,49 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="glass border-b border-white/20 sticky top-0 z-50">
+    <nav class="glass border-b border-white/10 sticky top-0 z-50 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <h1 class="text-2xl font-bold text-white font-space">
-                        Admin Dashboard - Quotify
-                    </h1>
-                    <span class="admin-badge text-white text-xs px-3 py-1 rounded-full font-semibold">
+            <div class="flex justify-between items-center h-20">
+                <!-- Left side -->
+                <div class="flex items-center gap-6">
+                    <!-- Logo/Icon -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-white font-space">
+                                Admin Dashboard
+                            </h1>
+                            <p class="text-xs text-white/60">Quotify API</p>
+                        </div>
+                    </div>
+                    <span class="admin-badge text-white text-xs px-3 py-1.5 rounded-full font-bold tracking-wide">
                         ADMIN
                     </span>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="/profile" class="text-white/80 hover:text-white transition-colors duration-200 font-medium">
-                        Profile
+                
+                <!-- Right side -->
+                <div class="flex items-center gap-3">
+                    <a href="/" class="flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200 px-4 py-2 rounded-xl hover:bg-white/10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <span class="font-medium hidden sm:inline">Home</span>
                     </a>
-                    <a href="/" class="text-white/80 hover:text-white transition-colors duration-200 font-medium">
-                        Home
+                    <a href="/profile" class="flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200 px-4 py-2 rounded-xl hover:bg-white/10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span class="font-medium hidden sm:inline">Profile</span>
                     </a>
-                    <button onclick="logout()" class="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium">
-                        Logout
+                    <button onclick="logout()" class="flex items-center gap-2 bg-red-500/80 hover:bg-red-500 border border-red-500/50 hover:border-red-400 text-white px-5 py-2.5 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-red-500/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Logout</span>
                     </button>
                 </div>
             </div>
@@ -217,22 +250,24 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Welcome Section -->
-        <div class="text-center mb-16">
-            <h2 class="text-5xl font-bold text-white mb-6 font-space animate-fade-in">
-                System Overview
-            </h2>
-            <p class="text-white/80 text-xl animate-slide-up">
-                Monitor users, manage plans, and track API usage
-            </p>
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-white font-space mb-2">System Overview</h2>
+            <p class="text-white/60">Monitor users, manage plans, and track API usage</p>
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            <div class="glass rounded-2xl p-8 stats-card animate-slide-up">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="glass rounded-2xl p-6 stats-card animate-slide-up border border-white/10 hover:border-white/20">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-white/60 text-sm font-medium mb-2">Total Users</p>
-                        <p class="text-4xl font-bold text-white font-space" id="totalUsers">-</p>
+                        <p class="text-3xl font-bold text-white font-space" id="totalUsers">-</p>
+                        <div class="mt-2 flex items-center gap-2 text-xs text-green-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            <span>Active accounts</span>
+                        </div>
                     </div>
                     <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center neon-blue">
                         <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -581,9 +616,11 @@
         // Check authentication
         function checkAuth() {
             const token = localStorage.getItem('quotify_token');
-            const apiKey = localStorage.getItem('apiKey');
             
-            if (!token && !apiKey) {
+            // Admin panel requires JWT authentication only
+            if (!token) {
+                console.log('Admin authentication required: Redirecting to login...');
+                alert('Administrator accounts must use JWT authentication. Please login through the web interface.');
                 window.location.href = '/login';
                 return false;
             }
@@ -594,33 +631,14 @@
         async function loadStats() {
             try {
                 const token = localStorage.getItem('quotify_token');
-                let apiKey = localStorage.getItem('apiKey');
                 
-                // If no API key in localStorage, try to get it from the server
-                if (!apiKey && token) {
-                    try {
-                        const keysResponse = await fetch('/api/v1/admin/keys', {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (keysResponse.ok) {
-                            const keysData = await keysResponse.json();
-                            const activeKey = keysData.api_keys.find(key => key.is_active);
-                            if (activeKey) {
-                                apiKey = activeKey.key_value;
-                                localStorage.setItem('apiKey', apiKey);
-                                console.log('✅ API key loaded from server and stored in localStorage');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error fetching API key:', error);
-                    }
+                if (!token) {
+                    throw new Error('Authentication required');
                 }
                 
                 const response = await fetch('/api/v1/admin/stats', {
                     headers: {
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 
@@ -654,31 +672,13 @@
                 console.log('Auth token:', token ? 'Present' : 'Missing');
                 console.log('API key:', apiKey ? 'Present' : 'Missing');
                 
-                // If no API key in localStorage, try to get it from the server
-                if (!apiKey && token) {
-                    try {
-                        const keysResponse = await fetch('/api/v1/admin/keys', {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (keysResponse.ok) {
-                            const keysData = await keysResponse.json();
-                            const activeKey = keysData.api_keys.find(key => key.is_active);
-                            if (activeKey) {
-                                apiKey = activeKey.key_value;
-                                localStorage.setItem('apiKey', apiKey);
-                                console.log('✅ API key loaded from server and stored in localStorage');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error fetching API key:', error);
-                    }
+                if (!token) {
+                    throw new Error('Authentication required');
                 }
                 
                 const response = await fetch('/api/v1/admin/users', {
                     headers: {
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 console.log('Users response status:', response.status);
@@ -754,15 +754,16 @@
         async function updateUserPlan(userId, plan) {
             try {
                 const token = localStorage.getItem('quotify_token');
-                const apiKey = localStorage.getItem('apiKey');
-                
+
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
+
                 const response = await fetch(`/api/v1/admin/users/${userId}/plan`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ plan })
                 });
@@ -809,14 +810,15 @@
         async function showUserDetails(userId) {
             try {
                 const token = localStorage.getItem('quotify_token');
-                const apiKey = localStorage.getItem('apiKey');
+                
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
                 
                 // Get user details
                 const userResponse = await fetch(`/api/v1/admin/users/${userId}`, {
                     headers: {
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 
@@ -1096,11 +1098,16 @@
                 createButton.disabled = true;
 
                 // Create user and API key
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    throw new Error('Authentication required. Please login again.');
+                }
+                
                 const response = await fetch('/api/v1/admin/users/create-with-key', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': localStorage.getItem('apiKey')
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         username: username,
@@ -1219,15 +1226,16 @@
 
             try {
                 const token = localStorage.getItem('quotify_token');
-                const apiKey = localStorage.getItem('apiKey');
-                
+
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
+
                 const response = await fetch(`/api/v1/admin/users/${userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
@@ -1348,15 +1356,16 @@
                 
                 // Update plan via API
                 const token = localStorage.getItem('quotify_token');
-                const apiKey = localStorage.getItem('apiKey');
+                
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
                 
                 const response = await fetch(`/api/v1/admin/users/${currentUserId}/plan`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? 
-                            { 'Authorization': `Bearer ${token}` } : 
-                            { 'x-api-key': apiKey })
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ plan })
                 });
