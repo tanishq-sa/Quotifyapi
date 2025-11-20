@@ -1,5 +1,5 @@
 const express = require('express');
-const database = require('../database');
+const database = require('../database-adapter');
 const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('../quotes');
 
 const router = express.Router();

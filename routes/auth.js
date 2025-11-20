@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { generateToken, authenticateJWT, authenticateFlexible } = require('../auth');
-const database = require('../database');
+const database = require('../database-adapter');
 
 const router = express.Router();
 

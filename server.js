@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const { inject } = require('@vercel/analytics');
 const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('./quotes');
-const database = require('./database');
+const database = require('./database-adapter');
 const { configurePassport, authenticateFlexible } = require('./auth');
 
 // Import route modules
