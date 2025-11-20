@@ -25,28 +25,39 @@ class PostgresDatabase {
       // Create connection pool
       this.pool = new Pool({
         connectionString: connectionString,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: { rejectUnauthorized: false }, // Always use SSL for remote connections
         max: 20, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 10000, // Increased timeout for serverless cold starts
+        connectionTimeoutMillis: 20000, // Increased timeout for Aiven/serverless
+        statement_timeout: 30000, // Query timeout
+        query_timeout: 30000,
       });
 
       // Test connection with retry logic
-      let retries = 3;
+      let retries = 2;
       let connected = false;
+      let lastError = null;
       
       while (retries > 0 && !connected) {
         try {
           const client = await this.pool.connect();
           console.log('✅ Connected to PostgreSQL database');
+          console.log('   Host:', connectionString.split('@')[1]?.split('/')[0]);
           client.release();
           connected = true;
         } catch (err) {
+          lastError = err;
           retries--;
-          if (retries === 0) throw err;
-          console.log(`⚠️  Database connection attempt failed, retrying... (${retries} attempts left)`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log(`⚠️  Database connection attempt failed: ${err.message}`);
+          if (retries > 0) {
+            console.log(`   Retrying... (${retries} attempts left)`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
         }
+      }
+      
+      if (!connected) {
+        throw lastError;
       }
 
       // Set up cleanup interval for rate limiting
