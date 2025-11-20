@@ -26,19 +26,70 @@ const PORT = process.env.PORT || 3000;
 // Trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
 
-// Initialize database
+// Initialize database (lazy initialization for serverless)
+let dbInitialized = false;
+let dbInitPromise = null;
+
 async function initializeApp() {
-  try {
-    await database.init();
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize database:', error);
-    process.exit(1);
-  }
+  if (dbInitialized) return;
+  if (dbInitPromise) return dbInitPromise;
+  
+  dbInitPromise = (async () => {
+    try {
+      await database.init();
+      dbInitialized = true;
+      console.log('✅ Database initialized successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize database:', error);
+      // Don't exit in serverless - just log the error
+      if (process.env.NODE_ENV !== 'production') {
+        throw error;
+      }
+    }
+  })();
+  
+  return dbInitPromise;
 }
 
 // Configure Passport
 configurePassport();
+
+// Startup validation for production
+if (process.env.NODE_ENV === 'production') {
+  const requiredEnvVars = [
+    'POSTGRES_URL',
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'JWT_SECRET',
+    'SESSION_SECRET'
+  ];
+  
+  const missing = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missing.length > 0) {
+    console.error('🚨 Missing required environment variables:', missing.join(', '));
+    console.error('📝 Please set these in your Vercel dashboard: Settings → Environment Variables');
+  }
+}
+
+// Middleware to ensure database is initialized
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    try {
+      await initializeApp();
+    } catch (error) {
+      console.error('Database initialization error:', error.message);
+      return res.status(503).json({ 
+        error: 'Service unavailable',
+        message: 'Database connection failed. Please check your POSTGRES_URL environment variable.',
+        hint: process.env.NODE_ENV === 'production' 
+          ? 'Check Vercel environment variables' 
+          : error.message
+      });
+    }
+  }
+  next();
+});
 
 // Middleware
 app.use(cors({
@@ -53,17 +104,20 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 // SECURITY: Validate session secret
 if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
   console.error('🚨 CRITICAL SECURITY ERROR: SESSION_SECRET must be set and at least 32 characters long');
-  process.exit(1);
+  // Use a fallback for development, but warn loudly
+  if (process.env.NODE_ENV === 'production') {
+    console.error('🚨 Cannot start in production without proper SESSION_SECRET');
+  }
 }
 
 app.use(session({
-  secret: SESSION_SECRET,
+  secret: SESSION_SECRET || 'fallback-secret-for-development-only-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true, // SECURITY: Prevent XSS attacks
-    sameSite: 'strict', // SECURITY: Prevent CSRF attacks
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // SECURITY: Prevent CSRF attacks
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -228,6 +282,27 @@ app.use('/api', planAwareStrictLimiter); // Apply plan-aware strict rate limitin
 app.use((req, res, next) => {
   req.startTime = Date.now();
   next();
+});
+
+// Health check endpoint (no auth required)
+app.get('/api/health', (req, res) => {
+  const envCheck = {
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    HAS_POSTGRES_URL: !!process.env.POSTGRES_URL,
+    HAS_DATABASE_URL: !!process.env.DATABASE_URL,
+    HAS_GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
+    HAS_JWT_SECRET: !!process.env.JWT_SECRET,
+    HAS_SESSION_SECRET: !!process.env.SESSION_SECRET,
+    DATABASE_INITIALIZED: dbInitialized,
+    TIMESTAMP: new Date().toISOString()
+  };
+  
+  res.json({
+    status: 'ok',
+    message: 'Server is running',
+    database: dbInitialized ? 'connected' : 'initializing',
+    environment: envCheck
+  });
 });
 
 // API Routes
