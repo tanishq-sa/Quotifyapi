@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const database = require('./database');
+const database = require('./database-adapter');
 
 // JWT Configuration
 const JWT_SECRET = process.env.JWT_SECRET;

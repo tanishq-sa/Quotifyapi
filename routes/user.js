@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateJWT, authenticateFlexible } = require('../auth');
-const database = require('../database');
+const database = require('../database-adapter');
 
 const router = express.Router();
 

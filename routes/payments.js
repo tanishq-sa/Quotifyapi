@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
 const { authenticateJWT } = require('../auth');
-const database = require('../database');
+const database = require('../database-adapter');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
