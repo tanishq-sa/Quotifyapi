@@ -455,6 +455,7 @@ const motivationalQuotes = [
     text: "With the new day comes new strength and new thoughts.",
     author: "Eleanor Roosevelt"
   }
+  
 ];
 
 module.exports = motivationalQuotes; 

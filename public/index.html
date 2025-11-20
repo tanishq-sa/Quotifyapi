@@ -4,25 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote API - Beautiful Quote API Documentation</title>
+    <title>Quotify API - Premium Quote API with Authentication</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         'inter': ['Inter', 'sans-serif'],
+                        'space': ['Space Grotesk', 'sans-serif'],
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'bounce-slow': 'bounce 2s infinite',
                         'gradient': 'gradient 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
                     },
                     keyframes: {
                         float: {
@@ -32,6 +35,18 @@
                         gradient: {
                             '0%, 100%': { backgroundPosition: '0% 50%' },
                             '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
+                            '100%': { boxShadow: '0 0 30px rgba(59, 130, 246, 0.8)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
                         }
                     }
                 }
@@ -39,27 +54,125 @@
         }
     </script>
     <style>
-        /* Ensure dark background is enforced */
+        /* Modern gradient background */
         html, body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
             min-height: 100vh !important;
+            overflow-x: hidden;
         }
         
-        /* Force dark theme on all elements */
-        * {
-            color-scheme: dark;
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Ensure content sections maintain dark theme */
-        .bg-slate-800\/50 {
-            background-color: rgba(30, 41, 59, 0.5) !important;
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .bg-slate-700\/50 {
-            background-color: rgba(51, 65, 85, 0.5) !important;
+        /* Custom dropdown styling */
+        #endpoint-select {
+            background-image: none;
         }
         
-        /* Make code blocks completely non-interactive */
+        #endpoint-select:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+        
+        #endpoint-select option {
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 12px;
+        }
+        
+        #endpoint-select option:hover {
+            background-color: #374151;
+        }
+        
+        /* Custom scrollbar for dropdown */
+        #endpoint-select::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #endpoint-select::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        #endpoint-select::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        #endpoint-select::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* JSON syntax highlighting customization */
+        .language-json {
+            background: transparent !important;
+        }
+        
+        .language-json .token.string {
+            color: #a5d6a7 !important; /* Light green for strings */
+        }
+        
+        .language-json .token.number {
+            color: #81c784 !important; /* Green for numbers */
+        }
+        
+        .language-json .token.boolean {
+            color: #ffb74d !important; /* Orange for booleans */
+        }
+        
+        .language-json .token.property {
+            color: #90caf9 !important; /* Light blue for keys */
+        }
+        
+        .language-json .token.punctuation {
+            color: #e0e0e0 !important; /* Light gray for punctuation */
+        }
+        
+        .language-json .token.operator {
+            color: #e0e0e0 !important; /* Light gray for operators */
+        }
+        
+        /* Neon glow effects */
+        .neon-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .neon-purple {
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+        }
+        
+        .neon-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #2563eb, #7c3aed);
+        }
+        
+        /* Make code blocks non-interactive */
         pre code {
             cursor: default !important;
             user-select: text !important;
@@ -77,67 +190,171 @@
             pointer-events: auto !important;
             cursor: pointer !important;
         }
+        
+        /* Animated background particles */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; top: 20%; left: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; top: 60%; left: 80%; animation-delay: 2s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; top: 80%; left: 40%; animation-delay: 4s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; top: 40%; left: 60%; animation-delay: 1s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; top: 70%; left: 10%; animation-delay: 3s; }
     </style>
 </head>
 
-<body
-    class="font-inter bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 min-h-screen text-slate-100 relative overflow-x-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;">
+<body class="font-inter min-h-screen text-white relative overflow-x-hidden">
     <!-- Animated background elements -->
     <div class="fixed inset-0 -z-10">
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float"></div>
-        <div class="absolute top-3/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float"
-            style="animation-delay: -2s;"></div>
-        <div class="absolute bottom-1/4 left-1/2 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-float"
-            style="animation-delay: -4s;"></div>
+        <!-- Floating particles -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        
+        <!-- Gradient orbs -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-float" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-1/4 left-1/2 w-96 h-96 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-full blur-3xl animate-float" style="animation-delay: -4s;"></div>
+        
+        <!-- Grid pattern -->
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <header id="header"
-            class="relative bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600 py-16 text-center border-b border-slate-600/30 mb-8 overflow-hidden">
-            <!-- Shimmer effect -->
-            <div
-                class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-gradient">
+        <header id="header" class="relative py-20 text-center mb-16 overflow-hidden">
+            <!-- Hero content -->
+            <div class="relative z-10 animate-fade-in">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-8 animate-slide-up">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium text-green-400">API v1.0 - Now Live</span>
             </div>
 
-            <div class="relative z-10">
-                <h1
-                    class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent animate-pulse-slow">
-                    💬 Quotify API
+                <!-- Main heading -->
+                <h1 class="font-space text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 animate-slide-up" style="animation-delay: 0.2s;">
+                    <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Quotify
+                    </span>
+                    <br>
+                    <span class="text-white">API</span>
                 </h1>
-                <p class="text-lg sm:text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto px-4">
-                    Beautiful, fast, and reliable quote API
+                
+                <!-- Subtitle -->
+                <p class="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-12 max-w-4xl mx-auto px-4 font-light animate-slide-up" style="animation-delay: 0.4s;">
+                    Premium Quote API with 
+                    <span class="text-blue-400 font-semibold">Authentication</span>, 
+                    <span class="text-purple-400 font-semibold">Rate Limiting</span>, and 
+                    <span class="text-green-400 font-semibold">Tier-based Access</span>
                 </p>
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-                    <a href="#try-it"
-                        class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base">
-                        🚀 Try It Now
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center px-4 animate-slide-up" style="animation-delay: 0.6s;">
+                    <a href="#auth" class="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded-2xl shadow-2xl transform hover:-translate-y-2 transition-all duration-300 neon-blue">
+                        <span class="relative z-10 flex items-center gap-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            Get Started Free
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
                     </a>
-                    <a href="https://github.com/tanishq-sa/Quotifyapi"
-                        class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
-                        target="_blank">
-                        📚 GitHub
+                    
+                    <a href="#try-it" class="group px-8 py-4 glass border border-white/20 text-white hover:border-white/40 font-semibold rounded-2xl transition-all duration-300 hover:bg-white/5">
+                        <span class="flex items-center gap-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Try API
+                        </span>
                     </a>
+                    
+                    <a href="https://github.com/tanishq-sa/Quotifyapi" target="_blank" class="group px-8 py-4 glass border border-white/20 text-white hover:border-white/40 font-semibold rounded-2xl transition-all duration-300 hover:bg-white/5">
+                        <span class="flex items-center gap-3">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            View on GitHub
+                        </span>
+                    </a>
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto animate-slide-up" style="animation-delay: 0.8s;">
+                    <div class="glass rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-bold text-blue-400 mb-2">5+</div>
+                        <div class="text-gray-300">Quote Categories</div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-bold text-purple-400 mb-2">3</div>
+                        <div class="text-gray-300">Pricing Tiers</div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-bold text-green-400 mb-2">99.9%</div>
+                        <div class="text-gray-300">Uptime</div>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Navigation -->
-        <nav class="sticky top-2 sm:top-4 z-50 mb-8 sm:mb-12 px-2">
-            <div class="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-3 sm:p-4 shadow-2xl">
-                <div class="flex flex-wrap gap-2 sm:gap-4 justify-center">
-                    <a href="#overview"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Overview</a>
-                    <a href="#endpoints"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Endpoints</a>
-                    <a href="#examples"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Examples</a>
-                    <a href="#try-it"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Try It</a>
-                    <a href="#rate-limits"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Rate Limits</a>
-                    <a href="#installation"
-                        class="px-3 py-2 sm:px-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base">Installation</a>
+        <nav class="sticky top-4 z-50 mb-12 px-2">
+            <div class="glass rounded-3xl p-4 shadow-2xl">
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <a href="#overview" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Overview
+                        </span>
+                    </a>
+                    <a href="/login" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                            </svg>
+                            Login
+                        </span>
+                    </a>
+                    <a href="#endpoints" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            API
+                        </span>
+                    </a>
+                    <a href="#try-it" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Try It
+                        </span>
+                    </a>
+                    <a href="#rate-limits" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Limits
+                        </span>
+                    </a>
+                    <a href="/profile" class="nav-link px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 font-medium rounded-xl transition-all duration-300 text-sm">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Profile
+                        </span>
+                    </a>
                 </div>
             </div>
         </nav>
@@ -145,233 +362,526 @@
         <!-- Main Content -->
         <main class="main">
             <!-- Overview Section -->
-            <section id="overview"
-                class="mb-12 sm:mb-16 p-4 sm:p-6 md:p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl shadow-2xl">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white relative">
-                    Overview
-                    <div
-                        class="absolute bottom-0 left-0 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
-                    </div>
+            <section id="overview" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Why Choose
+                        </span>
+                        <br>
+                        <span class="text-white">Quotify API?</span>
                 </h2>
-                <p class="text-lg text-slate-300 mb-8 max-w-4xl">
-                    The Quote API provides a simple and elegant way to access inspirational quotes across multiple
-                    categories. Built with Express.js and designed for performance, it's perfect for developers building
-                    applications that need motivational content.
-                </p>
-                
-                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 mb-12 max-w-4xl mx-auto shadow-lg">
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-500/30">
-                            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        The most advanced quote API with enterprise-grade features, built for modern applications
+                    </p>
+                </div>
+
+                <!-- Notice Card -->
+                <div class="glass rounded-3xl p-8 mb-16 max-w-4xl mx-auto border border-amber-500/30">
+                    <div class="flex items-start gap-6">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center border border-amber-500/30">
+                            <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
-                                <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                        <div class="flex-1">
+                            <h4 class="text-2xl font-bold text-amber-400 mb-4 flex items-center gap-3">
+                                <span class="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></span>
                                 Important Notice
                             </h4>
-                            <p class="text-amber-100 text-base leading-relaxed">
+                            <p class="text-amber-100 text-lg leading-relaxed">
                                 <strong class="text-amber-300">Quotify API does not own the quotes</strong> provided through this service. All quotes are the intellectual property of their respective authors, creators, and copyright holders. This API serves as a collection and distribution platform only. Please respect the original authors' rights and ensure proper attribution when using these quotes in your applications.
                             </p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Features Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div
-                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
-                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🚀</div>
-                        <h3 class="text-xl font-semibold mb-3 text-white">Fast & Reliable</h3>
-                        <p class="text-slate-300">Built with Express.js and optimized for performance</p>
+                    <div class="group glass rounded-3xl p-8 text-center hover:bg-white/10 transform hover:-translate-y-4 transition-all duration-500 hover:shadow-2xl animate-slide-up relative overflow-hidden" style="animation-delay: 0.1s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative w-20 h-20 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
                     </div>
-                    <div
-                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
-                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🛡️</div>
-                        <h3 class="text-xl font-semibold mb-3 text-white">Secure</h3>
-                        <p class="text-slate-300">Rate limiting, security headers, and abuse protection</p>
+                        <h3 class="text-2xl font-bold mb-4 text-white relative">Lightning Fast</h3>
+                        <p class="text-gray-300 leading-relaxed relative">Built with Express.js and optimized for performance with sub-100ms response times</p>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-lg"></div>
                     </div>
-                    <div
-                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
-                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">📚</div>
-                        <h3 class="text-xl font-semibold mb-3 text-white">Rich Content</h3>
-                        <p class="text-slate-300">Multiple categories: happy, sad, love, motivational, wisdom</p>
+                    
+                    <div class="group glass rounded-3xl p-8 text-center hover:bg-white/10 transform hover:-translate-y-4 transition-all duration-500 hover:shadow-2xl animate-slide-up relative overflow-hidden" style="animation-delay: 0.2s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative w-20 h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
                     </div>
-                    <div
-                        class="group p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center hover:bg-slate-700/70 hover:border-slate-500/50 transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
-                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🌐</div>
-                        <h3 class="text-xl font-semibold mb-3 text-white">Easy Integration</h3>
-                        <p class="text-slate-300">Simple REST API with comprehensive documentation</p>
+                        <h3 class="text-2xl font-bold mb-4 text-white relative">Enterprise Security</h3>
+                        <p class="text-gray-300 leading-relaxed relative">Advanced authentication, rate limiting, and security headers for production use</p>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-lg"></div>
                     </div>
+                    
+                    <div class="group glass rounded-3xl p-8 text-center hover:bg-white/10 transform hover:-translate-y-4 transition-all duration-500 hover:shadow-2xl animate-slide-up relative overflow-hidden" style="animation-delay: 0.3s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative w-20 h-20 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-white relative">Rich Content</h3>
+                        <p class="text-gray-300 leading-relaxed relative">5+ categories with thousands of curated quotes from renowned authors</p>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full blur-lg"></div>
+                    </div>
+                    
+                    <div class="group glass rounded-3xl p-8 text-center hover:bg-white/10 transform hover:-translate-y-4 transition-all duration-500 hover:shadow-2xl animate-slide-up relative overflow-hidden" style="animation-delay: 0.4s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative w-20 h-20 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg class="w-10 h-10 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-white relative">Developer First</h3>
+                        <p class="text-gray-300 leading-relaxed relative">RESTful API with comprehensive documentation and SDKs</p>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full blur-lg"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication Section -->
+            <section id="auth" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            🔐 Authentication
+                        </span>
+                    </h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Secure your API access with enterprise-grade authentication
+                    </p>
+                </div>
+                
+                <!-- Security Notice -->
+                <div class="glass rounded-3xl p-8 mb-16 max-w-4xl mx-auto border border-blue-500/30">
+                    <div class="flex items-start gap-6">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center border border-blue-500/30">
+                            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-2xl font-bold text-blue-400 mb-4 flex items-center gap-3">
+                                <span class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span>
+                                Secure API Access Required
+                            </h4>
+                            <p class="text-blue-100 text-lg leading-relaxed">
+                                <strong class="text-blue-300">This API now requires authentication!</strong> 
+                                All quote endpoints require a valid API key. Get started by signing in with Google to receive your API key and access our premium features.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auth Features Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.1s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white">API Key Authentication</h3>
+                        </div>
+                        <p class="text-gray-300 mb-6 relative">All quote endpoints require an API key in the request header:</p>
+                        <div class="glass-dark rounded-2xl p-4 mb-6 border border-white/10 hover:border-white/20 transition-all duration-300">
+                            <code class="text-green-400 text-lg font-mono">x-api-key: your-api-key-here</code>
+                        </div>
+                        <p class="text-gray-300 text-sm relative">Get your API key by signing in with Google below.</p>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.2s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white">Tier-Based Access</h3>
+                        </div>
+                        <div class="space-y-4 relative">
+                            <div class="flex justify-between items-center p-4 glass-dark rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                                <span class="text-gray-300 font-medium">Free Plan:</span>
+                                <span class="text-green-400 font-bold text-lg">50 requests/day</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 glass-dark rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                                <span class="text-gray-300 font-medium">Basic Plan:</span>
+                                <span class="text-blue-400 font-bold text-lg">500 requests/day</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 glass-dark rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                                <span class="text-gray-300 font-medium">Pro Plan:</span>
+                                <span class="text-purple-400 font-bold text-lg">Unlimited</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-lg"></div>
+                    </div>
+                </div>
+
+                <!-- CTA Section -->
+                <div class="text-center">
+                    <a href="/auth/google" class="group relative inline-flex items-center gap-4 px-12 py-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-xl rounded-3xl shadow-2xl transform hover:-translate-y-2 transition-all duration-300 neon-blue">
+                        <span class="relative z-10 flex items-center gap-4">
+                            <svg class="w-8 h-8" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Sign in with Google
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
+                    </a>
+                    <p class="text-gray-400 text-lg mt-6">Sign in to get your API key and start using the Quote API</p>
                 </div>
             </section>
 
             <!-- Endpoints Section -->
-            <section id="endpoints" class="mb-12 sm:mb-16 p-4 sm:p-6 md:p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
-                    API Endpoints
-                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            <section id="endpoints" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            🚀 API Endpoints
+                        </span>
                 </h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Powerful RESTful endpoints for accessing quotes with authentication
+                    </p>
+                </div>
 
-                <div class="space-y-6">
-                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
-                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                <div class="space-y-8">
+                    <!-- Random Quote Endpoint -->
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <div class="glass-dark p-6 border-b border-white/10">
                             <div class="flex items-center gap-4 flex-wrap">
-                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
-                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api</code>
-                                <span class="text-slate-300 font-medium">Get a random quote</span>
+                                <span class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-xl">GET</span>
+                                <code class="glass-dark px-4 py-2 rounded-xl text-white font-mono text-lg">/api/v1/quotes</code>
+                                <span class="text-gray-300 font-medium text-lg">Get a random quote</span>
+                                <span class="px-3 py-1 bg-red-500/20 text-red-400 text-sm rounded-full border border-red-500/30">Requires API Key</span>
                             </div>
                         </div>
-                        <div class="p-6">
-                            <p class="text-slate-300 mb-4">Returns a random quote from any available category.</p>
-                            <h4 class="text-lg font-semibold text-white mb-3">Query Parameters:</h4>
-                            <ul class="list-disc list-inside text-slate-300 space-y-1">
-                                <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">type</code> (optional) - Filter by category: happy, sad, love, motivational, wisdom</li>
-                            </ul>
+                        <div class="p-8">
+                            <p class="text-gray-300 mb-6 text-lg">Returns a random quote from any available category.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Headers:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-green-400 text-lg font-mono">x-api-key: your-api-key-here</code>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Query Parameters:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-blue-400 font-mono">type</code>
+                                        <span class="text-gray-300 ml-2">(optional) - Filter by category</span>
+                                        <div class="mt-2 text-sm text-gray-400">
+                                            Available: happy, sad, love, motivational, wisdom
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
-                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                    <!-- Category Endpoint -->
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <div class="glass-dark p-6 border-b border-white/10">
                             <div class="flex items-center gap-4 flex-wrap">
-                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
-                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api/types</code>
-                                <span class="text-slate-300 font-medium">Get available categories</span>
+                                <span class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-xl">GET</span>
+                                <code class="glass-dark px-4 py-2 rounded-xl text-white font-mono text-lg">/api/v1/quotes/category/:category</code>
+                                <span class="text-gray-300 font-medium text-lg">Get quotes by category</span>
+                                <span class="px-3 py-1 bg-red-500/20 text-red-400 text-sm rounded-full border border-red-500/30">Requires API Key</span>
                             </div>
                         </div>
-                        <div class="p-6">
-                            <p class="text-slate-300">Returns all available quote categories and their counts.</p>
+                        <div class="p-8">
+                            <p class="text-gray-300 mb-6 text-lg">Returns a random quote from a specific category.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Headers:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-green-400 text-lg font-mono">x-api-key: your-api-key-here</code>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Example:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-blue-400 text-lg font-mono">/api/v1/quotes/category/motivational</code>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
-                        <div class="bg-slate-800/80 p-6 border-b border-slate-600/50">
+                    <!-- Search Endpoint -->
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <div class="glass-dark p-6 border-b border-white/10">
                             <div class="flex items-center gap-4 flex-wrap">
-                                <span class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg">GET</span>
-                                <code class="bg-slate-900 px-4 py-2 rounded-lg text-white font-mono border border-slate-600/50">/api/stats</code>
-                                <span class="text-slate-300 font-medium">Get quote statistics</span>
+                                <span class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-xl">GET</span>
+                                <code class="glass-dark px-4 py-2 rounded-xl text-white font-mono text-lg">/api/v1/quotes/search</code>
+                                <span class="text-gray-300 font-medium text-lg">Search quotes</span>
+                                <span class="px-3 py-1 bg-red-500/20 text-red-400 text-sm rounded-full border border-red-500/30">Requires API Key</span>
                             </div>
                         </div>
-                        <div class="p-6">
-                            <p class="text-slate-300">Returns detailed statistics about quotes in each category.</p>
+                        <div class="p-8">
+                            <p class="text-gray-300 mb-6 text-lg">Search for quotes containing specific text.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Headers:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-green-400 text-lg font-mono">x-api-key: your-api-key-here</code>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4">Query Parameters:</h4>
+                                    <div class="glass-dark p-4 rounded-2xl">
+                                        <code class="text-blue-400 font-mono">q</code>
+                                        <span class="text-gray-300 ml-2">(required) - Search query</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Examples Section -->
-            <section id="examples" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
-                    Examples
-                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-                </h2>
 
-                <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl overflow-hidden">
-                    <div class="flex flex-wrap bg-slate-800/80 border-b border-slate-600/50">
-                        <button class="tab-btn active px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-blue-400 text-sm sm:text-base" data-tab="curl">cURL</button>
-                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="javascript">JavaScript</button>
-                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="python">Python</button>
-                        <button class="tab-btn px-4 py-3 sm:px-6 sm:py-4 text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-300 border-b-2 border-transparent hover:border-blue-400 text-sm sm:text-base" data-tab="php">PHP</button>
+            <!-- Examples Section -->
+            <section id="examples" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            💻 Code Examples
+                        </span>
+                </h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Get started quickly with these code examples in multiple languages
+                    </p>
+                </div>
+
+                <div class="glass rounded-3xl overflow-hidden">
+                    <div class="glass-dark p-4 border-b border-white/10">
+                        <div class="flex flex-wrap gap-2">
+                            <button class="tab-btn active px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 font-medium transition-all duration-300 rounded-xl text-sm" data-tab="curl">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    cURL
+                                </span>
+                            </button>
+                            <button class="tab-btn px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 font-medium transition-all duration-300 rounded-xl text-sm" data-tab="javascript">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z"/>
+                                    </svg>
+                                    JavaScript
+                                </span>
+                            </button>
+                            <button class="tab-btn px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 font-medium transition-all duration-300 rounded-xl text-sm" data-tab="python">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.35-.35-.44-.32-.54-.28-.65-.21-.76-.14-.86-.05-.97.06-.95.16-.86.24-.76.31-.66.36-.56.4-.46.42-.37.42-.28.4-.2.36-.13.32-.07.26-.02.2.01h8.39v-.84H7.38l-.01-2.75-.02-.37.05-.34.11-.31.18-.28.25-.26.32-.23.38-.21.44-.18.5-.15.55-.12.59-.08.63-.05.67-.01h5.76l.67.01.63.05.59.08.55.12.5.15.44.18.38.21.32.23.25.26.18.28.11.31.05.34.02.37.01 2.75h3.39l.2-.01.26.02.32.07.36.13.4.2.42.28.42.37.4.46.36.56.31.66.24.76.16.86.06.95-.05.97-.14.86-.21.76-.28.65-.32.54-.35.44-.36.35-.36.26-.35.18-.32.12-.28.07-.21.03h-3.38v3.06l-.02.21-.04.27-.07.32-.1.35-.15.37-.2.36-.27.35-.33.32-.41.27-.5.22-.59.14-.69.05H6.78l-.21-.02-.26-.04-.3-.07-.33-.1-.35-.14-.35-.19-.33-.25-.3-.31-.26-.38-.21-.46-.13-.55-.05-.63V2.17l.01-.13.02-.2.04-.26.1-.3.16-.33.25-.34.34-.34.45-.32.59-.3.73-.26.9-.2.21-.04.28-.02.35.01h5.76l.35-.01.28.02.21.04z"/>
+                                    </svg>
+                                    Python
+                                </span>
+                            </button>
+                            <button class="tab-btn px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 font-medium transition-all duration-300 rounded-xl text-sm" data-tab="php">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                                    </svg>
+                                    PHP
+                                </span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-8">
                         <div class="tab-pane active" id="curl">
-                            <h4 class="text-lg font-semibold text-white mb-3">Get a random quote:</h4>
+                            <div class="space-y-8">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                        Get a random quote
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'curl -H &quot;x-api-key: your-api-key&quot; https://quotifyapi.vercel.app/api/v1/quotes')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api</code></pre>
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <code class="text-green-400 text-lg font-mono">curl -H "x-api-key: your-api-key" https://quotifyapi.vercel.app/api/v1/quotes</code>
+                                        </div>
+                                    </div>
                             </div>
 
-                            <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get a specific category:</h4>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                        Get a specific category
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api?type=motivational')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'curl -H &quot;x-api-key: your-api-key&quot; https://quotifyapi.vercel.app/api/v1/quotes/category/motivational')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl "https://quotifyapi.vercel.app/api?type=motivational"</code></pre>
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <code class="text-blue-400 text-lg font-mono">curl -H "x-api-key: your-api-key" https://quotifyapi.vercel.app/api/v1/quotes/category/motivational</code>
+                                        </div>
+                                    </div>
                             </div>
 
-                            <h4 class="text-lg font-semibold text-white mb-3 mt-6">Get available types:</h4>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                                        Search quotes
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('curl https://quotifyapi.vercel.app/api/types')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'curl -H &quot;x-api-key: your-api-key&quot; &quot;https://quotifyapi.vercel.app/api/v1/quotes/search?q=success&quot;')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-bash">curl https://quotifyapi.vercel.app/api/types</code></pre>
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <code class="text-purple-400 text-lg font-mono">curl -H "x-api-key: your-api-key" "https://quotifyapi.vercel.app/api/v1/quotes/search?q=success"</code>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="javascript">
-                            <h4 class="text-lg font-semibold text-white mb-3">Using fetch:</h4>
+                            <div class="space-y-8">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-yellow-400 rounded-full"></span>
+                                        Using Fetch API
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\nfetch(\'https://quotifyapi.vercel.app/api\')\n  .then(response => response.json())\n  .then(data => console.log(data));\n\n// Get motivational quote\nfetch(\'https://quotifyapi.vercel.app/api?type=motivational\')\n  .then(response => response.json())\n  .then(data => console.log(data));')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" data-copy-text="// Get random quote\nconst response = await fetch('https://quotifyapi.vercel.app/api/v1/quotes', {\n  headers: {\n    'x-api-key': 'your-api-key'\n  }\n});\nconst data = await response.json();\nconsole.log(data);">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-javascript">// Get random quote
-fetch('https://quotifyapi.vercel.app/api')
-  .then(response => response.json())
-  .then(data => console.log(data));
-
-// Get motivational quote
-fetch('https://quotifyapi.vercel.app/api?type=motivational')
-  .then(response => response.json())
-  .then(data => console.log(data));</code></pre>
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <pre><code class="text-yellow-400 text-lg font-mono">// Get random quote
+const response = await fetch('https://quotifyapi.vercel.app/api/v1/quotes', {
+  headers: {
+    'x-api-key': 'your-api-key'
+  }
+});
+const data = await response.json();
+console.log(data);</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="python">
-                            <h4 class="text-lg font-semibold text-white mb-3">Using requests:</h4>
+                            <div class="space-y-8">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                        Using Requests Library
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('import requests\n\n# Get random quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api\')\nquote = response.json()\nprint(quote)\n\n# Get love quote\nresponse = requests.get(\'https://quotifyapi.vercel.app/api?type=love\')\nquote = response.json()\nprint(quote)')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'import requests\n\n# Get random quote\nheaders = {\'x-api-key\': \'your-api-key\'}\nresponse = requests.get(\'https://quotifyapi.vercel.app/api/v1/quotes\', headers=headers)\nquote = response.json()\nprint(quote)')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-python">import requests
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <pre><code class="text-blue-400 text-lg font-mono">import requests
 
 # Get random quote
-response = requests.get('https://quotifyapi.vercel.app/api')
-quote = response.json()
-print(quote)
-
-# Get love quote
-response = requests.get('https://quotifyapi.vercel.app/api?type=love')
+headers = {'x-api-key': 'your-api-key'}
+response = requests.get('https://quotifyapi.vercel.app/api/v1/quotes', headers=headers)
 quote = response.json()
 print(quote)</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="php">
-                            <h4 class="text-lg font-semibold text-white mb-3">Using cURL:</h4>
+                            <div class="space-y-8">
+                                <div>
+                                    <h4 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                                        Using cURL
+                                    </h4>
                             <div class="relative group">
-                                <button class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-1" onclick="navigator.clipboard.writeText('// Get random quote\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, \'https://quotifyapi.vercel.app/api\');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\n\n$quote = json_decode($response, true);\necho $quote[\'quote\'][\'text\'];')">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '// Get random quote\n$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, \'https://quotifyapi.vercel.app/api/v1/quotes\');\ncurl_setopt($ch, CURLOPT_HTTPHEADER, [\'x-api-key: your-api-key\']);\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n$response = curl_exec($ch);\ncurl_close($ch);\n\n$quote = json_decode($response, true);\necho $quote[\'quote\'][\'text\'];')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                     </svg>
                                     Copy
                                 </button>
-                                <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto"><code class="language-php">// Get random quote
+                                        <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                            <pre><code class="text-purple-400 text-lg font-mono">// Get random quote
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://quotifyapi.vercel.app/api');
+curl_setopt($ch, CURLOPT_URL, 'https://quotifyapi.vercel.app/api/v1/quotes');
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['x-api-key: your-api-key']);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($ch);
 curl_close($ch);
 
 $quote = json_decode($response, true);
 echo $quote['quote']['text'];</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -379,96 +889,94 @@ echo $quote['quote']['text'];</code></pre>
             </section>
 
             <!-- Try It Section -->
-            <section id="try-it" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
-                    Try It Now
-                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            <section id="try-it" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            🚀 Try It Now
+                        </span>
                 </h2>
-                <p class="text-lg text-slate-300 mb-8">Test the API directly from this page:</p>
-
-                <div class="p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                    <div class="text-center mb-8">
-                        <h3 class="text-3xl font-bold mb-4 text-white">🧪 Interactive API Tester</h3>
-                        <p class="text-lg text-slate-300">Test any endpoint directly from this page</p>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Test the API directly in your browser with real-time responses
+                    </p>
                     </div>
 
-                    <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-8">
-                        <div class="flex-1">
-                            <div class="grid grid-cols-1 sm:grid-cols-4 items-center bg-slate-900/80 border border-slate-600/50 rounded-2xl p-3 gap-3">
-                                <span class="px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg whitespace-nowrap flex items-center justify-center h-[44px] min-w-[60px]">GET</span>
-                                <span class="text-slate-400 text-sm sm:text-base whitespace-nowrap flex items-center h-[44px] px-2">https://quotifyapi.vercel.app</span>
-                                <div class="relative">
-                                    <button id="dropdown-trigger" 
-                                        class="w-full h-[44px] bg-slate-800 text-white border border-slate-600/50 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 min-w-0 flex items-center justify-between hover:bg-slate-700/80">
-                                        <span id="selected-option">/api (Random Quote)</span>
-                                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </button>
-                                    
-                                    <div id="dropdown-menu" class="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-600/50 rounded-lg shadow-2xl z-50 opacity-0 invisible transform -translate-y-2 transition-all duration-300">
-                                        <div class="py-2">
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api" data-label="/api (Random Quote)">/api (Random Quote)</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=happy" data-label="/api?type=happy">/api?type=happy</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=sad" data-label="/api?type=sad">/api?type=sad</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=love" data-label="/api?type=love">/api?type=love</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=motivational" data-label="/api?type=motivational">/api?type=motivational</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api?type=wisdom" data-label="/api?type=wisdom">/api?type=wisdom</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api/types" data-label="/api/types">/api/types</div>
-                                            <div class="dropdown-option px-3 py-2 text-sm sm:text-base text-slate-300 hover:bg-blue-500/20 hover:text-blue-400 cursor-pointer transition-colors duration-200" data-value="/api/stats" data-label="/api/stats">/api/stats</div>
+                <div class="glass rounded-3xl overflow-hidden">
+                    <div class="glass-dark p-6 border-b border-white/10">
+                        <div class="space-y-4">
+                            <!-- Request Configuration -->
+                            <div class="flex flex-wrap gap-4 items-center justify-between">
+                                <div class="flex items-center gap-4 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 bg-green-400 rounded-full"></span>
+                                        <span class="text-sm font-medium text-gray-300">GET</span>
+                                    </div>
+                                    <div class="relative flex-1 min-w-[400px]">
+                                        <select id="endpoint-select" class="w-full appearance-none glass rounded-xl px-4 py-3 text-white bg-gray-800/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 cursor-pointer">
+                                            <option value="/api/v1/quotes" class="bg-gray-800 text-white">Random Quote</option>
+                                            <option value="/api/v1/quotes/category/motivational" class="bg-gray-800 text-white">Motivational Quotes</option>
+                                            <option value="/api/v1/quotes/category/love" class="bg-gray-800 text-white">Love Quotes</option>
+                                            <option value="/api/v1/quotes/category/wisdom" class="bg-gray-800 text-white">Wisdom Quotes</option>
+                                            <option value="/api/v1/quotes/category/happy" class="bg-gray-800 text-white">Happy Quotes</option>
+                                            <option value="/api/v1/quotes/category/sad" class="bg-gray-800 text-white">Sad Quotes</option>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
                                         </div>
                                     </div>
                                 </div>
-                                <button id="test-btn"
-                                    class="w-full px-6 sm:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 h-[44px] leading-none">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                <button id="test-btn" class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg hover:shadow-blue-500/25">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    <span class="text-sm sm:text-base">Send Request</span>
+                                    Send Request
                                 </button>
+                            </div>
+                            
+                            <!-- API Key Section -->
+                            <div class="flex items-center gap-4">
+                                <label class="text-sm font-medium text-gray-300 min-w-[80px]">API Key:</label>
+                                <div class="flex-1 flex items-center gap-2">
+                                    <input 
+                                        type="text" 
+                                        id="api-key-input" 
+                                        placeholder="Enter your API key or it will auto-fill if logged in"
+                                        class="flex-1 glass rounded-xl px-4 py-3 text-white bg-gray-800/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-gray-500 transition-all duration-200"
+                                    />
+                                    <button 
+                                        id="copy-api-key" 
+                                        class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-all duration-300 px-4 py-3 rounded-xl hover:bg-blue-500/10 hover:border-blue-500/30 border border-transparent"
+                                        title="Copy API Key"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                        <div class="p-6 border-b border-slate-600/50">
+                    <div class="p-8">
+                        <div class="space-y-6">
                             <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold text-white">Response</h3>
                                 <div class="flex items-center gap-3">
-                                    <svg class="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <h3 class="text-xl font-semibold text-white">API Response</h3>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span id="response-status"
-                                        class="px-3 py-1 bg-slate-600 text-slate-300 text-sm font-medium rounded-lg">Ready</span>
-                                    <button id="view-toggle" 
-                                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-                                        title="Toggle between pretty and raw view">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                                        </svg>
-                                        Pretty
-                                    </button>
-                                    <button id="copy-response" 
-                                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2 hidden"
-                                        title="Copy response to clipboard">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                        </svg>
-                                        Copy
+                                    <span id="response-status" class="px-3 py-1 bg-gray-600 text-gray-300 text-sm font-medium rounded-lg">Ready</span>
+                                    <button id="copy-response" class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-300 hidden">
+                                        Copy Response
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="p-6">
-                            <div id="response-body" class="min-h-[200px]">
-                                <div class="text-slate-400 text-center py-8">
-                                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            <div id="response-body" class="glass-dark rounded-2xl p-6 min-h-[200px] max-h-[500px] overflow-auto">
+                                <div class="text-center">
+                                    <svg class="w-12 h-12 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    <p class="text-slate-300">Click "Send Request" to test the API</p>
+                                    <p class="text-gray-400">Click "Send Request" to test the API</p>
+                                    <p class="text-gray-500 text-sm mt-2">Make sure you have a valid API key</p>
                                 </div>
                             </div>
                         </div>
@@ -476,124 +984,535 @@ echo $quote['quote']['text'];</code></pre>
                 </div>
             </section>
 
+
             <!-- Rate Limits Section -->
-            <section id="rate-limits" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
-                    Rate Limits
-                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            <section id="rate-limits" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            📊 Rate Limits & Pricing
+                        </span>
                 </h2>
-                <p class="text-lg text-slate-300 mb-8">To ensure fair usage and protect against abuse, the following rate limits are enforced:</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
-                        <h4 class="text-xl font-semibold mb-4 text-white">General Requests</h4>
-                        <div class="mb-4">
-                            <span class="block text-4xl font-bold text-blue-400 mb-2">1,000</span>
-                            <span class="text-slate-300">per 15 minutes</span>
+                    <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+                        Choose the perfect plan for your application needs. All plans include advanced rate limiting, 
+                        comprehensive analytics, and enterprise-grade security features.
+                    </p>
+                    <div id="loginNotice" class="glass-dark rounded-xl p-4 max-w-md mx-auto mb-8 hidden">
+                        <div class="flex items-center justify-center gap-2 text-yellow-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            <span class="font-semibold">Login Required</span>
                         </div>
-                        <p class="text-slate-300">Applies to all requests to the API</p>
+                        <p class="text-white/80 text-sm mt-2">Please login to upgrade your plan and make payments</p>
+                        <a href="/login" class="inline-block mt-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-300">
+                            Login Now
+                        </a>
                     </div>
-
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
-                        <h4 class="text-xl font-semibold mb-4 text-white">API Endpoints</h4>
-                        <div class="mb-4">
-                            <span class="block text-4xl font-bold text-purple-400 mb-2">500</span>
-                            <span class="text-slate-300">per 15 minutes</span>
+                    
+                    <!-- Additional Features Overview -->
+                    <div class="glass rounded-2xl p-6 max-w-5xl mx-auto">
+                        <h3 class="font-space text-xl font-bold text-white mb-4">✨ What's Included in Every Plan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                <span>JWT Authentication</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                <span>API Key Management</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-purple-400 rounded-full"></div>
+                                <span>Usage Analytics</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                <span>Rate Limit Headers</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                                <span>Error Handling</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+                                <span>Response Caching</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-orange-400 rounded-full"></div>
+                                <span>99.9% Uptime SLA</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                                <span>24/7 Support</span>
+                            </div>
                         </div>
-                        <p class="text-slate-300">Applies to all /api routes</p>
-                    </div>
-
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-center">
-                        <h4 class="text-xl font-semibold mb-4 text-white">Strict Limit</h4>
-                        <div class="mb-4">
-                            <span class="block text-4xl font-bold text-red-400 mb-2">50</span>
-                            <span class="text-slate-300">per minute</span>
-                        </div>
-                        <p class="text-slate-300">Additional protection for API routes</p>
                     </div>
                 </div>
 
-                <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
-                    <h4 class="text-xl font-semibold mb-4 text-white">Rate Limit Headers</h4>
-                    <p class="text-slate-300 mb-4">The API includes rate limit information in response headers:</p>
-                    <ul class="list-disc list-inside text-slate-300 space-y-2">
-                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Limit</code> - Maximum requests per window</li>
-                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Remaining</code> - Remaining requests in current window</li>
-                        <li><code class="bg-slate-800 px-2 py-1 rounded text-blue-400">RateLimit-Reset</code> - Time when the rate limit resets</li>
-                    </ul>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 mt-8">
+                    <!-- Free Plan -->
+                    <div class="glass rounded-3xl p-8 pt-12 text-center hover:scale-105 transition-all duration-300 animate-slide-up relative overflow-visible group" style="animation-delay: 0.1s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Popular Badge -->
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                            <span class="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Perfect for Starters</span>
+                        </div>
+                        
+                        <div class="relative w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-space text-2xl font-bold text-white mb-4 relative">Free</h3>
+                        <div class="mb-6 relative">
+                            <span class="text-5xl font-bold text-green-400">50</span>
+                            <p class="text-gray-300 mt-2">requests per day</p>
+                            <p class="text-sm text-gray-400 mt-1">3 requests per minute</p>
+                        </div>
+                        
+                        <!-- Detailed Features -->
+                        <div class="text-left mb-6 space-y-3">
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Random quotes only</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Basic rate limiting</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>JSON responses</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Community support</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-400 mb-6 relative text-sm">Perfect for testing, learning, and small personal projects</p>
+                        <div class="glass-dark rounded-xl px-6 py-3 border border-white/10 hover:border-white/20 transition-all duration-300">
+                            <span class="text-green-400 font-semibold">Free Forever</span>
+                        </div>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+                    <!-- Basic Plan -->
+                    <div class="glass rounded-3xl p-8 pt-12 text-center hover:scale-105 transition-all duration-300 border-2 border-blue-500/50 animate-slide-up relative overflow-visible group" style="animation-delay: 0.2s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Popular Badge -->
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                            <span class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Most Popular</span>
+                        </div>
+                        
+                        <div class="relative w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-space text-2xl font-bold text-white mb-4 relative">Basic</h3>
+                        <div class="mb-6 relative">
+                            <span class="text-5xl font-bold text-blue-400">500</span>
+                            <p class="text-gray-300 mt-2">requests per day</p>
+                            <p class="text-sm text-gray-400 mt-1">20 requests per minute</p>
+                        </div>
+                        
+                        <!-- Detailed Features -->
+                        <div class="text-left mb-6 space-y-3">
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>All 5 quote categories</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Advanced rate limiting</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Usage analytics</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Priority support</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Quote search & filtering</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Response caching</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-400 mb-6 relative text-sm">Ideal for production applications and growing businesses</p>
+                        <button onclick="initiatePayment('basic', event)" data-plan="basic" class="w-full glass-dark rounded-xl px-6 py-4 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all duration-300 group cursor-pointer">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="text-blue-400 font-semibold group-hover:text-blue-300">INR 39/month</span>
+                                <svg class="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Click to upgrade</p>
+                        </button>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="glass rounded-3xl p-8 pt-12 text-center hover:scale-105 transition-all duration-300 animate-slide-up relative overflow-visible group" style="animation-delay: 0.3s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Popular Badge -->
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                            <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Enterprise Ready</span>
+                        </div>
+                        
+                        <div class="relative w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-space text-2xl font-bold text-white mb-4 relative">Pro</h3>
+                        <div class="mb-6 relative">
+                            <span class="text-5xl font-bold text-purple-400">∞</span>
+                            <p class="text-gray-300 mt-2">unlimited requests</p>
+                            <p class="text-sm text-gray-400 mt-1">unlimited requests per minute</p>
+                        </div>
+                        
+                        <!-- Detailed Features -->
+                        <div class="text-left mb-6 space-y-3">
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>All 5 quote categories</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Unlimited API calls</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Advanced analytics dashboard</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Dedicated support</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Custom rate limits</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-300">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>99.9% SLA guarantee</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-400 mb-6 relative text-sm">Perfect for high-volume applications and enterprise use</p>
+                        <button onclick="initiatePayment('pro', event)" data-plan="pro" class="w-full glass-dark rounded-xl px-6 py-4 border border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all duration-300 group cursor-pointer">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="text-purple-400 font-semibold group-hover:text-purple-300">INR 199/month</span>
+                                <svg class="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Click to upgrade</p>
+                        </button>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-lg"></div>
+                    </div>
+                </div>
+
+                <!-- Rate Limit Headers -->
+                <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.4s;">
+                    <!-- Background gradient overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-orange-500/5 to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="relative flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-space text-2xl font-bold text-white">Rate Limit Headers & Monitoring</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6 relative">The API includes comprehensive rate limit information in response headers to help you monitor and manage your usage:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative mb-8">
+                        <div class="glass-dark rounded-2xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                            <div class="flex items-center gap-2 mb-2">
+                                <code class="text-blue-400 font-mono text-sm">RateLimit-Limit</code>
+                                <span class="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded">Required</span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Maximum requests allowed per time window</p>
+                            <p class="text-xs text-gray-400">Example: <code class="text-blue-300">500</code> (for Basic plan)</p>
+                        </div>
+                        <div class="glass-dark rounded-2xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                            <div class="flex items-center gap-2 mb-2">
+                                <code class="text-green-400 font-mono text-sm">RateLimit-Remaining</code>
+                                <span class="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded">Required</span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Number of requests remaining in current window</p>
+                            <p class="text-xs text-gray-400">Example: <code class="text-green-300">487</code> (13 requests used)</p>
+                        </div>
+                        <div class="glass-dark rounded-2xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                            <div class="flex items-center gap-2 mb-2">
+                                <code class="text-purple-400 font-mono text-sm">RateLimit-Reset</code>
+                                <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Required</span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Unix timestamp when the rate limit resets</p>
+                            <p class="text-xs text-gray-400">Example: <code class="text-purple-300">1640995200</code></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Rate Limiting Information -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
+                        <div class="glass-dark rounded-2xl p-6">
+                            <h4 class="font-semibold text-white mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Rate Limiting Types
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                    <span><strong>Per-minute:</strong> 3-∞ requests based on plan</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span><strong>Daily:</strong> 50-∞ requests based on plan</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full"></div>
+                                    <span><strong>IP-based:</strong> Additional protection layer</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                    <span><strong>API Key:</strong> Per-key rate limiting</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-dark rounded-2xl p-6">
+                            <h4 class="font-semibold text-white mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Error Handling
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                                    <span><strong>429 Too Many Requests:</strong> Rate limit exceeded</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                                    <span><strong>Retry-After:</strong> Seconds to wait before retry</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-orange-400 rounded-full"></div>
+                                    <span><strong>X-RateLimit-Warning:</strong> Approaching limit</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span><strong>Graceful degradation:</strong> No service interruption</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative elements -->
+                    <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-full blur-xl"></div>
+                    <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-orange-500/20 to-yellow-500/20 rounded-full blur-lg"></div>
                 </div>
             </section>
 
             <!-- Installation Section -->
-            <section id="installation" class="mb-16 p-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white relative">
-                    Installation & Usage
-                    <div class="absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            <section id="installation" class="mb-20">
+                <div class="text-center mb-16">
+                    <h2 class="font-space text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+                        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            📦 Installation & Usage
+                        </span>
                 </h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Get started with QuoteAPI in minutes using your preferred method
+                    </p>
+                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
-                        <h4 class="text-xl font-semibold mb-4 text-white">NPM Package</h4>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install quotifyapi')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                <!-- Authentication Notice -->
+                <div class="max-w-4xl mx-auto mb-12">
+                    <div class="glass rounded-3xl p-8">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                                 </svg>
-                                Copy
-                            </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">npm install quotifyapi</code></pre>
+                            </div>
+                            <h3 class="font-space text-2xl font-bold text-white">Authentication Required</h3>
                         </div>
-                        <p class="text-slate-300 mb-4">Install the package and use it in your Node.js applications.</p>
                         
-                        <h5 class="text-lg font-semibold mb-3 text-white">Usage Example:</h5>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'const quotify = require(\'quotifyapi\');\n\n// Get a random quote\nquotify.getRandomQuote()\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));\n\n// Get quote by type\nquotify.getQuoteByType(\'motivational\')\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));\n\n// Get available types\nquotify.getAvailableTypes()\n  .then(types => console.log(types))\n  .catch(err => console.error(err));')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 mb-6">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-white mb-2">API Key Required</h4>
+                                    <p class="text-gray-300 text-sm leading-relaxed">
+                                        All methods below require a valid API key for authentication. 
+                                        Please <a href="/login" class="text-blue-400 hover:text-blue-300 underline">login</a> to get your API key and access the service.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Methods -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- NPM Package -->
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden" style="animation-delay: 0.1s;">
+                        
+                        <div class="relative flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-space text-2xl font-bold text-white">NPM Package</h3>
+                        </div>
+                        
+                        <div class="relative group mb-6">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install quotifyapi')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 Copy
                             </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-javascript">const quotify = require('quotifyapi');
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <code class="text-red-400 text-lg font-mono">npm install quotifyapi</code>
+                        </div>
+                        </div>
+                        
+                        <p class="text-gray-300 mb-6 relative">Install the package and use it in your Node.js applications with your API key.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-4 text-white relative">Usage Example:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'const quotify = require(\'quotifyapi\');\n\n// Initialize with your API key\nconst api = new quotify.QuoteAPI(\'your-api-key\');\n\n// Get a random quote\napi.getRandomQuote()\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));\n\n// Get quote by type\napi.getQuoteByType(\'motivational\')\n  .then(quote => console.log(quote))\n  .catch(err => console.error(err));')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <pre class="text-yellow-400 text-sm font-mono"><code>const quotify = require('quotifyapi');
+
+// Initialize with your API key
+const api = new quotify.QuoteAPI('your-api-key');
 
 // Get a random quote
-quotify.getRandomQuote()
+api.getRandomQuote()
   .then(quote => console.log(quote))
   .catch(err => console.error(err));
 
 // Get quote by type
-quotify.getQuoteByType('motivational')
+api.getQuoteByType('motivational')
   .then(quote => console.log(quote))
-  .catch(err => console.error(err));
-
-// Get available types
-quotify.getAvailableTypes()
-  .then(types => console.log(types))
   .catch(err => console.error(err));</code></pre>
                         </div>
                     </div>
 
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
-                        <h4 class="text-xl font-semibold mb-4 text-white">CLI Tool</h4>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install -g quotifyapi')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                                Copy
-                            </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">npm install -g quotifyapi</code></pre>
-                        </div>
-                        <p class="text-slate-300 mb-4">Install globally to use the command-line interface.</p>
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-pink-500/20 to-red-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+                    <!-- CLI Tool -->
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden" style="animation-delay: 0.2s;">
                         
-                        <h5 class="text-lg font-semibold mb-3 text-white">CLI Commands:</h5>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get a random quote\nquotifyapi\n\n# Get quote by type\nquotifyapi --type motivational\nquotifyapi --type love\nquotifyapi --type wisdom\n\n# Get available types\nquotifyapi --types\n\n# Get API stats\nquotifyapi --stats\n\n# Help\nquotifyapi --help')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="relative flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-space text-2xl font-bold text-white">CLI Tool</h3>
+                        </div>
+                        <div class="relative group mb-6">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'npm install -g quotifyapi')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 Copy
                             </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Get a random quote
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <code class="text-green-400 text-lg font-mono">npm install -g quotifyapi</code>
+                        </div>
+                        </div>
+                        <p class="text-gray-300 mb-6 relative">Install globally to use the command-line interface with your API key.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-4 text-white relative">CLI Commands:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Set your API key\nexport QUOTIFY_API_KEY=\'your-api-key\'\n\n# Get a random quote\nquotifyapi\n\n# Get quote by type\nquotifyapi --type motivational\nquotifyapi --type love\nquotifyapi --type wisdom\n\n# Get available types\nquotifyapi --types\n\n# Get API stats\nquotifyapi --stats')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <pre class="text-green-400 text-sm font-mono"><code># Set your API key
+export QUOTIFY_API_KEY='your-api-key'
+
+# Get a random quote
 quotifyapi
 
 # Get quote by type
@@ -605,115 +1524,496 @@ quotifyapi --type wisdom
 quotifyapi --types
 
 # Get API stats
-quotifyapi --stats
-
-# Help
-quotifyapi --help</code></pre>
+quotifyapi --stats</code></pre>
                         </div>
+                        </div>
+                        
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-full blur-lg"></div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
-                        <h4 class="text-xl font-semibold mb-4 text-white">Direct API</h4>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Base URL: https://quotifyapi.vercel.app')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                                Copy
-                            </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Base URL: https://quotifyapi.vercel.app</code></pre>
-                        </div>
-                        <p class="text-slate-300 mb-4">Make HTTP requests directly to the API endpoints.</p>
+                <!-- Direct API -->
+                <div class="max-w-4xl mx-auto">
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden" style="animation-delay: 0.3s;">
                         
-                        <h5 class="text-lg font-semibold mb-3 text-white">cURL Examples:</h5>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get random quote\ncurl https://quotifyapi.vercel.app/api\n\n# Get motivational quote\ncurl https://quotifyapi.vercel.app/api?type=motivational\n\n# Get available types\ncurl https://quotifyapi.vercel.app/api/types\n\n# Get API stats\ncurl https://quotifyapi.vercel.app/api/stats')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="relative flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-space text-2xl font-bold text-white">Direct API</h3>
+                        </div>
+                        <div class="relative group mb-6">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Base URL: https://quotifyapi.vercel.app\n# All requests require API key authentication')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                                 Copy
                             </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Get random quote
-curl https://quotifyapi.vercel.app/api
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <code class="text-blue-400 text-lg font-mono"># Base URL: https://quotifyapi.vercel.app<br># All requests require API key authentication</code>
+                        </div>
+                        </div>
+                        <p class="text-gray-300 mb-6 relative">Make HTTP requests directly to the API endpoints with your API key.</p>
+                        
+                        <h5 class="text-lg font-semibold mb-4 text-white relative">cURL Examples:</h5>
+                        <div class="relative group">
+                            <button class="copy-btn absolute top-4 right-4 px-3 py-2 glass-dark hover:bg-white/20 text-gray-300 text-sm font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Get random quote\\ncurl -H &quot;x-api-key: YOUR_API_KEY&quot; https://quotifyapi.vercel.app/api\\n\\n# Get motivational quote\\ncurl -H &quot;x-api-key: YOUR_API_KEY&quot; https://quotifyapi.vercel.app/api?type=motivational\\n\\n# Get available types\\ncurl -H &quot;x-api-key: YOUR_API_KEY&quot; https://quotifyapi.vercel.app/api/types\\n\\n# Get API stats\\ncurl -H &quot;x-api-key: YOUR_API_KEY&quot; https://quotifyapi.vercel.app/api/stats')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <div class="glass-dark p-6 rounded-2xl overflow-x-auto">
+                                <pre class="text-blue-400 text-sm font-mono"><code># Get random quote
+curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api
 
 # Get motivational quote
-curl https://quotifyapi.vercel.app/api?type=motivational
+curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api?type=motivational
 
 # Get available types
-curl https://quotifyapi.vercel.app/api/types
+curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/types
 
 # Get API stats
-curl https://quotifyapi.vercel.app/api/stats</code></pre>
+curl -H "x-api-key: YOUR_API_KEY" https://quotifyapi.vercel.app/api/stats</code></pre>
                         </div>
-                    </div>
-
-                    <div class="p-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl">
-                        <h4 class="text-xl font-semibold mb-4 text-white">Self-Hosted</h4>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, 'git clone https://github.com/tanishq-sa/Quotifyapi\ncd quotifyapi\nnpm install\nnpm start')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                                Copy
-                            </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash">git clone https://github.com/tanishq-sa/Quotifyapi
-cd quotifyapi
-npm install
-npm start</code></pre>
-                        </div>
-                        <p class="text-slate-300 mb-4">Clone the repository and run your own instance.</p>
                         
-                        <h5 class="text-lg font-semibold mb-3 text-white">Environment Setup:</h5>
-                        <div class="relative group">
-                            <button class="copy-btn absolute top-3 right-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center gap-2" onclick="copyToClipboard(this, '# Copy environment file\ncp env.example .env\n\n# Edit configuration\nnano .env\n\n# Start development server\nnpm run dev\n\n# Start production server\nnpm start')">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                                Copy
-                            </button>
-                            <pre class="bg-slate-900 p-4 rounded-lg border border-slate-600/50 overflow-x-auto mb-4"><code class="language-bash"># Copy environment file
-cp env.example .env
-
-# Edit configuration
-nano .env
-
-# Start development server
-npm run dev
-
-# Start production server
-npm start</code></pre>
-                        </div>
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-lg"></div>
+                    </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Footer -->
-        <footer class="mt-16 py-12 bg-slate-800/80 backdrop-blur-xl border-t border-slate-700/50 rounded-t-3xl">
-            <div class="text-center">
-                <p class="text-slate-300 mb-6">&copy; 2025 Quotify API. Built with ❤️ and Express.js</p>
-                
-                <div class="bg-slate-700/50 border border-slate-600/50 rounded-xl p-4 mb-6 max-w-2xl mx-auto">
-                    <p class="text-slate-300 text-sm leading-relaxed">
-                        <strong>Copyright Notice:</strong> Quotify API is a service that provides access to quotes. 
-                        <strong>We do not own, create, or claim ownership</strong> of any quotes provided through this API. 
+                <!-- Footer -->
+        <footer class="mt-20 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 opacity-50"></div>
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);"></div>
+            
+            <div class="relative z-10">
+                <!-- Main Footer Content -->
+                <div class="glass rounded-3xl mx-4 p-8 md:p-12">
+                    <!-- Logo and Tagline -->
+                    <div class="text-center mb-12">
+                        <div class="flex items-center justify-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                                </svg>
+                        </div>
+                            <div>
+                                <h2 class="font-space text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">QuoteAPI</h2>
+                                <p class="text-gray-400 text-sm">Inspiring quotes for developers</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-lg mb-8">&copy; 2025 QuoteAPI. Built with ❤️ and Express.js</p>
+                    </div>
+                    
+                    <!-- Links Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                        <!-- Product -->
+                        <div>
+                            <h3 class="font-semibold text-white mb-6 text-lg">Product</h3>
+                            <div class="space-y-3">
+                                <a href="#overview" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Overview</a>
+                                <a href="#auth" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Authentication</a>
+                                <a href="#endpoints" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">API Endpoints</a>
+                                <a href="#examples" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Examples</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Resources -->
+                        <div>
+                            <h3 class="font-semibold text-white mb-6 text-lg">Resources</h3>
+                            <div class="space-y-3">
+                                <a href="#rate-limits" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Rate Limits</a>
+                                <a href="#installation" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Installation</a>
+                                <a href="/login" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Login</a>
+                                <a href="/profile" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Profile</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Support -->
+                        <div>
+                            <h3 class="font-semibold text-white mb-6 text-lg">Support</h3>
+                            <div class="space-y-3">
+                                <a href="/contact" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Contact Us</a>
+                                <a href="mailto:support@dazzelr.tech" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Email Support</a>
+                                <a href="/login" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Get API Key</a>
+                                <a href="/profile" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Account Management</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Legal -->
+                        <div>
+                            <h3 class="font-semibold text-white mb-6 text-lg">Legal</h3>
+                            <div class="space-y-3">
+                                <a href="/privacy" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Privacy Policy</a>
+                                <a href="/terms" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Terms of Service</a>
+                                <a href="/refund" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Refund Policy</a>
+                                <a href="/cancellation" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Cancellation Policy</a>
+                                <a href="/shipping" class="block text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform">Digital Service Policy</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Connect -->
+                        <div>
+                            <h3 class="font-semibold text-white mb-6 text-lg">Connect</h3>
+                            <div class="flex gap-3">
+                                <a href="mailto:support@dazzelr.tech" class="group relative">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center hover:from-green-400 hover:to-green-500 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                        </div>
+                                    <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Email</span>
+                                </a>
+                                <a href="/login" class="group relative">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center hover:from-blue-400 hover:to-blue-500 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                        </svg>
+                    </div>
+                                    <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Login</span>
+                                </a>
+                </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Copyright Notice -->
+                    <div class="glass-dark rounded-2xl p-6 mb-8">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white mb-2">Copyright Notice</h4>
+                                <p class="text-gray-300 text-sm leading-relaxed">
+                                    QuoteAPI is a service that provides access to quotes. 
+                                    <strong class="text-white">We do not own, create, or claim ownership</strong> of any quotes provided through this API. 
                         All quotes are the intellectual property of their respective authors, creators, and copyright holders. 
                         This service operates as a collection and distribution platform only.
                     </p>
+                            </div>
+                        </div>
                 </div>
                 
-                <div class="flex gap-6 justify-center flex-wrap">
-                    <a href="https://github.com/tanishq-sa/Quotifyapi" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">GitHub</a>
-                    <a href="https://github.com/tanishq-sa/Quotifyapi/issues" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">Issues</a>
-                    <a href="https://github.com/tanishq-sa/Quotifyapi/blob/main/LICENSE" class="text-slate-400 hover:text-blue-400 transition-colors duration-300" target="_blank">License</a>
+                    <!-- Bottom Bar -->
+                    <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 gap-4">
+                        <p class="text-gray-500 text-sm">Made with ❤️ by the QuoteAPI team</p>
+                        <div class="flex flex-wrap gap-6 text-sm">
+                            <a href="/contact" class="text-gray-500 hover:text-white transition-colors duration-300">Contact</a>
+                            <a href="/privacy" class="text-gray-500 hover:text-white transition-colors duration-300">Privacy</a>
+                            <a href="/terms" class="text-gray-500 hover:text-white transition-colors duration-300">Terms</a>
+                            <a href="/refund" class="text-gray-500 hover:text-white transition-colors duration-300">Refund</a>
+                            <a href="/login" class="text-gray-500 hover:text-white transition-colors duration-300">Login</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
     </div>
 
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
     <script src="script.js"></script>
+    
+    <script>
+        // Payment functionality
+        async function initiatePayment(plan, event = null) {
+            try {
+                // Check if user is logged in
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    // Show a more user-friendly message
+                    if (confirm('You need to be logged in to upgrade your plan. Would you like to login now?')) {
+                        window.location.href = '/login';
+                    }
+                    return;
+                }
+                
+                // Verify token is still valid by making a test request
+                try {
+                    const testResponse = await fetch('/api/v1/user/profile', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!testResponse.ok) {
+                        // Token is invalid, clear it and redirect to login
+                        localStorage.removeItem('quotify_token');
+                        localStorage.removeItem('apiKey');
+                        if (confirm('Your session has expired. Please login again to continue.')) {
+                            window.location.href = '/login';
+                        }
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Token validation error:', error);
+                    localStorage.removeItem('quotify_token');
+                    localStorage.removeItem('apiKey');
+                    if (confirm('Unable to verify your session. Please login again.')) {
+                        window.location.href = '/login';
+                    }
+                    return;
+                }
+                
+                // Show loading state
+                let button;
+                if (event && event.target) {
+                    button = event.target.closest('button');
+                } else {
+                    // Fallback: find button by data-plan attribute
+                    button = document.querySelector(`button[data-plan="${plan}"]`);
+                }
+                
+                if (!button) {
+                    console.error('Could not find payment button');
+                    return;
+                }
+                
+                const originalContent = button.innerHTML;
+                button.innerHTML = `
+                    <div class="flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 animate-spin text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span class="text-blue-400 font-semibold">Processing...</span>
+                    </div>
+                `;
+                button.disabled = true;
+                
+                // Create subscription
+                const response = await fetch('/api/v1/payments/create-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ plan: plan })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to create subscription');
+                }
+                
+                // Validate required data
+                if (!data.subscriptionId) {
+                    throw new Error('Missing subscription ID from server');
+                }
+                
+                if (!data.razorpayKey) {
+                    throw new Error('Missing Razorpay key from server');
+                }
+                
+                // Get user profile for prefill
+                let userEmail = 'user@example.com';
+                let userName = 'User';
+                try {
+                    const profileResponse = await fetch('/api/v1/user/profile', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (profileResponse.ok) {
+                        const profileData = await profileResponse.json();
+                        // Check if profile data exists (can be in profile or user field)
+                        const userData = profileData.profile || profileData.user;
+                        if (userData) {
+                            userEmail = userData.email || userEmail;
+                            userName = userData.name || userName;
+                            console.log('✅ Loaded user info for Razorpay prefill:', { email: userEmail, name: userName });
+                        } else {
+                            console.warn('⚠️ User profile data not found in response:', profileData);
+                        }
+                    } else {
+                        console.warn('⚠️ Failed to fetch user profile:', profileResponse.status, profileResponse.statusText);
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Could not fetch user profile for prefill:', error);
+                    // Continue with default values if fetch fails
+                }
+                
+                // Configure Razorpay options for subscription (monthly recurring billing)
+                const options = {
+                    key: data.razorpayKey, // Use key from server response
+                    subscription_id: data.subscriptionId, // Use subscription ID for recurring billing
+                    name: 'Quotify API',
+                    description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan - ₹${data.amount/100}/month (10 years)`,
+                    prefill: {
+                        name: userName,
+                        email: userEmail
+                    },
+                    theme: {
+                        color: plan === 'basic' ? '#3b82f6' : '#8b5cf6'
+                    },
+                    handler: async function (response) {
+                        try {
+                            // Verify subscription payment
+                            const verifyResponse = await fetch('/api/v1/payments/verify-subscription', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    subscription_id: response.razorpay_subscription_id,
+                                    payment_id: response.razorpay_payment_id,
+                                    signature: response.razorpay_signature,
+                                    plan: data.originalPlan || plan
+                                })
+                            });
+                            
+                            const verifyData = await verifyResponse.json();
+                            
+                            if (verifyData.success) {
+                                const billingInfo = data.billingInfo || { period: 'monthly', duration: '10 years' };
+                                alert(`🎉 Subscription Successful! You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.\n\n₹${data.amount/100} will be charged monthly for ${billingInfo.duration}.`);
+                                // Redirect to profile page to see updated plan
+                                window.location.href = '/profile';
+                            } else {
+                                alert('Subscription verification failed: ' + verifyData.error);
+                            }
+                        } catch (error) {
+                            console.error('Payment verification error:', error);
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            // Reset button state when modal is dismissed
+                            button.innerHTML = originalContent;
+                            button.disabled = false;
+                        }
+                    }
+                };
+                
+                // Open Razorpay checkout
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+            } catch (error) {
+                console.error('Payment initiation error:', error);
+                alert('Failed to initiate payment: ' + error.message);
+                
+                // Reset button state
+                let button;
+                if (event && event.target) {
+                    button = event.target.closest('button');
+                } else {
+                    button = document.querySelector(`button[data-plan="${plan}"]`);
+                }
+                
+                if (button) {
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }
+            }
+        }
+        
+        // Check login status and update UI
+        function checkLoginStatus() {
+            const token = localStorage.getItem('quotify_token');
+            const pricingButtons = document.querySelectorAll('button[onclick^="initiatePayment"]');
+            const loginNotice = document.getElementById('loginNotice');
+            
+            if (!token) {
+                // User is not logged in - show login prompt
+                if (loginNotice) {
+                    loginNotice.classList.remove('hidden');
+                }
+                
+                pricingButtons.forEach(button => {
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = `
+                        <div class="flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            <span class="font-semibold">Login Required</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Click to login first</p>
+                    `;
+                    button.classList.add('opacity-75', 'cursor-pointer');
+                    button.onclick = function() {
+                        window.location.href = '/login';
+                    };
+                });
+            } else {
+                // User is logged in - hide login notice and restore functionality
+                if (loginNotice) {
+                    loginNotice.classList.add('hidden');
+                }
+                // User is logged in - restore original functionality
+                pricingButtons.forEach(button => {
+                    if (button.getAttribute('data-plan') === 'basic') {
+                        button.innerHTML = `
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="text-blue-400 font-semibold group-hover:text-blue-300">INR 39/month</span>
+                                <svg class="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Click to upgrade</p>
+                        `;
+                    } else if (button.getAttribute('data-plan') === 'pro') {
+                        button.innerHTML = `
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="text-purple-400 font-semibold group-hover:text-purple-300">INR 199/month</span>
+                                <svg class="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Click to upgrade</p>
+                        `;
+                    }
+                    button.classList.remove('opacity-75');
+                    button.onclick = function(event) {
+                        initiatePayment(button.getAttribute('data-plan'), event);
+                    };
+                });
+            }
+        }
+
+        // Add hover effects to pricing buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check login status on page load
+            checkLoginStatus();
+            
+            const pricingButtons = document.querySelectorAll('button[onclick^="initiatePayment"]');
+            pricingButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Listen for storage changes (when user logs in/out in another tab)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'quotify_token') {
+                    checkLoginStatus();
+                }
+            });
+            
+            // Check login status periodically (every 30 seconds)
+            setInterval(checkLoginStatus, 30000);
+        });
+    </script>
 </body>
 
 </html>

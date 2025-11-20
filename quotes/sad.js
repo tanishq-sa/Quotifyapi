@@ -346,6 +346,17 @@ const sadQuotes = [
   {
     text: "Some people feel like they don't deserve love. They walk away quietly into empty spaces, trying to close the gaps of the past.",
     author: "Jon Krakauer"
+  },
+  {
+    text: "The saddest thing in life is wasted talent.",
+    author: "Bob Marley"
+  },
+  {
+    text: "Sadness is like a shadow, never announced.",
+  },
+  {
+    text: "Sadness is like a shadow, never announced.",
+    author: "Pablo Neruda"
   }
 ];
 

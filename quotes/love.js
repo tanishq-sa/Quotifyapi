@@ -431,6 +431,7 @@ const loveQuotes = [
     text: "A new command I give you: Love one another. As I have loved you, so you must love one another.",
     author: "Jesus Christ"
   }
+  
 ];
 
 module.exports = loveQuotes; 
