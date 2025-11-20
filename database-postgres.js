@@ -86,78 +86,115 @@ class PostgresDatabase {
   async createTables() {
     const client = await this.pool.connect();
     try {
-      await client.query('BEGIN');
-
-      // Users table
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          id SERIAL PRIMARY KEY,
-          email TEXT UNIQUE NOT NULL,
-          name TEXT NOT NULL,
-          provider TEXT NOT NULL,
-          provider_id TEXT NOT NULL,
-          plan TEXT DEFAULT 'free',
-          plan_expiry TIMESTAMP,
-          role TEXT DEFAULT 'user',
-          api_key TEXT UNIQUE,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
+      // Check if tables already exist to avoid race conditions
+      const checkResult = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = 'users'
+        );
       `);
+      
+      if (checkResult.rows[0].exists) {
+        console.log('✅ Database tables already exist, skipping creation');
+        return;
+      }
 
-      // API keys table
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS api_keys (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          key_value TEXT UNIQUE NOT NULL,
-          name TEXT DEFAULT 'Default Key',
-          is_active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_used TIMESTAMP
-        )
-      `);
+      // Use advisory lock to prevent concurrent table creation
+      await client.query('SELECT pg_advisory_lock(12345)');
+      
+      try {
+        // Double-check after acquiring lock
+        const recheckResult = await client.query(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = 'users'
+          );
+        `);
+        
+        if (recheckResult.rows[0].exists) {
+          console.log('✅ Database tables already exist (created by another instance)');
+          return;
+        }
 
-      // API usage tracking table
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS api_usage (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          api_key_id INTEGER REFERENCES api_keys(id) ON DELETE SET NULL,
-          endpoint TEXT NOT NULL,
-          method TEXT NOT NULL,
-          ip_address TEXT,
-          user_agent TEXT,
-          response_status INTEGER,
-          response_time INTEGER,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
+        // Users table
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            provider TEXT NOT NULL,
+            provider_id TEXT NOT NULL,
+            plan TEXT DEFAULT 'free',
+            plan_expiry TIMESTAMP,
+            role TEXT DEFAULT 'user',
+            api_key TEXT UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
 
-      // User favorites table
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS user_favorites (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          quote_text TEXT NOT NULL,
-          quote_author TEXT,
-          quote_category TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
+        // API keys table
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS api_keys (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            key_value TEXT UNIQUE NOT NULL,
+            name TEXT DEFAULT 'Default Key',
+            is_active BOOLEAN DEFAULT true,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_used TIMESTAMP
+          )
+        `);
 
-      // Create indices for better performance
-      await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id)');
-      await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_key_value ON api_keys(key_value)');
-      await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_user_id ON api_usage(user_id)');
-      await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_created_at ON api_usage(created_at)');
-      await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+        // API usage tracking table
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS api_usage (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            api_key_id INTEGER REFERENCES api_keys(id) ON DELETE SET NULL,
+            endpoint TEXT NOT NULL,
+            method TEXT NOT NULL,
+            ip_address TEXT,
+            user_agent TEXT,
+            response_status INTEGER,
+            response_time INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
 
-      await client.query('COMMIT');
-      console.log('All database tables created successfully');
+        // User favorites table
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS user_favorites (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            quote_text TEXT NOT NULL,
+            quote_author TEXT,
+            quote_category TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create indices for better performance
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_key_value ON api_keys(key_value)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_user_id ON api_usage(user_id)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_created_at ON api_usage(created_at)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+
+        console.log('✅ All database tables created successfully');
+      } finally {
+        // Release the advisory lock
+        await client.query('SELECT pg_advisory_unlock(12345)');
+      }
     } catch (error) {
-      await client.query('ROLLBACK');
-      console.error('Error creating tables:', error);
+      // Handle duplicate key errors gracefully (race condition)
+      if (error.code === '23505' || error.message.includes('already exists')) {
+        console.log('✅ Database tables already exist (concurrent creation detected)');
+        return;
+      }
+      console.error('❌ Error creating tables:', error.message);
       throw error;
     } finally {
       client.release();
