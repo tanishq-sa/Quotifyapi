@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isLocalhost) {
             return `http://localhost:${window.location.port || 3000}`;
         }
-        return 'https://quotifyapi.vercel.app';
+        return 'https://quotify.dazzelr.tech';
     }
 
     // Function to get full URL for requests
