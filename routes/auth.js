@@ -16,20 +16,20 @@ router.get('/google/callback',
     try {
       const token = generateToken(req.user);
       
-      // For admin users, ensure they have an API key
-      if (req.user.email === process.env.ADMIN_EMAIL || req.user.email === 'tanishqsaini872@gmail.com') {
-        try {
-          const hasKeys = await database.hasApiKeys(req.user.id);
-          if (!hasKeys) {
-            const apiKey = await database.createFirstAdminApiKey(req.user.id);
-            console.log(`✅ Created first API key for admin ${req.user.email}`);
-          } else {
-            console.log(`ℹ️  Admin ${req.user.email} already has API keys`);
-          }
-        } catch (error) {
-          console.error('Error creating admin API key:', error);
-          // Don't fail the login if API key creation fails
+      // Ensure ALL users have an API key (not just admins)
+      try {
+        const hasKeys = await database.hasApiKeys(req.user.id);
+        if (!hasKeys) {
+          const isAdmin = req.user.email === process.env.ADMIN_EMAIL || req.user.email === 'tanishqsaini872@gmail.com';
+          const keyName = isAdmin ? 'Admin Default Key' : 'Personal Key';
+          const apiKey = await database.createApiKey(req.user.id, keyName);
+          console.log(`✅ Created first API key for user ${req.user.email}`);
+        } else {
+          console.log(`ℹ️  User ${req.user.email} already has API keys`);
         }
+      } catch (error) {
+        console.error('Error creating API key:', error);
+        // Don't fail the login if API key creation fails
       }
       
       // Redirect to frontend with token
