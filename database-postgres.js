@@ -11,6 +11,37 @@ class PostgresDatabase {
     this.rateLimitMap = new Map();
     this.RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
     this.MAX_REQUESTS_PER_WINDOW = 1000; // Max requests per window
+    
+    // PERFORMANCE: Simple cache for frequently accessed data
+    this.cache = new Map();
+    this.CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+  }
+  
+  // Cache helper methods
+  getCached(key) {
+    const cached = this.cache.get(key);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.data;
+    }
+    this.cache.delete(key);
+    return null;
+  }
+  
+  setCache(key, data) {
+    this.cache.set(key, { data, timestamp: Date.now() });
+    // Limit cache size
+    if (this.cache.size > 1000) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+  }
+  
+  invalidateCache(pattern) {
+    for (const key of this.cache.keys()) {
+      if (key.includes(pattern)) {
+        this.cache.delete(key);
+      }
+    }
   }
 
   // Initialize database connection
@@ -33,11 +64,13 @@ class PostgresDatabase {
           rejectUnauthorized: false, // Accept self-signed certificates from cloud providers
           require: true
         },
-        max: 20, // Maximum number of clients in the pool
-        idleTimeoutMillis: 30000,
+        // PERFORMANCE: Optimized pool settings for serverless
+        max: 10, // Reduced from 20 - serverless functions should use fewer connections
+        min: 0, // No minimum connections - save resources
+        idleTimeoutMillis: 10000, // Close idle connections faster (10s instead of 30s)
         connectionTimeoutMillis: 20000, // Increased timeout for Aiven/serverless
         statement_timeout: 30000, // Query timeout
-        query_timeout: 30000,
+        allowExitOnIdle: true, // Allow the pool to close when all connections are idle
       });
 
       // Test connection with retry logic
@@ -178,9 +211,11 @@ class PostgresDatabase {
 
         // Create indices for better performance
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id)');
-        await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_key_value ON api_keys(key_value)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_active ON api_keys(user_id, is_active)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_key_value ON api_keys(key_value) WHERE is_active = true');
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_user_id ON api_usage(user_id)');
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_created_at ON api_usage(created_at)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_user_date ON api_usage(user_id, created_at)');
         await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
 
         console.log('✅ All database tables created successfully');
@@ -328,9 +363,12 @@ class PostgresDatabase {
     const result = await this.pool.query(
       `INSERT INTO users (email, name, provider, provider_id, plan, api_key)
        VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`,
+       RETURNING id, email, name, provider, provider_id, plan, plan_expiry, role, created_at, updated_at`,
       [email, name, provider, provider_id, plan, api_key]
     );
+    
+    // Invalidate user cache
+    this.invalidateCache(`user:`);
     
     return result.rows[0];
   }
@@ -340,7 +378,22 @@ class PostgresDatabase {
       throw new Error('Invalid email format');
     }
     
-    const result = await this.pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    // Check cache first
+    const cacheKey = `user:email:${email}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // Optimized query - only select needed fields
+    const result = await this.pool.query(
+      `SELECT id, email, name, provider, provider_id, plan, plan_expiry, role, created_at, updated_at 
+       FROM users WHERE email = $1 LIMIT 1`,
+      [email]
+    );
+    
+    if (result.rows[0]) {
+      this.setCache(cacheKey, result.rows[0]);
+    }
+    
     return result.rows[0];
   }
 
@@ -350,7 +403,22 @@ class PostgresDatabase {
       throw new Error('Invalid user ID');
     }
     
-    const result = await this.pool.query('SELECT * FROM users WHERE id = $1', [userIdInt]);
+    // Check cache first
+    const cacheKey = `user:id:${userIdInt}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // Optimized query - only select needed fields
+    const result = await this.pool.query(
+      `SELECT id, email, name, provider, provider_id, plan, plan_expiry, role, created_at, updated_at 
+       FROM users WHERE id = $1 LIMIT 1`,
+      [userIdInt]
+    );
+    
+    if (result.rows[0]) {
+      this.setCache(cacheKey, result.rows[0]);
+    }
+    
     return result.rows[0];
   }
 
@@ -363,8 +431,10 @@ class PostgresDatabase {
       throw new Error('Invalid provider_id');
     }
     
+    // Optimized query - only select needed fields
     const result = await this.pool.query(
-      'SELECT * FROM users WHERE provider = $1 AND provider_id = $2',
+      `SELECT id, email, name, provider, provider_id, plan, plan_expiry, role, created_at, updated_at 
+       FROM users WHERE provider = $1 AND provider_id = $2 LIMIT 1`,
       [provider, provider_id]
     );
     return result.rows[0];
@@ -393,9 +463,12 @@ class PostgresDatabase {
     const result = await this.pool.query(
       `INSERT INTO api_keys (user_id, key_value, name)
        VALUES ($1, $2, $3)
-       RETURNING *`,
+       RETURNING id, user_id, key_value, name, is_active, created_at, last_used`,
       [userIdInt, key_value, name]
     );
+    
+    // Invalidate API keys cache
+    this.invalidateCache(`apikeys:user:${userIdInt}`);
     
     return result.rows[0];
   }
@@ -444,10 +517,22 @@ class PostgresDatabase {
       throw new Error('Invalid user ID');
     }
     
+    // Check cache first
+    const cacheKey = `apikeys:user:${userIdInt}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // Optimized query - only select needed fields, use composite index
     const result = await this.pool.query(
-      'SELECT * FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC',
+      `SELECT id, user_id, key_value, name, is_active, created_at, last_used 
+       FROM api_keys 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT 50`,
       [userIdInt]
     );
+    
+    this.setCache(cacheKey, result.rows);
     return result.rows;
   }
 
@@ -457,11 +542,12 @@ class PostgresDatabase {
       throw new Error('Invalid user ID');
     }
     
+    // Optimized query - use EXISTS instead of COUNT, uses composite index
     const result = await this.pool.query(
-      'SELECT COUNT(*) as count FROM api_keys WHERE user_id = $1 AND is_active = true',
+      'SELECT EXISTS(SELECT 1 FROM api_keys WHERE user_id = $1 AND is_active = true LIMIT 1) as has_keys',
       [userIdInt]
     );
-    return parseInt(result.rows[0].count) > 0;
+    return result.rows[0].has_keys;
   }
 
   async revokeApiKey(keyId, userId) {
