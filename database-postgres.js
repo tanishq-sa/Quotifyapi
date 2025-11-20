@@ -495,11 +495,19 @@ class PostgresDatabase {
       throw new Error('Rate limit exceeded. Please try again later.');
     }
     
+    // Check cache first (cache valid API keys for 2 minutes)
+    const cacheKey = `apikey:${apiKey}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // OPTIMIZED: Only select needed fields, use partial index
     const result = await this.pool.query(
-      `SELECT ak.*, u.email, u.name, u.plan, u.provider, u.role
+      `SELECT ak.id, ak.user_id, ak.key_value, ak.name, 
+              u.email, u.name as user_name, u.plan, u.provider, u.role
        FROM api_keys ak
-       JOIN users u ON ak.user_id = u.id
-       WHERE ak.key_value = $1 AND ak.is_active = true`,
+       INNER JOIN users u ON ak.user_id = u.id
+       WHERE ak.key_value = $1 AND ak.is_active = true
+       LIMIT 1`,
       [apiKey]
     );
     
@@ -508,7 +516,9 @@ class PostgresDatabase {
       throw new Error('Invalid API key');
     }
     
-    return result.rows[0];
+    const keyData = result.rows[0];
+    this.setCache(cacheKey, keyData);
+    return keyData;
   }
 
   async getUserApiKeys(userId) {
@@ -656,32 +666,51 @@ class PostgresDatabase {
       throw new Error('Invalid days parameter (must be between 1 and 365)');
     }
     
+    // Check cache first
+    const cacheKey = `usage:${userIdInt}:${daysInt}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // OPTIMIZED: Use simpler COUNT with filter, avoid CASE statements
     const result = await this.pool.query(
       `SELECT 
         DATE(created_at) as date,
         COUNT(*) as total_requests,
-        COUNT(CASE WHEN response_status >= 200 AND response_status < 300 THEN 1 END) as successful_requests,
-        COUNT(CASE WHEN response_status >= 400 THEN 1 END) as failed_requests,
-        AVG(response_time) as avg_response_time
+        COUNT(*) FILTER (WHERE response_status BETWEEN 200 AND 299) as successful_requests,
+        COUNT(*) FILTER (WHERE response_status >= 400) as failed_requests,
+        ROUND(AVG(response_time)::numeric, 2) as avg_response_time
        FROM api_usage 
-       WHERE user_id = $1 AND created_at >= NOW() - INTERVAL '1 day' * $2
+       WHERE user_id = $1 
+         AND created_at >= CURRENT_DATE - $2::integer
        GROUP BY DATE(created_at)
-       ORDER BY date DESC`,
+       ORDER BY date DESC
+       LIMIT 365`,
       [userIdInt, daysInt]
     );
     
+    this.setCache(cacheKey, result.rows);
     return result.rows;
   }
 
   async getDailyUsageCount(userId, date = new Date().toISOString().split('T')[0]) {
+    // Check cache first (cache for 1 minute for current day)
+    const cacheKey = `daily:${userId}:${date}`;
+    const cached = this.getCached(cacheKey);
+    if (cached !== null) return cached;
+    
+    // OPTIMIZED: Use indexed column directly, no function on column
     const result = await this.pool.query(
       `SELECT COUNT(*) as count
        FROM api_usage 
-       WHERE user_id = $1 AND DATE(created_at) = $2`,
+       WHERE user_id = $1 
+         AND created_at >= $2::date 
+         AND created_at < ($2::date + INTERVAL '1 day')`,
       [userId, date]
     );
     
-    return result.rows[0]?.count || 0;
+    const count = parseInt(result.rows[0]?.count || 0);
+    this.setCache(cacheKey, count);
+    return count;
   }
 
   // User favorites methods
@@ -755,18 +784,27 @@ class PostgresDatabase {
   }
 
   async getAllUsers() {
+    // Check cache first (cache for 30 seconds)
+    const cacheKey = 'all_users';
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // OPTIMIZED: Use subqueries instead of LEFT JOINs to avoid cartesian product
     const result = await this.pool.query(
-      `SELECT u.id, u.email, u.name, u.plan, u.role, u.provider, u.created_at, u.updated_at,
-              COUNT(DISTINCT CASE WHEN ak.is_active = true THEN ak.id END) as api_key_count,
-              COUNT(DISTINCT au.id) as total_requests,
-              COUNT(DISTINCT CASE WHEN DATE(au.created_at) = CURRENT_DATE THEN au.id END) as today_requests
+      `SELECT 
+        u.id, u.email, u.name, u.plan, u.role, u.provider, u.created_at, u.updated_at,
+        (SELECT COUNT(*) FROM api_keys ak WHERE ak.user_id = u.id AND ak.is_active = true) as api_key_count,
+        (SELECT COUNT(*) FROM api_usage au WHERE au.user_id = u.id) as total_requests,
+        (SELECT COUNT(*) FROM api_usage au 
+         WHERE au.user_id = u.id 
+           AND au.created_at >= CURRENT_DATE 
+           AND au.created_at < CURRENT_DATE + INTERVAL '1 day') as today_requests
        FROM users u
-       LEFT JOIN api_keys ak ON u.id = ak.user_id
-       LEFT JOIN api_usage au ON u.id = au.user_id
-       GROUP BY u.id
-       ORDER BY u.created_at DESC`
+       ORDER BY u.created_at DESC
+       LIMIT 1000`
     );
     
+    this.setCache(cacheKey, result.rows);
     return result.rows;
   }
 
@@ -803,34 +841,51 @@ class PostgresDatabase {
   }
 
   async getSystemStats() {
+    // Check cache first (cache for 1 minute)
+    const cacheKey = 'system_stats';
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // OPTIMIZED: Use FILTER instead of CASE, optimize date comparison
     const result = await this.pool.query(
       `SELECT 
         COUNT(*) as total_users,
-        COUNT(CASE WHEN plan = 'free' THEN 1 END) as free_users,
-        COUNT(CASE WHEN plan = 'basic' THEN 1 END) as basic_users,
-        COUNT(CASE WHEN plan = 'pro' THEN 1 END) as pro_users,
+        COUNT(*) FILTER (WHERE plan = 'free') as free_users,
+        COUNT(*) FILTER (WHERE plan = 'basic') as basic_users,
+        COUNT(*) FILTER (WHERE plan = 'pro') as pro_users,
         (SELECT COUNT(*) FROM api_usage) as total_requests,
-        (SELECT COUNT(*) FROM api_usage WHERE DATE(created_at) = CURRENT_DATE) as today_requests,
+        (SELECT COUNT(*) FROM api_usage 
+         WHERE created_at >= CURRENT_DATE 
+           AND created_at < CURRENT_DATE + INTERVAL '1 day') as today_requests,
         (SELECT COUNT(*) FROM api_keys WHERE is_active = true) as active_api_keys
        FROM users`
     );
     
+    this.setCache(cacheKey, result.rows[0]);
     return result.rows[0];
   }
 
   async getDailyUsageStats(days = 30) {
+    // Check cache first
+    const cacheKey = `daily_stats:${days}`;
+    const cached = this.getCached(cacheKey);
+    if (cached) return cached;
+    
+    // OPTIMIZED: Avoid DATE() function on indexed column
     const result = await this.pool.query(
       `SELECT 
-        DATE(created_at) as date,
+        created_at::date as date,
         COUNT(*) as requests,
         COUNT(DISTINCT user_id) as unique_users
        FROM api_usage 
-       WHERE created_at >= CURRENT_DATE - INTERVAL '1 day' * $1
-       GROUP BY DATE(created_at)
-       ORDER BY date DESC`,
+       WHERE created_at >= CURRENT_DATE - $1::integer
+       GROUP BY created_at::date
+       ORDER BY date DESC
+       LIMIT 365`,
       [days]
     );
     
+    this.setCache(cacheKey, result.rows);
     return result.rows;
   }
 
