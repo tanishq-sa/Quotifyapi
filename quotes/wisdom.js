@@ -466,6 +466,14 @@ const wisdomQuotes = [
   {
     text: "The big lesson in life, baby, is never be scared of anyone or anything.",
     author: "Frank Sinatra"
+  },
+  {
+    text: "The best way to predict the future is to invent it.",
+    author: "Alan Kay"
+  },
+  {
+    text: "The only way to do great work is to love what you do.",
+    author: "Steve Jobs"
   }
 ];
 

@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - QuoteAPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                        'space': ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'gradient': 'gradient 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
+                            '100%': { boxShadow: '0 0 30px rgba(59, 130, 246, 0.8)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Solid black background */
+        html, body {
+            background: #000000 !important;
+            min-height: 100vh !important;
+            overflow-x: hidden;
+        }
+        
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Enhanced animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+        }
+        
+        @keyframes slide-up {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
+        .animate-gradient { 
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite; 
+        }
+        .animate-glow { animation: glow 2s ease-in-out infinite; }
+        .animate-slide-up { 
+            animation: slide-up 0.6s ease-out forwards; 
+        }
+        .animate-fade-in { 
+            animation: fade-in 0.8s ease-out forwards; 
+        }
+        
+        /* Neon glow effects */
+        .neon-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .neon-purple {
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+        }
+        
+        .neon-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #2563eb, #7c3aed);
+        }
+        
+        /* Animated particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 1s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 3s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 4s; }
+        .particle:nth-child(6) { width: 6px; height: 6px; left: 60%; animation-delay: 5s; }
+        .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: 0.5s; }
+        .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: 1.5s; }
+        .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: 2.5s; }
+        .particle:nth-child(10) { width: 6px; height: 6px; left: 95%; animation-delay: 3.5s; }
+    </style>
+</head>
+
+<body class="font-inter text-white relative">
+    <!-- Animated particles background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                </div>
+                <span class="font-space text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">QuoteAPI</span>
+            </a>
+            
+            <div class="flex items-center gap-6">
+                <a href="/" class="nav-link text-gray-300 hover:text-white hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Home
+                </a>
+                <a href="/admin" id="adminLink" class="nav-link text-red-300 hover:text-red-200 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 hidden">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Admin
+                </a>
+                <button id="logoutBtn" class="text-red-400 hover:text-red-300 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen px-4 py-20 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12 animate-fade-in">
+                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <h1 class="font-space text-4xl sm:text-5xl font-bold mb-4">
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        Welcome Back
+                    </span>
+                </h1>
+                <p class="text-gray-400 text-lg">Manage your API access and monitor usage</p>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- API Key Section -->
+                <div class="lg:col-span-2">
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.1s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Header with icon -->
+                        <div class="relative flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="font-space text-2xl font-bold text-white">API Key</h2>
+                                    <p class="text-sm text-gray-400">Your authentication credentials</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="refreshStats" class="glass-dark hover:bg-white/20 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn">
+                                    <svg class="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Refresh
+                                </button>
+                                <button id="copyApiKey" class="glass-dark hover:bg-white/20 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn">
+                                    <svg class="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <button id="generateNewKey" class="glass-dark hover:bg-white/20 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn">
+                                    <svg class="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Generate New
+                                </button>
+                                <button id="regenerateAdminKey" class="glass-dark hover:bg-white/20 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn hidden">
+                                    <svg class="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Regenerate Personal Key
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="relative mb-6">
+                            <div class="glass-dark rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group/key">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-400 uppercase tracking-wide">Your API Key</span>
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-500 bg-gray-500/20 px-2 py-1 rounded-full">Keep this secure</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <code id="apiKeyDisplay" class="flex-1 bg-black/20 px-4 py-3 rounded-xl text-green-400 font-mono text-sm break-all border border-green-400/20 group-hover/key:border-green-400/40 transition-all duration-300">
+                                        Loading...
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Usage Statistics -->
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="font-space text-xl font-bold text-white">Usage Statistics</h3>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="glass-dark rounded-xl p-6 text-center border border-white/10 hover:border-white/20 transition-all duration-300 group/stat">
+                                    <div class="text-3xl font-bold text-blue-400 group-hover/stat:scale-110 transition-transform duration-200" id="totalRequests">0</div>
+                                    <div class="text-sm text-gray-400 mt-1">Requests Left</div>
+                                    <div class="text-xs text-gray-500 mt-1" id="totalLimitText">Free: 50/day</div>
+                                    <div class="w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="glass-dark rounded-xl p-6 text-center border border-white/10 hover:border-white/20 transition-all duration-300 group/stat">
+                                    <div class="text-3xl font-bold text-green-400 group-hover/stat:scale-110 transition-transform duration-200" id="requestsToday">0</div>
+                                    <div class="text-sm text-gray-400 mt-1">Today</div>
+                                    <div class="w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="glass-dark rounded-xl p-6 text-center border border-white/10 hover:border-white/20 transition-all duration-300 group/stat">
+                                    <div class="text-3xl font-bold text-purple-400 group-hover/stat:scale-110 transition-transform duration-200" id="successRate">100%</div>
+                                    <div class="text-sm text-gray-400 mt-1">Success Rate</div>
+                                    <div class="w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Usage Instructions -->
+                        <div class="space-y-6 mt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="font-space text-xl font-bold text-white">How to Use</h3>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="glass-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group/step">
+                                    <div class="flex items-start gap-6">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 group-hover/step:scale-110 transition-transform duration-200 shadow-lg">1</div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-white font-semibold mb-3 text-xl">Add to Headers</h4>
+                                            <p class="text-gray-400 text-base mb-4 leading-relaxed">Include your API key in the request headers</p>
+                                            <div class="bg-black/30 px-4 py-3 rounded-lg border border-blue-400/30">
+                                                <code class="text-blue-400 font-mono text-sm break-all">x-api-key: your_key_here</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="glass-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group/step">
+                                    <div class="flex items-start gap-6">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 group-hover/step:scale-110 transition-transform duration-200 shadow-lg">2</div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-white font-semibold mb-3 text-xl">Make Requests</h4>
+                                            <p class="text-gray-400 text-base mb-4 leading-relaxed">Use any of our endpoints to get quotes</p>
+                                            <div class="bg-black/30 px-4 py-3 rounded-lg border border-purple-400/30">
+                                                <code class="text-purple-400 font-mono text-sm break-all">GET /api/v1/quotes</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="glass-dark rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group/step">
+                                    <div class="flex items-start gap-6">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 group-hover/step:scale-110 transition-transform duration-200 shadow-lg">3</div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-white font-semibold mb-3 text-xl">Monitor Usage</h4>
+                                            <p class="text-gray-400 text-base mb-4 leading-relaxed">Track your requests and stay within limits</p>
+                                            <div class="flex items-center gap-3 text-sm text-green-400 bg-green-500/10 px-4 py-2 rounded-lg border border-green-400/20">
+                                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                <span class="font-medium">Real-time tracking available</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    <!-- User Info -->
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.2s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Header with icon -->
+                        <div class="relative flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-space text-xl font-bold text-white">Account Info</h3>
+                                <p class="text-sm text-gray-400">Your profile details</p>
+                            </div>
+                        </div>
+
+                        <!-- User details with enhanced styling -->
+                        <div class="relative space-y-6">
+                            <!-- Name -->
+                            <div class="group/item">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-400 uppercase tracking-wide">Name</span>
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="glass-dark rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                                    <p id="userName" class="text-white font-semibold text-lg">Loading...</p>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="group/item">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-400 uppercase tracking-wide">Email</span>
+                                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="glass-dark rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                                    <p id="userEmail" class="text-white font-semibold text-lg break-all">Loading...</p>
+                                </div>
+                            </div>
+
+                            <!-- Plan with badge -->
+                            <div class="group/item">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-400 uppercase tracking-wide">Plan</span>
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="glass-dark rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300">
+                                    <div class="flex items-center justify-between">
+                                        <p id="userPlan" class="text-white font-semibold text-lg capitalize">Loading...</p>
+                                        <div id="planBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide hidden">
+                                            <!-- Plan badge will be added dynamically -->
+                                        </div>
+                                    </div>
+                                    <!-- Subscription Status (shown if canceled) -->
+                                    <div id="subscriptionStatus" class="hidden mt-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                                        <div class="flex items-center gap-2 text-orange-400 text-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="font-semibold">Subscription Canceled</span>
+                                        </div>
+                                        <p id="expiryMessage" class="text-xs text-orange-300 mt-1"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cancel Subscription Button (hidden by default, shown for paid plans) -->
+                            <div id="cancelSubscriptionSection" class="group/item hidden">
+                                <button id="cancelSubscriptionBtn" onclick="cancelSubscription()" class="w-full glass-dark hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-xl p-4 flex items-center justify-center gap-3 transition-all duration-300 group/cancel">
+                                    <svg class="w-5 h-5 text-red-400 group-hover/cancel:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    <span class="text-red-400 font-semibold">Cancel Subscription</span>
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2 text-center">Access continues until end of billing period</p>
+                            </div>
+                        </div>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+
+                    <!-- Quick Actions -->
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.3s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Header with icon -->
+                        <div class="relative flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-space text-xl font-bold text-white">Quick Actions</h3>
+                                <p class="text-sm text-gray-400">Essential tools & resources</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative space-y-4">
+                            <a href="/#try-it" class="glass-dark hover:bg-white/20 border border-white/10 hover:border-white/30 rounded-xl p-4 flex items-center gap-4 transition-all duration-300 group/action">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover/action:scale-110 transition-transform duration-200">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-semibold text-white text-lg">Try API</span>
+                                    <p class="text-sm text-gray-400">Test your API key</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400 group-hover/action:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                            
+                            <a href="/#examples" class="glass-dark hover:bg-white/20 border border-white/10 hover:border-white/30 rounded-xl p-4 flex items-center gap-4 transition-all duration-300 group/action">
+                                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover/action:scale-110 transition-transform duration-200">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-semibold text-white text-lg">Code Examples</span>
+                                    <p class="text-sm text-gray-400">Integration samples</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400 group-hover/action:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                            
+                            <a href="/#rate-limits" class="glass-dark hover:bg-white/20 border border-white/10 hover:border-white/30 rounded-xl p-4 flex items-center gap-4 transition-all duration-300 group/action">
+                                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover/action:scale-110 transition-transform duration-200">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-semibold text-white text-lg">Rate Limits</span>
+                                    <p class="text-sm text-gray-400">Usage guidelines</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400 group-hover/action:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-full blur-lg"></div>
+                    </div>
+
+                    <!-- Support -->
+                    <div class="glass rounded-3xl p-8 animate-slide-up relative overflow-hidden group" style="animation-delay: 0.4s;">
+                        <!-- Background gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <!-- Header with icon -->
+                        <div class="relative flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-space text-xl font-bold text-white">Need Help?</h3>
+                                <p class="text-sm text-gray-400">We're here to assist you</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative space-y-4">
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Having issues with your API? Our support team is here to help you get the most out of your QuoteAPI experience.
+                            </p>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 text-sm text-gray-400">
+                                    <div class="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                    <span>24/7 Email Support</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-gray-400">
+                                    <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
+                                    <span>Quick Response Time</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-gray-400">
+                                    <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+                                    <span>Technical Documentation</span>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn">
+                                <svg class="w-5 h-5 group-hover/btn:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                Contact Support
+                            </button>
+                        </div>
+
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-600/20 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('quotify_token');
+        const apiKey = localStorage.getItem('apiKey');
+        let isAdmin = false;
+        
+        console.log('Profile page load - Authentication check:', {
+            hasToken: !!token,
+            hasApiKey: !!apiKey,
+            tokenLength: token ? token.length : 0,
+            apiKeyLength: apiKey ? apiKey.length : 0
+        });
+        
+        if (!token && !apiKey) {
+            window.location.href = '/login';
+        }
+
+        // If user has API key but no token, fetch user data using API key
+        if (apiKey && !token) {
+            console.log('Taking API key only path');
+            // Fetch user data and usage using API key
+            Promise.all([
+                fetch('/api/v1/user/profile', { headers: { 'x-api-key': apiKey } }),
+                fetch('/api/v1/user/usage', { headers: { 'x-api-key': apiKey } })
+            ])
+            .then(responses => Promise.all(responses.map(r => r.json())))
+            .then(([profileData, usageData]) => {
+                if (profileData.profile) {
+                    document.getElementById('userName').textContent = profileData.profile.name || 'User';
+                    document.getElementById('userEmail').textContent = profileData.profile.email || 'user@example.com';
+                    document.getElementById('userPlan').textContent = profileData.profile.plan || 'Free';
+                    document.getElementById('apiKeyDisplay').textContent = apiKey;
+                    
+                    // Check if user is admin
+                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    
+                    // Show appropriate button for admin users
+                    if (isAdmin) {
+                        document.getElementById('generateNewKey').classList.add('hidden');
+                        document.getElementById('regenerateAdminKey').classList.remove('hidden');
+                        document.getElementById('adminLink').classList.remove('hidden');
+                    }
+                    
+                    // Add plan badge
+                    updatePlanBadge(profileData.profile.plan || 'free');
+                    
+                    // Display usage statistics
+                    if (usageData) {
+                        console.log('Processing usage data (API key only):', usageData);
+                        
+                        // Calculate total requests from usage_stats array
+                        const totalRequests = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
+                        
+                        // Calculate success rate
+                        const totalSuccessful = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
+                        const successRate = totalRequests > 0 ? 
+                            Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                        
+                        // Calculate requests left based on plan
+                        const plan = usageData.plan || profileData.profile.plan || 'free';
+                        const todayUsage = usageData.today_usage || 0;
+                        
+                        let requestsLeft;
+                        let dailyLimit;
+                        if (plan === 'free') {
+                            dailyLimit = 50;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'basic') {
+                            dailyLimit = 500;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'pro') {
+                            requestsLeft = 'Unlimited';
+                            dailyLimit = 'Unlimited';
+                        }
+                        
+                        console.log('API key path - Plan detection:', {
+                            usageDataPlan: usageData.plan,
+                            profileDataPlan: profileData.profile.plan,
+                            finalPlan: plan,
+                            dailyLimit: dailyLimit,
+                            todayUsage: todayUsage,
+                            requestsLeft: requestsLeft
+                        });
+                        
+                        document.getElementById('totalRequests').textContent = requestsLeft;
+                        document.getElementById('requestsToday').textContent = todayUsage;
+                        document.getElementById('successRate').textContent = `${successRate}%`;
+                        
+                        // Update progress bars
+                        updateProgressBars(plan, requestsLeft, todayUsage, successRate);
+                        
+                        console.log('Updated usage stats (API key only):', {
+                            requestsLeft: requestsLeft,
+                            todayUsage: todayUsage,
+                            successRate: `${successRate}%`
+                        });
+                    } else {
+                        // Fallback to plan-based limits (showing full limit as requests left since usage is 0)
+                        const plan = profileData.profile.plan || 'free';
+                        console.log('Fallback - Plan detection:', {
+                            profileDataPlan: profileData.profile.plan,
+                            finalPlan: plan
+                        });
+                        
+                        if (plan === 'free') {
+                            document.getElementById('totalRequests').textContent = '50';
+                        } else if (plan === 'basic') {
+                            document.getElementById('totalRequests').textContent = '500';
+                        } else if (plan === 'pro') {
+                            document.getElementById('totalRequests').textContent = 'Unlimited';
+                        }
+                        document.getElementById('requestsToday').textContent = '0';
+                        document.getElementById('successRate').textContent = '100%';
+                        
+                        // Update progress bars for fallback
+                        updateProgressBars(plan, plan === 'free' ? 50 : plan === 'basic' ? 500 : 0, 0, 100);
+                    }
+                } else {
+                    throw new Error('Profile data not found');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching profile with API key:', error);
+                // Fallback to basic info
+                document.getElementById('userName').textContent = 'User';
+                document.getElementById('userEmail').textContent = 'user@example.com';
+                document.getElementById('userPlan').textContent = 'Free';
+                document.getElementById('apiKeyDisplay').textContent = apiKey;
+                document.getElementById('totalRequests').textContent = '50';
+                document.getElementById('requestsToday').textContent = '0';
+                document.getElementById('successRate').textContent = '100%';
+                
+                // Update progress bars for error fallback
+                updateProgressBars('free', 50, 0, 100);
+            });
+        } else {
+            console.log('Taking JWT token path');
+            // Fetch user data and API key
+            const headers = token ? 
+                { 'Authorization': `Bearer ${token}` } : 
+                { 'x-api-key': apiKey };
+                
+            // First get user profile to determine if admin
+            fetch('/api/v1/user/profile', { headers })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(profileData => {
+                if (profileData.profile) {
+                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    
+                    // Show appropriate button for admin users
+                    if (isAdmin) {
+                        document.getElementById('generateNewKey').classList.add('hidden');
+                        document.getElementById('regenerateAdminKey').classList.remove('hidden');
+                        document.getElementById('adminLink').classList.remove('hidden');
+                    }
+                }
+                
+                // Fetch usage and API keys based on user type
+                const keysEndpoint = isAdmin ? '/api/v1/admin/keys' : '/auth/keys';
+                
+                return Promise.all([
+                    Promise.resolve(profileData),
+                    fetch('/api/v1/user/usage', { headers }),
+                    fetch(keysEndpoint, { headers })
+                ]);
+            })
+            .catch(error => {
+                console.error('Error fetching profile with JWT, trying with API key:', error);
+                
+                // If JWT fails, try with API key if available
+                if (apiKey) {
+                    const apiKeyHeaders = { 'x-api-key': apiKey };
+                    const keysEndpoint = '/api/v1/admin/keys'; // Assume admin if using API key
+                    
+                    return Promise.all([
+                        fetch('/api/v1/user/profile', { headers: apiKeyHeaders }),
+                        fetch('/api/v1/user/usage', { headers: apiKeyHeaders }),
+                        fetch(keysEndpoint, { headers: apiKeyHeaders })
+                    ]).then(responses => {
+                        // Check if all responses are ok
+                        const allOk = responses.every(r => r.ok);
+                        if (!allOk) {
+                            throw new Error('API key authentication failed');
+                        }
+                        
+                        // Process responses
+                        return Promise.all(responses.map(r => r.json()));
+                    }).then(([profileData, usageData, keysData]) => {
+                        // Set admin status
+                        if (profileData.profile) {
+                            isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                            
+                            if (isAdmin) {
+                                document.getElementById('generateNewKey').classList.add('hidden');
+                                document.getElementById('regenerateAdminKey').classList.remove('hidden');
+                                document.getElementById('adminLink').classList.remove('hidden');
+                            }
+                            
+                            // Display usage statistics for API key fallback
+                            if (usageData) {
+                                console.log('Processing usage data (API key fallback):', usageData);
+                                
+                                // Calculate total requests from usage_stats array
+                                const totalRequests = usageData.usage_stats ? 
+                                    usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
+                                
+                                // Calculate success rate
+                                const totalSuccessful = usageData.usage_stats ? 
+                                    usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
+                                const successRate = totalRequests > 0 ? 
+                                    Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                                
+                        // For free plan, show 50 as total limit, for pro show unlimited, otherwise show actual usage
+                        const plan = profileData.profile.plan || 'free';
+                        const totalLimit = plan === 'free' ? 50 : plan === 'pro' ? 'Unlimited' : totalRequests;
+                                
+                                document.getElementById('totalRequests').textContent = totalLimit;
+                                document.getElementById('requestsToday').textContent = usageData.today_usage || 0;
+                                document.getElementById('successRate').textContent = `${successRate}%`;
+                                
+                                // Update progress bars
+                                updateProgressBars(plan, totalLimit, usageData.today_usage || 0, successRate);
+                                
+                                console.log('Updated usage stats (API key fallback):', {
+                                    totalRequests: totalLimit,
+                                    todayUsage: usageData.today_usage || 0,
+                                    successRate: `${successRate}%`
+                                });
+                            }
+                        }
+                        
+                        return [profileData, usageData, keysData];
+                    });
+                } else {
+                    throw error; // Re-throw if no API key available
+                }
+            })
+            .then(responses => {
+                // Check for rate limit errors
+                const rateLimited = responses.some(r => r.status === 429);
+                if (rateLimited) {
+                    throw new Error('Rate limit exceeded');
+                }
+                
+                // Check for authentication errors
+                const authErrors = responses.some(r => r.status === 401);
+                if (authErrors) {
+                    throw new Error('Authentication failed');
+                }
+                
+                // If responses are already parsed (from API key fallback), return as is
+                if (Array.isArray(responses) && responses.length === 3 && typeof responses[0] === 'object' && responses[0].profile) {
+                    return responses;
+                }
+                
+                // Otherwise, parse the responses
+                return Promise.all(responses.map(r => r.json()));
+            })
+            .then(([profileData, usageData, keysData]) => {
+                console.log('Profile data received:', profileData);
+                console.log('Usage data received:', usageData);
+                console.log('Keys data received:', keysData);
+                
+                if (profileData.profile) {
+                    // Display user info
+                    document.getElementById('userName').textContent = profileData.profile.name || 'User';
+                    document.getElementById('userEmail').textContent = profileData.profile.email || 'user@example.com';
+                    document.getElementById('userPlan').textContent = profileData.profile.plan || 'Free';
+                    
+                    // Check if user is admin
+                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    
+                    // Show appropriate button for admin users
+                    if (isAdmin) {
+                        document.getElementById('generateNewKey').classList.add('hidden');
+                        document.getElementById('regenerateAdminKey').classList.remove('hidden');
+                        document.getElementById('adminLink').classList.remove('hidden');
+                    }
+                    
+                    // Add plan badge
+                    updatePlanBadge(profileData.profile.plan || 'free');
+                    
+                    // Display usage statistics
+                    if (usageData) {
+                        console.log('Processing usage data:', usageData);
+                        
+                        // Calculate total requests from usage_stats array
+                        const totalRequests = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
+                        
+                        // Calculate success rate
+                        const totalSuccessful = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
+                        const successRate = totalRequests > 0 ? 
+                            Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                        
+                        // Calculate requests left based on plan
+                        const plan = usageData.plan || profileData.profile.plan || 'free';
+                        const todayUsage = usageData.today_usage || 0;
+                        
+                        let requestsLeft;
+                        let dailyLimit;
+                        if (plan === 'free') {
+                            dailyLimit = 50;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'basic') {
+                            dailyLimit = 500;
+                            requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                        } else if (plan === 'pro') {
+                            requestsLeft = 'Unlimited';
+                            dailyLimit = 'Unlimited';
+                        }
+                        
+                        console.log('Initial load - Plan detection:', {
+                            usageDataPlan: usageData.plan,
+                            profileDataPlan: profileData.profile.plan,
+                            finalPlan: plan,
+                            dailyLimit: dailyLimit,
+                            todayUsage: todayUsage,
+                            requestsLeft: requestsLeft
+                        });
+                        
+                        document.getElementById('totalRequests').textContent = requestsLeft;
+                        document.getElementById('requestsToday').textContent = todayUsage;
+                        document.getElementById('successRate').textContent = `${successRate}%`;
+                        
+                        // Update progress bars
+                        updateProgressBars(plan, requestsLeft, todayUsage, successRate);
+                        
+                        console.log('Updated usage stats:', {
+                            requestsLeft: requestsLeft,
+                            todayUsage: todayUsage,
+                            successRate: `${successRate}%`
+                        });
+                    }
+                    
+                    // Display API key - prioritize localStorage API key
+                    const storedApiKey = localStorage.getItem('apiKey');
+                    console.log('Stored API key:', storedApiKey);
+                    console.log('URL API key:', apiKey);
+                    console.log('Keys data structure:', keysData);
+                    
+                    if (storedApiKey) {
+                        // User has API key stored in localStorage (from auth-success page)
+                        document.getElementById('apiKeyDisplay').textContent = storedApiKey;
+                        // Store in localStorage for future use
+                        localStorage.setItem('apiKey', storedApiKey);
+                        console.log('✅ Using stored API key');
+                    } else if (apiKey) {
+                        // User has API key from URL parameter or other source
+                        document.getElementById('apiKeyDisplay').textContent = apiKey;
+                        // Store in localStorage for future use
+                        localStorage.setItem('apiKey', apiKey);
+                        console.log('✅ Using URL API key');
+                    } else if (keysData && ((keysData.api_keys && keysData.api_keys.length > 0) || (keysData.api_key && keysData.api_key.key_value))) {
+                        // Handle both admin (api_keys array) and user (api_key object) responses
+                        let activeKey = null;
+                        
+                        if (keysData.api_keys && Array.isArray(keysData.api_keys)) {
+                            // Admin response format
+                            activeKey = keysData.api_keys.find(key => key.is_active);
+                        } else if (keysData.api_key && keysData.api_key.key_value) {
+                            // User response format
+                            activeKey = keysData.api_key;
+                        }
+                        
+                        if (activeKey && activeKey.key_value) {
+                            // Show the API key value and store it
+                            document.getElementById('apiKeyDisplay').textContent = activeKey.key_value;
+                            localStorage.setItem('apiKey', activeKey.key_value);
+                            console.log('✅ API key loaded from server and stored in localStorage:', activeKey.key_value);
+                        } else {
+                            // No active API key found, create one
+                            console.log('No active API key found, creating new one...');
+                            createApiKeyForUser();
+                        }
+                    } else {
+                        // No API key found, try to create one
+                        console.log('No API key data found, creating new one...');
+                        
+                        // For admin users, try to fetch the API key directly
+                        if (isAdmin) {
+                            console.log('Admin user detected, fetching API key directly...');
+                            fetch('/api/v1/admin/keys', { 
+                                headers: { 'x-api-key': 'qapi_0ec69653cfbbd303ad61b04ff1e344a4f1568cb44a730114274ee557bc731493' }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.api_keys && data.api_keys.length > 0) {
+                                    const activeKey = data.api_keys.find(key => key.is_active);
+                                    if (activeKey) {
+                                        document.getElementById('apiKeyDisplay').textContent = activeKey.key_value;
+                                        localStorage.setItem('apiKey', activeKey.key_value);
+                                        console.log('✅ Admin API key loaded directly:', activeKey.key_value);
+                                        return;
+                                    }
+                                }
+                                createApiKeyForUser();
+                            })
+                            .catch(error => {
+                                console.error('Error fetching admin API key:', error);
+                                createApiKeyForUser();
+                            });
+                        } else {
+                            createApiKeyForUser();
+                        }
+                    }
+                } else {
+                    throw new Error('User data not found');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+                console.log('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    token: token ? 'Present' : 'Missing',
+                    apiKey: apiKey ? 'Present' : 'Missing'
+                });
+                
+                // Check if it's a rate limit error
+                if (error.message && error.message.includes('rate limit')) {
+                    console.log('Rate limit hit, showing cached data or waiting...');
+                    // Don't redirect on rate limit, just show a message
+                    document.getElementById('apiKeyDisplay').textContent = 'Rate limited - please wait';
+                    return;
+                }
+                
+                // Only redirect to login for authentication errors, not rate limit errors
+                if (error.message && (error.message.includes('401') || error.message.includes('unauthorized'))) {
+                    window.location.href = '/login';
+                } else {
+                    // For other errors, just show error message
+                    document.getElementById('apiKeyDisplay').textContent = 'Error loading data';
+                }
+            });
+        }
+
+        // Refresh stats functionality
+        document.getElementById('refreshStats').addEventListener('click', function() {
+            const originalText = this.textContent;
+            this.textContent = 'Refreshing...';
+            this.classList.add('text-blue-400');
+            
+            refreshUsageStats();
+            
+            setTimeout(() => {
+                this.textContent = originalText;
+                this.classList.remove('text-blue-400');
+            }, 1000);
+        });
+
+        // Copy API key functionality
+        document.getElementById('copyApiKey').addEventListener('click', function() {
+            const apiKey = document.getElementById('apiKeyDisplay').textContent;
+            if (apiKey && apiKey !== 'No API key found') {
+                navigator.clipboard.writeText(apiKey).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    this.classList.add('text-green-400');
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('text-green-400');
+                    }, 2000);
+                });
+            }
+        });
+
+        // Create API key for user (fallback when no API key found)
+        async function createApiKeyForUser() {
+            try {
+                const token = localStorage.getItem('quotify_token');
+                const apiKey = localStorage.getItem('apiKey');
+                
+                // Use admin endpoint if user is admin
+                const endpoint = isAdmin ? '/api/v1/admin/keys/generate' : '/auth/keys/generate';
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: token ? 
+                        { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : 
+                        { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: 'Auto-generated Key' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.api_key && data.api_key.key_value) {
+                        document.getElementById('apiKeyDisplay').textContent = data.api_key.key_value;
+                        // Store the API key in localStorage
+                        localStorage.setItem('apiKey', data.api_key.key_value);
+                        console.log('API key created and stored for user');
+                    } else {
+                        document.getElementById('apiKeyDisplay').textContent = 'Failed to create API key';
+                    }
+                } else {
+                    const errorData = await response.json();
+                    
+                    // Check if user is admin
+                    if (errorData.message && errorData.message.includes('Admin users must generate API keys through the admin dashboard')) {
+                        showAdminMessage();
+                        return;
+                    }
+                    
+                    document.getElementById('apiKeyDisplay').textContent = 'No API key found';
+                }
+            } catch (error) {
+                console.error('Failed to create API key:', error);
+                document.getElementById('apiKeyDisplay').textContent = 'No API key found';
+            }
+        }
+
+        // Show admin message
+        function showAdminMessage() {
+            const apiKeySection = document.querySelector('.glass.rounded-3xl.p-8');
+            if (apiKeySection) {
+                // Remove any existing admin message
+                const existingMessage = apiKeySection.querySelector('.admin-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+                
+                // Add admin message
+                const adminMessage = document.createElement('div');
+                adminMessage.className = 'admin-message bg-red-500/10 border border-red-500/20 rounded-xl p-4 mt-4';
+                adminMessage.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-red-300 font-semibold mb-1">Admin User Detected</h4>
+                            <p class="text-red-200/80 text-sm mb-3">
+                                Admin users must generate API keys through the admin dashboard for security reasons.
+                            </p>
+                            <button onclick="window.location.href='/admin'" class="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                                Go to Admin Dashboard
+                            </button>
+                        </div>
+                    </div>
+                `;
+                apiKeySection.appendChild(adminMessage);
+                
+                // Update the API key display
+                document.getElementById('apiKeyDisplay').textContent = 'Admin users must use the admin dashboard';
+                
+                // Show admin link in navigation
+                const adminLink = document.getElementById('adminLink');
+                if (adminLink) {
+                    adminLink.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Generate new API key (for non-admin users)
+        document.getElementById('generateNewKey').addEventListener('click', async function() {
+            try {
+                // Show confirmation modal
+                await ConfirmationModal.show({
+                    title: 'Generate New API Key',
+                    message: 'Are you sure you want to generate a new API key?',
+                    subtext: 'This will create a new API key and your current key will remain active.',
+                    confirmText: 'Generate Key',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
+                    iconType: 'info'
+                });
+                
+                const response = await fetch('/auth/keys/generate', {
+                    method: 'POST',
+                    headers: token ? 
+                        { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : 
+                        { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: 'Generated Key' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.api_key && data.api_key.key_value) {
+                        document.getElementById('apiKeyDisplay').textContent = data.api_key.key_value;
+                        // Update localStorage with new API key
+                        localStorage.setItem('apiKey', data.api_key.key_value);
+                        
+                        // Add a small delay to ensure database transaction is committed
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        await ConfirmationModal.show({
+                            title: 'API Key Generated',
+                            message: 'New API key generated successfully!',
+                            confirmText: 'OK',
+                            cancelText: 'Cancel',
+                            confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
+                            iconType: 'success'
+                        });
+                        
+                        // Page will automatically refresh data on next load
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to generate new key');
+                }
+            } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return; // User cancelled, do nothing
+                }
+                console.error('Generate key error:', error);
+                await ConfirmationModal.show({
+                    title: 'Generation Failed',
+                    message: `Failed to generate new API key: ${error.message}`,
+                    confirmText: 'OK',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
+                    iconType: 'danger'
+                });
+            }
+        });
+
+        // Regenerate admin personal API key
+        document.getElementById('regenerateAdminKey').addEventListener('click', async function() {
+            try {
+                // Show confirmation modal
+                await ConfirmationModal.show({
+                    title: 'Regenerate Personal API Key',
+                    message: 'Are you sure you want to regenerate your personal API key?',
+                    subtext: 'This will create a new personal API key for admin access.',
+                    confirmText: 'Regenerate Key',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-blue-500/80 hover:bg-blue-500 border-blue-500/50 hover:border-blue-400',
+                    iconType: 'warning'
+                });
+                
+                console.log('🔄 Attempting to regenerate admin API key...');
+                
+                const response = await fetch('/api/v1/admin/keys/regenerate', {
+                    method: 'PUT',
+                    headers: token ? 
+                        { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : 
+                        { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: 'Admin Personal Key' })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    
+                    if (data.api_key && data.api_key.key_value) {
+                        document.getElementById('apiKeyDisplay').textContent = data.api_key.key_value;
+                        // Update localStorage with new API key
+                        localStorage.setItem('apiKey', data.api_key.key_value);
+                        
+                        // Add a small delay to ensure database transaction is committed
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        await ConfirmationModal.show({
+                            title: 'API Key Regenerated',
+                            message: 'Admin personal API key regenerated successfully!',
+                            confirmText: 'OK',
+                            cancelText: 'Cancel',
+                            confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
+                            iconType: 'success'
+                        });
+                        
+                        // Page will automatically refresh data on next load
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    throw new Error(errorData.details || errorData.message || 'Failed to regenerate admin key');
+                }
+            } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return; // User cancelled, do nothing
+                }
+                console.error('Regenerate admin key error:', error);
+                await ConfirmationModal.show({
+                    title: 'Regeneration Failed',
+                    message: `Failed to regenerate admin API key: ${error.message}`,
+                    confirmText: 'OK',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
+                    iconType: 'danger'
+                });
+            }
+        });
+
+        // Function to update progress bars based on plan limits
+        function updateProgressBars(plan, totalRequests, todayUsage, successRate) {
+            // Update total requests progress bar
+            const totalProgressBar = document.querySelector('#totalRequests').parentElement.querySelector('.bg-gradient-to-r');
+            const totalLimitText = document.getElementById('totalLimitText');
+            
+            if (totalProgressBar) {
+                let totalLimit = 50; // Default free plan
+                let limitText = 'Free: 50/day';
+                
+                if (plan === 'basic') {
+                    totalLimit = 500;
+                    limitText = 'Basic: 500/day';
+                } else if (plan === 'pro') {
+                    totalLimit = 1000; // Show as percentage for unlimited
+                    limitText = 'Pro Plan';
+                }
+                
+                // Update limit text
+                if (totalLimitText) {
+                    totalLimitText.textContent = limitText;
+                }
+                
+                // For Pro plan, show 0% since it's unlimited
+                const totalPercentage = plan === 'pro' ? 
+                    0 : // Pro users have unlimited, so no progress bar needed
+                    Math.min(100, (totalRequests / totalLimit) * 100);
+                totalProgressBar.style.width = `${totalPercentage}%`;
+            }
+            
+            // Update today's usage progress bar
+            const todayProgressBar = document.querySelector('#requestsToday').parentElement.querySelector('.bg-gradient-to-r');
+            if (todayProgressBar) {
+                let dailyLimit = 50; // Default free plan
+                if (plan === 'basic') dailyLimit = 500;
+                else if (plan === 'pro') dailyLimit = 1000; // Show as percentage for unlimited
+                
+                const todayPercentage = plan === 'pro' ? 
+                    0 : // Pro users have unlimited, so no progress bar needed
+                    Math.min(100, (todayUsage / dailyLimit) * 100);
+                todayProgressBar.style.width = `${todayPercentage}%`;
+            }
+            
+            // Update success rate progress bar
+            const successProgressBar = document.querySelector('#successRate').parentElement.querySelector('.bg-gradient-to-r');
+            if (successProgressBar) {
+                successProgressBar.style.width = `${successRate}%`;
+            }
+        }
+
+        // Function to update plan badge and subscription status
+        function updatePlanBadge(plan, subscriptionStatus = null, expiryDate = null) {
+            const badge = document.getElementById('planBadge');
+            if (!badge) return;
+            
+            // Clear existing classes
+            badge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide';
+            
+            const cancelSection = document.getElementById('cancelSubscriptionSection');
+            const statusSection = document.getElementById('subscriptionStatus');
+            const expiryMessage = document.getElementById('expiryMessage');
+            
+            // Check if subscription is canceled
+            const isCanceled = subscriptionStatus === 'canceled';
+            
+            // Show/hide subscription status
+            if (isCanceled && statusSection && expiryDate) {
+                statusSection.classList.remove('hidden');
+                const expiryDateObj = new Date(expiryDate);
+                if (expiryMessage) {
+                    expiryMessage.textContent = `Your ${plan} plan access will end on ${expiryDateObj.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}. You will then be moved to the Free plan.`;
+                }
+            } else if (statusSection) {
+                statusSection.classList.add('hidden');
+            }
+            
+            // Add plan-specific styling and show/hide cancel button
+            switch(plan.toLowerCase()) {
+                case 'free':
+                    badge.classList.add('bg-gray-500/20', 'text-gray-300', 'border', 'border-gray-400/30');
+                    badge.textContent = 'Free';
+                    if (cancelSection) cancelSection.classList.add('hidden');
+                    break;
+                case 'basic':
+                    badge.classList.add('bg-blue-500/20', 'text-blue-300', 'border', 'border-blue-400/30');
+                    badge.textContent = 'Basic';
+                    // Hide cancel button if already canceled
+                    if (cancelSection) {
+                        if (isCanceled) {
+                            cancelSection.classList.add('hidden');
+                        } else {
+                            cancelSection.classList.remove('hidden');
+                        }
+                    }
+                    break;
+                case 'pro':
+                    badge.classList.add('bg-gradient-to-r', 'from-purple-500/20', 'to-pink-500/20', 'text-purple-300', 'border', 'border-purple-400/30');
+                    badge.textContent = 'Pro';
+                    // Hide cancel button if already canceled
+                    if (cancelSection) {
+                        if (isCanceled) {
+                            cancelSection.classList.add('hidden');
+                        } else {
+                            cancelSection.classList.remove('hidden');
+                        }
+                    }
+                    break;
+                default:
+                    badge.classList.add('bg-gray-500/20', 'text-gray-300', 'border', 'border-gray-400/30');
+                    badge.textContent = plan;
+                    if (cancelSection) cancelSection.classList.add('hidden');
+            }
+            
+            badge.classList.remove('hidden');
+        }
+
+        // Cancel subscription function
+        async function cancelSubscription() {
+            if (!confirm('Are you sure you want to cancel your subscription? You will be downgraded to the Free plan immediately.')) {
+                return;
+            }
+
+            const btn = document.getElementById('cancelSubscriptionBtn');
+            const originalContent = btn.innerHTML;
+            
+            try {
+                // Show loading state
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span class="text-red-400 font-semibold">Canceling...</span>
+                `;
+
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    throw new Error('Not authenticated');
+                }
+
+                const response = await fetch('/api/v1/payments/cancel-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to cancel subscription');
+                }
+
+                // Show success message
+                alert('✅ Subscription canceled successfully! You have been downgraded to the Free plan.');
+                
+                // Reload the page to reflect changes
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Error canceling subscription:', error);
+                alert('❌ Failed to cancel subscription: ' + error.message);
+                
+                // Restore button
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        }
+
+        // Auto-refresh usage statistics every 10 seconds
+        function refreshUsageStats() {
+            const token = localStorage.getItem('quotify_token');
+            const apiKey = localStorage.getItem('apiKey');
+            
+            if (!token && !apiKey) return;
+            
+            // Show refresh indicator
+            const refreshBtn = document.getElementById('refreshStats');
+            if (refreshBtn) {
+                refreshBtn.classList.add('animate-pulse');
+            }
+            
+            const headers = token ? 
+                { 'Authorization': `Bearer ${token}` } : 
+                { 'x-api-key': apiKey };
+            
+            fetch('/api/v1/user/usage', { headers })
+            .then(response => response.json())
+            .then(usageData => {
+                if (usageData && usageData.usage_stats) {
+                    // Calculate total requests from usage_stats array
+                    const totalRequests = usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0);
+                    
+                    // Calculate success rate
+                    const totalSuccessful = usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0);
+                    const successRate = totalRequests > 0 ? 
+                        Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                    
+                    // Calculate requests left based on plan
+                    const plan = usageData.plan || 'free';
+                    const todayUsage = usageData.today_usage || 0;
+                    
+                    let requestsLeft;
+                    let dailyLimit;
+                    if (plan === 'free') {
+                        dailyLimit = 50;
+                        requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                    } else if (plan === 'basic') {
+                        dailyLimit = 500;
+                        requestsLeft = Math.max(0, dailyLimit - todayUsage);
+                    } else if (plan === 'pro') {
+                        requestsLeft = 'Unlimited';
+                        dailyLimit = 'Unlimited';
+                    }
+                    
+                    console.log('Refresh - Plan detection:', {
+                        usageDataPlan: usageData.plan,
+                        finalPlan: plan,
+                        dailyLimit: dailyLimit,
+                        todayUsage: todayUsage,
+                        requestsLeft: requestsLeft
+                    });
+                    
+                    // Update display
+                    document.getElementById('totalRequests').textContent = requestsLeft;
+                    document.getElementById('requestsToday').textContent = usageData.today_usage || 0;
+                    document.getElementById('successRate').textContent = `${successRate}%`;
+                    
+                    // Update progress bars
+                    updateProgressBars(plan, requestsLeft, usageData.today_usage || 0, successRate);
+                    
+                    console.log('Usage stats refreshed:', {
+                        requestsLeft: requestsLeft,
+                        todayUsage: usageData.today_usage || 0,
+                        successRate: `${successRate}%`
+                    });
+                }
+                
+                // Remove refresh indicator
+                const refreshBtn = document.getElementById('refreshStats');
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('animate-pulse', 'text-blue-400');
+                    refreshBtn.textContent = 'Refresh';
+                }
+            })
+            .catch(error => {
+                console.log('Auto-refresh failed:', error);
+                
+                // Remove refresh indicator even on error
+                const refreshBtn = document.getElementById('refreshStats');
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('animate-pulse', 'text-blue-400');
+                    refreshBtn.textContent = 'Refresh';
+                }
+            });
+        }
+        
+        // Start auto-refresh every 10 seconds
+        setInterval(refreshUsageStats, 1000);
+        
+        // Refresh usage stats once on initial load (after a short delay to ensure page is ready)
+        setTimeout(() => {
+            console.log('Initial load - triggering usage stats refresh');
+            
+            // Show initial loading indicator
+            const refreshBtn = document.getElementById('refreshStats');
+            if (refreshBtn) {
+                refreshBtn.textContent = 'Loading...';
+                refreshBtn.classList.add('text-blue-400', 'animate-pulse');
+            }
+            
+            refreshUsageStats();
+        }, 1000);
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('quotify_token');
+            localStorage.removeItem('apiKey');
+            window.location.href = '/login';
+        });
+    </script>
+    
+    <!-- Confirmation Modal Component -->
+    <script src="components/confirmation-modal.js"></script>
+</body>
+</html>
