@@ -702,13 +702,19 @@ router.post('/cancel-subscription', authenticateJWT, async (req, res) => {
         
         // Mark subscription as canceled but keep plan active until expiry
         // The plan will remain active until the plan_expiry date
-        await database.db.run(
-            `UPDATE users 
-             SET subscription_status = 'canceled', 
-                 updated_at = CURRENT_TIMESTAMP 
-             WHERE id = ?`,
-            [userId]
-        );
+        const client = await database.pool.connect();
+        try {
+            await client.query(
+                `UPDATE users 
+                 SET updated_at = CURRENT_TIMESTAMP 
+                 WHERE id = $1`,
+                [userId]
+            );
+            client.release();
+        } catch (err) {
+            client.release();
+            throw err;
+        }
         
         // Get the expiry date to return to user
         const expiryDate = user.plan_expiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();

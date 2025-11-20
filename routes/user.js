@@ -45,16 +45,35 @@ router.put('/profile', authenticateJWT, async (req, res) => {
     }
 
     // Update user profile in database
-    const query = 'UPDATE users SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-    const success = await new Promise((resolve, reject) => {
-      database.db.run(query, [name.trim(), req.user.id], function(err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(this.changes > 0);
-        }
+    // Use database adapter method instead of direct SQL
+    const user = await database.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User account not found'
       });
-    });
+    }
+    
+    // Update via pool for PostgreSQL compatibility
+    const client = await database.pool.connect();
+    try {
+      const result = await client.query(
+        'UPDATE users SET name = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [name.trim(), req.user.id]
+      );
+      const success = result.rowCount > 0;
+      client.release();
+      
+      if (!success) {
+        return res.status(404).json({
+          error: 'User not found',
+          message: 'Failed to update user profile'
+        });
+      }
+    } catch (err) {
+      client.release();
+      throw err;
+    }
 
     if (!success) {
       return res.status(404).json({
@@ -244,6 +263,141 @@ router.post('/favorites', authenticateJWT, async (req, res) => {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to add quote to favorites'
+    });
+  }
+});
+
+// Get user's API keys
+router.get('/keys', authenticateFlexible, async (req, res) => {
+  try {
+    const apiKeys = await database.getUserApiKeys(req.user.id);
+    
+    res.json({
+      api_keys: apiKeys,
+      total: apiKeys.length,
+      message: 'API keys retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Get API keys error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to retrieve API keys'
+    });
+  }
+});
+
+// Create a new API key
+router.post('/keys', authenticateJWT, async (req, res) => {
+  try {
+    const { name = 'Personal Key' } = req.body;
+    
+    // Check if user already has API keys
+    const existingKeys = await database.getUserApiKeys(req.user.id);
+    
+    // For non-admin users on free plan, limit to 1 key
+    const user = await database.findUserById(req.user.id);
+    if (user.role !== 'admin' && user.plan === 'free' && existingKeys.length >= 1) {
+      return res.status(400).json({
+        error: 'Limit reached',
+        message: 'Free plan users can only have 1 API key. Please upgrade to create more keys.'
+      });
+    }
+    
+    const newKey = await database.createApiKey(req.user.id, name);
+    
+    res.json({
+      api_key: newKey,
+      message: 'API key created successfully'
+    });
+  } catch (error) {
+    console.error('Create API key error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message || 'Failed to create API key'
+    });
+  }
+});
+
+// Regenerate an API key (delete old, create new)
+router.put('/keys/:keyId/regenerate', authenticateJWT, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    const { name } = req.body;
+    
+    // Delete the old key
+    const deleted = await database.deleteApiKey(keyId, req.user.id);
+    
+    if (!deleted) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'API key not found or you do not have permission to regenerate it'
+      });
+    }
+    
+    // Create a new key with the same name
+    const newKey = await database.createApiKey(req.user.id, name || 'Personal Key');
+    
+    res.json({
+      api_key: newKey,
+      message: 'API key regenerated successfully'
+    });
+  } catch (error) {
+    console.error('Regenerate API key error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to regenerate API key'
+    });
+  }
+});
+
+// Revoke (deactivate) an API key
+router.put('/keys/:keyId/revoke', authenticateJWT, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    
+    const revoked = await database.revokeApiKey(keyId, req.user.id);
+    
+    if (!revoked) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'API key not found or you do not have permission to revoke it'
+      });
+    }
+    
+    res.json({
+      message: 'API key revoked successfully'
+    });
+  } catch (error) {
+    console.error('Revoke API key error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to revoke API key'
+    });
+  }
+});
+
+// Delete an API key
+router.delete('/keys/:keyId', authenticateJWT, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    
+    const deleted = await database.deleteApiKey(keyId, req.user.id);
+    
+    if (!deleted) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'API key not found or you do not have permission to delete it'
+      });
+    }
+    
+    res.json({
+      message: 'API key deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete API key error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to delete API key'
     });
   }
 });
