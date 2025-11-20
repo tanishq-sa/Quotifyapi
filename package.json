@@ -15,7 +15,7 @@
     "dev": "nodemon server.js",
     "build": "echo 'Build complete - Express API ready for deployment'",
     "vercel-build": "echo 'Vercel build complete'",
-    "docs": "echo 'Documentation available at https://quotifyapi.vercel.app'",
+    "docs": "echo 'Documentation available at https://quotify.dazzelr.tech'",
     "test": "echo 'No tests specified yet'",
     "lint": "echo 'No linter configured yet'",
     "prepublishOnly": "npm run build"
@@ -67,7 +67,7 @@
   "bugs": {
     "url": "https://github.com/tanishq-sa/Quotifyapi/issues"
   },
-  "homepage": "https://quotifyapi.vercel.app",
+  "homepage": "https://quotify.dazzelr.tech",
   "engines": {
     "node": ">=14.0.0"
   },
