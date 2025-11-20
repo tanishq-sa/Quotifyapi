@@ -16,19 +16,38 @@ class PostgresDatabase {
   // Initialize database connection
   async init() {
     try {
+      const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+      
+      if (!connectionString) {
+        throw new Error('POSTGRES_URL or DATABASE_URL environment variable is required for PostgreSQL connection');
+      }
+
       // Create connection pool
       this.pool = new Pool({
-        connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL,
+        connectionString: connectionString,
         ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
         max: 20, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        connectionTimeoutMillis: 10000, // Increased timeout for serverless cold starts
       });
 
-      // Test connection
-      const client = await this.pool.connect();
-      console.log('✅ Connected to PostgreSQL database');
-      client.release();
+      // Test connection with retry logic
+      let retries = 3;
+      let connected = false;
+      
+      while (retries > 0 && !connected) {
+        try {
+          const client = await this.pool.connect();
+          console.log('✅ Connected to PostgreSQL database');
+          client.release();
+          connected = true;
+        } catch (err) {
+          retries--;
+          if (retries === 0) throw err;
+          console.log(`⚠️  Database connection attempt failed, retrying... (${retries} attempts left)`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
 
       // Set up cleanup interval for rate limiting
       setInterval(() => {
@@ -39,7 +58,8 @@ class PostgresDatabase {
       await this.setupAdmin();
     } catch (error) {
       this.logSecurityEvent('Database connection failed', { error: error.message });
-      console.error('Error connecting to database:', error);
+      console.error('❌ Error connecting to PostgreSQL database:', error.message);
+      console.error('💡 Make sure POSTGRES_URL is set in your environment variables');
       throw error;
     }
   }
