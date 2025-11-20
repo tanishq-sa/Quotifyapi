@@ -22,10 +22,17 @@ class PostgresDatabase {
         throw new Error('POSTGRES_URL or DATABASE_URL environment variable is required for PostgreSQL connection');
       }
 
-      // Create connection pool
+      // Create connection pool with SSL configuration for cloud providers
+      // Remove any SSL params from connection string to avoid conflicts
+      const cleanConnectionString = connectionString.split('?')[0];
+      const params = new URLSearchParams(connectionString.split('?')[1] || '');
+      
       this.pool = new Pool({
-        connectionString: connectionString,
-        ssl: { rejectUnauthorized: false }, // Always use SSL for remote connections
+        connectionString: cleanConnectionString,
+        ssl: {
+          rejectUnauthorized: false, // Accept self-signed certificates from cloud providers
+          require: true
+        },
         max: 20, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 20000, // Increased timeout for Aiven/serverless
