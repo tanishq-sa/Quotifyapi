@@ -34,7 +34,7 @@ class PostgresDatabase {
       });
 
       // Test connection with retry logic
-      let retries = 2;
+      let retries = 3;
       let connected = false;
       let lastError = null;
       
