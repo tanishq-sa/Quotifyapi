@@ -1833,6 +1833,12 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                     },
                     handler: async function (response) {
                         try {
+                            console.log('💳 Payment completed, verifying...', {
+                                subscription_id: response.razorpay_subscription_id,
+                                payment_id: response.razorpay_payment_id,
+                                has_signature: !!response.razorpay_signature
+                            });
+                            
                             // Verify subscription payment
                             const verifyResponse = await fetch('/api/v1/payments/verify-subscription', {
                                 method: 'POST',
@@ -1848,7 +1854,10 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                                 })
                             });
                             
+                            console.log('📡 Verification response status:', verifyResponse.status);
+                            
                             const verifyData = await verifyResponse.json();
+                            console.log('📦 Verification data:', verifyData);
                             
                             if (verifyData.success) {
                                 const billingInfo = data.billingInfo || { period: 'monthly', duration: '10 years' };
@@ -1856,11 +1865,14 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                                 // Redirect to profile page to see updated plan
                                 window.location.href = '/profile';
                             } else {
-                                alert('Subscription verification failed: ' + verifyData.error);
+                                console.error('❌ Verification failed:', verifyData);
+                                const errorMsg = verifyData.error || 'Unknown error';
+                                const details = verifyData.details ? `\n\nDetails: ${JSON.stringify(verifyData.details)}` : '';
+                                alert(`Subscription verification failed: ${errorMsg}${details}\n\nPlease contact support if the issue persists.`);
                             }
                         } catch (error) {
-                            console.error('Payment verification error:', error);
-                            alert('Payment verification failed. Please contact support.');
+                            console.error('❌ Payment verification error:', error);
+                            alert(`Payment verification failed: ${error.message}\n\nPlease check the console for details and contact support.`);
                         }
                     },
                     modal: {
