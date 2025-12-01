@@ -219,6 +219,73 @@ router.get('/users/:userId', validateUserId, async (req, res) => {
   }
 });
 
+// Regenerate API key for a user (Admin only)
+router.post('/users/:userId/api-keys/:keyId/regenerate', validateUserId, async (req, res) => {
+  try {
+    const { userId, keyId } = req.params;
+    
+    // SECURITY: Validate keyId
+    if (!keyId || !/^\d+$/.test(keyId)) {
+      return res.status(400).json({
+        error: 'Invalid key ID',
+        message: 'Key ID must be a positive integer'
+      });
+    }
+    
+    const keyIdInt = parseInt(keyId);
+    if (keyIdInt > 999999999) {
+      return res.status(400).json({
+        error: 'Invalid key ID',
+        message: 'Key ID is too large'
+      });
+    }
+    
+    // Check if user exists
+    const user = await database.findUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'No user found with the specified ID'
+      });
+    }
+    
+    // Get the existing API key
+    const existingKeys = await database.getUserApiKeys(userId);
+    const existingKey = existingKeys.find(k => k.id === keyIdInt);
+    
+    if (!existingKey) {
+      return res.status(404).json({
+        error: 'API key not found',
+        message: 'No API key found with the specified ID for this user'
+      });
+    }
+    
+    console.log(`🔄 Admin ${req.user.email} regenerating API key ${keyIdInt} for user ${user.email}`);
+    
+    // Regenerate the API key
+    const newApiKey = await database.regenerateApiKey(userId, keyIdInt);
+    
+    console.log(`✅ Admin ${req.user.email} regenerated API key for user ${user.email}`);
+    
+    res.json({
+      success: true,
+      message: 'API key regenerated successfully',
+      api_key: {
+        id: newApiKey.id,
+        key_value: newApiKey.key_value,
+        name: newApiKey.name,
+        created_at: newApiKey.created_at
+      }
+    });
+  } catch (error) {
+    console.error('Regenerate API key error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to regenerate API key'
+    });
+  }
+});
+
 // Get usage analytics - SECURE VERSION
 router.get('/analytics', async (req, res) => {
   try {

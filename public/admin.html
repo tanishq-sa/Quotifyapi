@@ -877,6 +877,9 @@
                                         user.plan === 'basic' ? 'bg-green-500/20 text-green-300' :
                                         'bg-purple-500/20 text-purple-300'
                                     }">${user.plan.toUpperCase()}</span>
+                                    <button onclick="changeUserPlan(${user.id}, '${user.plan}', '${user.email}')" class="ml-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 px-2 py-1 rounded text-xs transition-colors border border-indigo-500/30 hover:border-indigo-400/50">
+                                        Change Plan
+                                    </button>
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Role:</span>
@@ -916,12 +919,18 @@
                                             <div class="text-white/60 text-sm font-mono break-all">${key.key_value || key.api_key || 'N/A'}</div>
                                             <div class="text-white/40 text-xs mt-1">Created: ${new Date(key.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                                         </div>
-                                        <div class="flex items-center space-x-2 ml-4">
+                                        <div class="flex items-center space-x-2 ml-4 flex-shrink-0">
                                             <span class="px-3 py-1 rounded-lg text-xs font-semibold ${key.is_active || key.is_active === undefined ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}">
                                                 ${key.is_active || key.is_active === undefined ? 'Active' : 'Inactive'}
                                             </span>
                                             <button onclick="copyToClipboard('${key.key_value || key.api_key}')" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs transition-colors border border-blue-500/30 hover:border-blue-400/50">
                                                 Copy
+                                            </button>
+                                            <button onclick="regenerateApiKey(${user.id}, ${key.id}, '${key.name || `API Key #${index + 1}`}')" class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 px-3 py-1 rounded-lg text-xs transition-colors border border-purple-500/30 hover:border-purple-400/50 flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                </svg>
+                                                Regenerate
                                             </button>
                                         </div>
                                     </div>
@@ -977,6 +986,196 @@
                 await ConfirmationModal.show({
                     title: 'Copy Failed',
                     message: 'Failed to copy to clipboard',
+                    confirmText: 'OK',
+                    cancelText: '',
+                    confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
+                    iconType: 'danger'
+                });
+            }
+        }
+
+        // Change user plan
+        async function changeUserPlan(userId, currentPlan, userEmail) {
+            try {
+                // Show plan selection modal
+                const planOptions = [
+                    { value: 'free', label: 'Free Plan', color: 'blue', limits: '100 requests/day' },
+                    { value: 'basic', label: 'Basic Plan (₹39/month)', color: 'green', limits: '1000 requests/day' },
+                    { value: 'pro', label: 'Pro Plan (₹199/month)', color: 'purple', limits: 'Unlimited requests' }
+                ];
+
+                const currentPlanName = planOptions.find(p => p.value === currentPlan)?.label || currentPlan;
+                
+                const confirmed = await ConfirmationModal.show({
+                    title: 'Change User Plan',
+                    message: `Current plan: ${currentPlanName}\n\nSelect new plan for ${userEmail}:`,
+                    confirmText: 'Change Plan',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-indigo-500/80 hover:bg-indigo-500 border-indigo-500/50 hover:border-indigo-400',
+                    iconType: 'info'
+                });
+
+                if (!confirmed) return;
+
+                // For now, let's create a custom modal for plan selection
+                const planSelect = document.createElement('div');
+                planSelect.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]';
+                planSelect.innerHTML = `
+                    <div class="glass rounded-3xl p-8 max-w-md w-full mx-4 border border-white/10">
+                        <h3 class="text-2xl font-bold text-white mb-6 font-space">Select New Plan</h3>
+                        <div class="space-y-3">
+                            ${planOptions.map(plan => `
+                                <button onclick="confirmPlanChange(${userId}, '${plan.value}', '${userEmail}')" 
+                                        class="w-full glass rounded-xl p-4 border border-${plan.color}-500/30 hover:border-${plan.color}-400/50 transition-all text-left group">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="text-white font-semibold text-lg">${plan.label}</div>
+                                            <div class="text-${plan.color}-300 text-sm mt-1">${plan.limits}</div>
+                                        </div>
+                                        <div class="bg-${plan.color}-500/20 text-${plan.color}-300 px-3 py-1 rounded-lg text-xs font-semibold uppercase">
+                                            ${plan.value}
+                                        </div>
+                                    </div>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="w-full mt-6 glass rounded-xl px-6 py-3 text-white/80 hover:text-white transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(planSelect);
+
+            } catch (error) {
+                console.error('Change plan error:', error);
+                await ConfirmationModal.show({
+                    title: 'Error',
+                    message: error.message || 'Failed to change plan',
+                    confirmText: 'OK',
+                    cancelText: '',
+                    confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
+                    iconType: 'danger'
+                });
+            }
+        }
+
+        // Confirm plan change
+        async function confirmPlanChange(userId, newPlan, userEmail) {
+            try {
+                // Remove the modal
+                document.querySelector('.fixed.inset-0')?.remove();
+
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
+
+                const response = await fetch(`/api/v1/admin/users/${userId}/plan`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ plan: newPlan })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to change plan');
+                }
+
+                const data = await response.json();
+
+                await ConfirmationModal.show({
+                    title: 'Plan Changed!',
+                    message: `Successfully changed ${userEmail}'s plan to ${newPlan.toUpperCase()}!`,
+                    confirmText: 'OK',
+                    cancelText: '',
+                    confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
+                    iconType: 'success'
+                });
+
+                // Refresh user details and statistics
+                showUserDetails(userId);
+                loadStats();
+
+            } catch (error) {
+                console.error('Confirm plan change error:', error);
+                await ConfirmationModal.show({
+                    title: 'Change Failed',
+                    message: error.message || 'Failed to change plan',
+                    confirmText: 'OK',
+                    cancelText: '',
+                    confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
+                    iconType: 'danger'
+                });
+            }
+        }
+
+        // Regenerate API key
+        async function regenerateApiKey(userId, keyId, keyName) {
+            try {
+                const confirmed = await ConfirmationModal.show({
+                    title: 'Regenerate API Key?',
+                    message: `Are you sure you want to regenerate "${keyName}"? The old key will stop working immediately.`,
+                    confirmText: 'Regenerate',
+                    cancelText: 'Cancel',
+                    confirmClass: 'bg-purple-500/80 hover:bg-purple-500 border-purple-500/50 hover:border-purple-400',
+                    iconType: 'warning'
+                });
+
+                if (!confirmed) return;
+
+                const token = localStorage.getItem('quotify_token');
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
+
+                // Show loading state
+                const loadingModal = await ConfirmationModal.show({
+                    title: 'Regenerating...',
+                    message: 'Please wait while we regenerate the API key...',
+                    confirmText: '',
+                    cancelText: '',
+                    iconType: 'info'
+                });
+
+                const response = await fetch(`/api/v1/admin/users/${userId}/api-keys/${keyId}/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to regenerate API key');
+                }
+
+                const data = await response.json();
+
+                // Show new key and copy to clipboard
+                await navigator.clipboard.writeText(data.api_key.key_value);
+                
+                await ConfirmationModal.show({
+                    title: 'Key Regenerated!',
+                    message: `New API key has been generated and copied to clipboard!\n\n${data.api_key.key_value}\n\nMake sure to save it - you won't be able to see it again.`,
+                    confirmText: 'OK',
+                    cancelText: '',
+                    confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
+                    iconType: 'success'
+                });
+
+                // Refresh user details
+                showUserDetails(userId);
+
+            } catch (error) {
+                console.error('Regenerate API key error:', error);
+                await ConfirmationModal.show({
+                    title: 'Regeneration Failed',
+                    message: error.message || 'Failed to regenerate API key',
                     confirmText: 'OK',
                     cancelText: '',
                     confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
