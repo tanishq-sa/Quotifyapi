@@ -4,6 +4,7 @@ const database = require('../database-adapter');
 
 const router = express.Router();
 
+
 // SECURITY: Rate limiting for admin endpoints
 const adminRateLimit = require('express-rate-limit')({
   windowMs: 15 * 60 * 1000, // 15 minutes
