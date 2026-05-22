@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-const { getRandomQuote, getRandomQuoteByType, getAvailableTypes, getQuotesCount } = require('./quotes');
+const http = require('http');
+const https = require('https');
+const url = require('url');
 
 // Colors for terminal output
 const colors = {
@@ -39,18 +41,17 @@ function showHelp() {
     console.log('  stats               Show quote statistics by category');
     console.log('  help                Show this help message');
     console.log('');
+    console.log(colorize('Options:', 'bright'));
+    console.log('  -t, --type <name>   Shortcut to get a quote from a specific category');
+    console.log('  --types             Shortcut to show all quote categories');
+    console.log('  --stats             Shortcut to show quote statistics');
+    console.log('');
     console.log(colorize('Examples:', 'bright'));
     console.log('  quotifyapi random');
     console.log('  quotifyapi type motivational');
-    console.log('  quotifyapi type love');
+    console.log('  quotifyapi --type love');
     console.log('  quotifyapi types');
     console.log('  quotifyapi stats');
-    console.log('');
-    console.log(colorize('Available Categories:', 'bright'));
-    const types = getAvailableTypes();
-    types.forEach(type => {
-        console.log(`  - ${colorize(type, 'green')}`);
-    });
 }
 
 // Display a quote with nice formatting
@@ -67,10 +68,7 @@ function displayQuote(quote, type = 'random') {
 }
 
 // Display types with counts
-function displayTypes() {
-    const types = getAvailableTypes();
-    const counts = getQuotesCount();
-    
+function displayTypes(types, counts) {
     console.log('');
     console.log(colorize('📚 Available Quote Categories', 'cyan'));
     console.log(colorize('================================', 'cyan'));
@@ -91,15 +89,13 @@ function displayTypes() {
 }
 
 // Display statistics
-function displayStats() {
-    const counts = getQuotesCount();
-    
+function displayStats(counts) {
     console.log('');
     console.log(colorize('📊 Quote Statistics', 'cyan'));
     console.log(colorize('==================', 'cyan'));
     console.log('');
     
-    const types = getAvailableTypes();
+    const types = Object.keys(counts).filter(k => k !== 'total');
     types.forEach(type => {
         const count = counts[type];
         const percentage = ((count / counts.total) * 100).toFixed(1);
@@ -115,52 +111,160 @@ function displayStats() {
     console.log('');
 }
 
+// Helper to make HTTP/HTTPS GET requests
+function makeRequest(apiUrl, headers = {}) {
+    return new Promise((resolve, reject) => {
+        try {
+            const parsedUrl = url.parse(apiUrl);
+            const protocol = parsedUrl.protocol === 'https:' ? https : http;
+            
+            const options = {
+                hostname: parsedUrl.hostname,
+                port: parsedUrl.port,
+                path: parsedUrl.path,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Quotify-CLI/1.3.0',
+                    ...headers
+                }
+            };
+            
+            const req = protocol.request(options, (res) => {
+                let data = '';
+                
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+                
+                res.on('end', () => {
+                    try {
+                        const parsedData = JSON.parse(data);
+                        resolve({
+                            statusCode: res.statusCode,
+                            data: parsedData
+                        });
+                    } catch (e) {
+                        reject(new Error(`Failed to parse API response: ${data.substring(0, 100)}`));
+                    }
+                });
+            });
+            
+            req.on('error', (err) => {
+                reject(err);
+            });
+            
+            req.end();
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
 // Main CLI logic
-function main() {
+async function main() {
     const args = process.argv.slice(2);
     
-    if (args.length === 0 || args[0] === 'help') {
+    // Check for help flags or empty args
+    if (args.length === 0 || args.includes('help') || args.includes('--help') || args.includes('-h')) {
         showBanner();
         showHelp();
         return;
     }
     
-    const command = args[0].toLowerCase();
+    // Check API Key
+    const apiKey = process.env.QUOTIFY_API_KEY;
+    if (!apiKey) {
+        console.log(colorize('❌ Error: QUOTIFY_API_KEY environment variable is not set.', 'red'));
+        console.log('');
+        console.log('Please set your API key in your environment to authenticate CLI requests.');
+        console.log('You can get your API key from the Quotify Dashboard.');
+        console.log('');
+        console.log(colorize('On Linux/macOS:', 'bright'));
+        console.log(`  export QUOTIFY_API_KEY="your_api_key_here"`);
+        console.log('');
+        console.log(colorize('On Windows (Command Prompt):', 'bright'));
+        console.log(`  set QUOTIFY_API_KEY="your_api_key_here"`);
+        console.log('');
+        console.log(colorize('On Windows (PowerShell):', 'bright'));
+        console.log(`  $env:QUOTIFY_API_KEY="your_api_key_here"`);
+        console.log('');
+        process.exit(1);
+    }
+    
+    const BASE_URL = process.env.QUOTIFY_API_URL || 'https://quotify.dazzelr.tech';
+    const requestHeaders = {
+        'x-api-key': apiKey
+    };
+    
+    // Parse arguments
+    let command = args[0].toLowerCase();
+    let category = '';
+    
+    if (command === '--types') {
+        command = 'types';
+    } else if (command === '--stats') {
+        command = 'stats';
+    } else if (command === 'type' || command === '--type' || command === '-t') {
+        command = 'type';
+        category = args[1];
+    }
     
     try {
         switch (command) {
             case 'random':
-                const randomQuote = getRandomQuote();
-                displayQuote(randomQuote, 'random');
+                {
+                    const res = await makeRequest(`${BASE_URL}/api/v1/quotes`, requestHeaders);
+                    if (res.statusCode === 200) {
+                        displayQuote(res.data.quote, res.data.type);
+                    } else {
+                        const errorMsg = res.data.message || res.data.error || 'Failed to fetch quote';
+                        console.log(colorize(`❌ Error: ${errorMsg}`, 'red'));
+                    }
+                }
                 break;
                 
             case 'type':
-                if (!args[1]) {
-                    console.log(colorize('❌ Error: Please specify a category', 'red'));
-                    console.log(colorize('   Example: quote-api type motivational', 'yellow'));
-                    return;
+                {
+                    if (!category) {
+                        console.log(colorize('❌ Error: Please specify a category', 'red'));
+                        console.log(colorize('   Example: quotifyapi type motivational', 'yellow'));
+                        return;
+                    }
+                    
+                    const res = await makeRequest(`${BASE_URL}/api/v1/quotes/category/${category.toLowerCase()}`, requestHeaders);
+                    if (res.statusCode === 200) {
+                        displayQuote(res.data.quote, res.data.category);
+                    } else {
+                        const errorMsg = res.data.message || res.data.error || 'Failed to fetch quote by category';
+                        console.log(colorize(`❌ Error: ${errorMsg}`, 'red'));
+                    }
                 }
-                
-                const category = args[1].toLowerCase();
-                const typeQuote = getRandomQuoteByType(category);
-                
-                if (!typeQuote) {
-                                    console.log(colorize(`❌ Error: Category "${category}" not found`, 'red'));
-                console.log(colorize('   Use "quotifyapi types" to see available categories', 'yellow'));
-                    return;
-                }
-                
-                displayQuote(typeQuote, category);
                 break;
                 
             case 'types':
-                showBanner();
-                displayTypes();
+                {
+                    const res = await makeRequest(`${BASE_URL}/api/v1/quotes/types`, requestHeaders);
+                    if (res.statusCode === 200) {
+                        showBanner();
+                        displayTypes(res.data.availableTypes, res.data.counts);
+                    } else {
+                        const errorMsg = res.data.message || res.data.error || 'Failed to fetch categories';
+                        console.log(colorize(`❌ Error: ${errorMsg}`, 'red'));
+                    }
+                }
                 break;
                 
             case 'stats':
-                showBanner();
-                displayStats();
+                {
+                    const res = await makeRequest(`${BASE_URL}/api/v1/quotes/stats`, requestHeaders);
+                    if (res.statusCode === 200) {
+                        showBanner();
+                        displayStats(res.data.counts);
+                    } else {
+                        const errorMsg = res.data.message || res.data.error || 'Failed to fetch statistics';
+                        console.log(colorize(`❌ Error: ${errorMsg}`, 'red'));
+                    }
+                }
                 break;
                 
             default:
@@ -169,7 +273,8 @@ function main() {
                 break;
         }
     } catch (error) {
-        console.log(colorize(`❌ Error: ${error.message}`, 'red'));
+        console.log(colorize(`❌ Connection Error: ${error.message}`, 'red'));
+        console.log(`   Make sure the server is online and you can access ${BASE_URL}`);
         process.exit(1);
     }
 }
