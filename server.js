@@ -95,7 +95,18 @@ app.use(async (req, res, next) => {
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "'unsafe-inline'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://*.googleusercontent.com", "https://lh3.googleusercontent.com"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
@@ -610,8 +621,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start the server (for local development)
-if (process.env.NODE_ENV !== 'production') {
+// Start the server (for local development or direct execution)
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
   initializeApp().then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Quote API server is running on port ${PORT}`);
