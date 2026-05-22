@@ -131,18 +131,6 @@ class ConfirmationModal {
             const subtextEl = document.getElementById('confirmationSubtext');
             if (subtextEl) subtextEl.textContent = config.subtext;
             
-            // Update button texts
-            const cancelBtn = document.getElementById('confirmationCancel');
-            if (cancelBtn) cancelBtn.textContent = config.cancelText;
-            
-            const confirmBtn = document.getElementById('confirmationConfirm');
-            if (confirmBtn) {
-                confirmBtn.textContent = config.confirmText;
-                // Use setAttribute for better compatibility
-                confirmBtn.setAttribute('class', `flex-1 px-6 py-3 text-white rounded-xl transition-all duration-200 font-medium ${config.confirmClass}`);
-            }
-            
-            // Update icon
             this.updateIcon(config.iconType);
             
             // Handle custom content
@@ -153,6 +141,29 @@ class ConfirmationModal {
                     customContentDiv.classList.remove('hidden');
                 } else {
                     customContentDiv.classList.add('hidden');
+                }
+            }
+
+            // Update buttons
+            const confirmBtn = document.getElementById('confirmationConfirm');
+            const cancelBtn = document.getElementById('confirmationCancel');
+            
+            if (confirmBtn) {
+                if (config.confirmText) {
+                    confirmBtn.textContent = config.confirmText;
+                    confirmBtn.className = 'flex-1 px-6 py-3 text-white rounded-xl transition-all duration-200 font-medium border ' + (config.confirmClass || 'bg-blue-500/80 hover:bg-blue-500 border-blue-500/50 hover:border-blue-400');
+                    confirmBtn.classList.remove('hidden');
+                } else {
+                    confirmBtn.classList.add('hidden');
+                }
+            }
+            
+            if (cancelBtn) {
+                if (config.cancelText) {
+                    cancelBtn.textContent = config.cancelText;
+                    cancelBtn.classList.remove('hidden');
+                } else {
+                    cancelBtn.classList.add('hidden');
                 }
             }
         } catch (error) {

@@ -552,6 +552,52 @@
     <script src="components/confirmation-modal.js"></script>
     
     <script>
+        // Escape HTML to prevent XSS
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        }
+
+        // Click handler wrappers to avoid dynamic string interpolation syntax issues in inline HTML event handlers
+        function handleDeleteUserClick(button) {
+            const userId = button.getAttribute('data-id');
+            const userName = button.getAttribute('data-name');
+            const userEmail = button.getAttribute('data-email');
+            deleteUser(userId, userName, userEmail);
+        }
+
+        function handleChangePlanClick(button) {
+            const userId = button.getAttribute('data-id');
+            const plan = button.getAttribute('data-plan');
+            const email = button.getAttribute('data-email');
+            changeUserPlan(userId, plan, email);
+        }
+
+        function handleConfirmPlanChangeClick(button) {
+            const userId = button.getAttribute('data-userid');
+            const planValue = button.getAttribute('data-planvalue');
+            const email = button.getAttribute('data-email');
+            confirmPlanChange(userId, planValue, email);
+        }
+
+        function handleRegenerateApiKeyClick(button) {
+            const userId = button.getAttribute('data-userid');
+            const keyId = button.getAttribute('data-keyid');
+            const keyName = button.getAttribute('data-keyname');
+            regenerateApiKey(userId, keyId, keyName);
+        }
+
+        function handleCopyKeyClick(button) {
+            const key = button.getAttribute('data-key');
+            copyToClipboard(key);
+        }
+
         // Helper function to get plan limit display
         function getPlanLimitDisplay(plan) {
             switch(plan.toLowerCase()) {
@@ -642,6 +688,12 @@
                     }
                 });
                 
+                if (response.status === 401 || response.status === 403) {
+                    console.log('Session expired or unauthorized, redirecting to login...');
+                    logout();
+                    return;
+                }
+                
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Stats data:', data); // Debug log
@@ -683,6 +735,12 @@
                 });
                 console.log('Users response status:', response.status);
                 
+                if (response.status === 401 || response.status === 403) {
+                    console.log('Session expired or unauthorized, redirecting to login...');
+                    logout();
+                    return;
+                }
+                
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Users data:', data); // Debug log
@@ -698,19 +756,19 @@
                     tbody.innerHTML = users.map(user => `
                         <tr class="table-row rounded-xl mb-2 cursor-pointer hover:bg-white/10" onclick="showUserDetails(${user.id})">
                             <td class="py-6 px-6 text-white/80 font-medium">${user.id}</td>
-                            <td class="py-6 px-6 text-white font-medium">${user.name}</td>
-                            <td class="py-6 px-6 text-white/80">${user.email}</td>
+                            <td class="py-6 px-6 text-white font-medium">${escapeHTML(user.name)}</td>
+                            <td class="py-6 px-6 text-white/80">${escapeHTML(user.email)}</td>
                             <td class="py-6 px-6">
                                 <span class="px-4 py-2 rounded-xl text-sm font-semibold ${
                                     user.plan === 'free' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
                                     user.plan === 'basic' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
                                     'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                }">${user.plan.toUpperCase()}</span>
+                                }">${escapeHTML(user.plan.toUpperCase())}</span>
                             </td>
                             <td class="py-6 px-6">
                                 <span class="px-4 py-2 rounded-xl text-sm font-semibold ${
                                     user.role === 'admin' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-gray-500/20 text-gray-300 border border-gray-500/30'
-                                }">${user.role.toUpperCase()}</span>
+                                }">${escapeHTML(user.role.toUpperCase())}</span>
                             </td>
                             <td class="py-6 px-6 text-white/80 font-medium">
                                 <div class="flex items-center gap-2">
@@ -722,14 +780,14 @@
                                 <div class="flex space-x-3 items-center">
                                     <div class="relative">
                                         <button onclick="showPlanMenu(${user.id}, event)" class="bg-white/10 text-white text-sm px-4 py-2 rounded-xl border border-white/20 hover:bg-white/20 focus:outline-none transition-all duration-200 flex items-center gap-2 min-w-[100px]">
-                                            <span id="planText${user.id}">${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}</span>
+                                            <span id="planText${user.id}">${escapeHTML(user.plan.charAt(0).toUpperCase() + user.plan.slice(1))}</span>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </button>
                                     </div>
                                     ${user.role !== 'admin' ? `
-                                    <button onclick="deleteUser(${user.id}, '${user.name}', '${user.email}')" class="px-4 py-2 bg-red-500/10 text-red-400 rounded-xl text-sm hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 flex items-center gap-2 border border-red-500/20 hover:border-red-500/40 font-medium">
+                                    <button data-id="${user.id}" data-name="${escapeHTML(user.name)}" data-email="${escapeHTML(user.email)}" onclick="handleDeleteUserClick(this)" class="px-4 py-2 bg-red-500/10 text-red-400 rounded-xl text-sm hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 flex items-center gap-2 border border-red-500/20 hover:border-red-500/40 font-medium">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
@@ -768,6 +826,12 @@
                     body: JSON.stringify({ plan })
                 });
                 
+                if (response.status === 401 || response.status === 403) {
+                    console.log('Session expired or unauthorized, redirecting to login...');
+                    logout();
+                    return;
+                }
+                
                 if (response.ok) {
                     const data = await response.json();
                     await ConfirmationModal.show({
@@ -792,6 +856,9 @@
                     });
                 }
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Failed to update user plan:', error);
                 await ConfirmationModal.show({
                     title: 'Update Failed',
@@ -822,6 +889,12 @@
                     }
                 });
                 
+                if (userResponse.status === 401 || userResponse.status === 403) {
+                    console.log('Session expired or unauthorized, redirecting to login...');
+                    logout();
+                    return;
+                }
+                
                 if (!userResponse.ok) {
                     await ConfirmationModal.show({
                         title: 'Load Failed',
@@ -850,15 +923,15 @@
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Name:</span>
-                                    <span class="text-white ml-2">${user.name}</span>
+                                    <span class="text-white ml-2">${escapeHTML(user.name)}</span>
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Email:</span>
-                                    <span class="text-white ml-2">${user.email}</span>
+                                    <span class="text-white ml-2">${escapeHTML(user.email)}</span>
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Provider:</span>
-                                    <span class="text-white ml-2">${user.provider || 'N/A'}</span>
+                                    <span class="text-white ml-2">${escapeHTML(user.provider || 'N/A')}</span>
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Created:</span>
@@ -876,8 +949,8 @@
                                         user.plan === 'free' ? 'bg-blue-500/20 text-blue-300' :
                                         user.plan === 'basic' ? 'bg-green-500/20 text-green-300' :
                                         'bg-purple-500/20 text-purple-300'
-                                    }">${user.plan.toUpperCase()}</span>
-                                    <button onclick="changeUserPlan(${user.id}, '${user.plan}', '${user.email}')" class="ml-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 px-2 py-1 rounded text-xs transition-colors border border-indigo-500/30 hover:border-indigo-400/50">
+                                    }">${escapeHTML(user.plan.toUpperCase())}</span>
+                                    <button data-id="${user.id}" data-plan="${user.plan}" data-email="${escapeHTML(user.email)}" onclick="handleChangePlanClick(this)" class="ml-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 px-2 py-1 rounded text-xs transition-colors border border-indigo-500/30 hover:border-indigo-400/50">
                                         Change Plan
                                     </button>
                                 </div>
@@ -885,7 +958,7 @@
                                     <span class="text-white/60 text-sm">Role:</span>
                                     <span class="ml-2 px-3 py-1 rounded-lg text-sm font-semibold ${
                                         user.role === 'admin' ? 'bg-red-500/20 text-red-300' : 'bg-gray-500/20 text-gray-300'
-                                    }">${user.role.toUpperCase()}</span>
+                                    }">${escapeHTML(user.role.toUpperCase())}</span>
                                 </div>
                                 <div>
                                     <span class="text-white/60 text-sm">Request Limit:</span>
@@ -915,18 +988,18 @@
                                 ${apiKeys.map((key, index) => `
                                     <div class="flex justify-between items-center bg-white/5 rounded-xl p-4 border border-white/10">
                                         <div class="flex-1 min-w-0">
-                                            <div class="text-white font-medium">${key.name || `API Key #${index + 1}`}</div>
-                                            <div class="text-white/60 text-sm font-mono break-all">${key.key_value || key.api_key || 'N/A'}</div>
+                                            <div class="text-white font-medium">${escapeHTML(key.name || `API Key #${index + 1}`)}</div>
+                                            <div class="text-white/60 text-sm font-mono break-all">${escapeHTML(key.key_value || key.api_key || 'N/A')}</div>
                                             <div class="text-white/40 text-xs mt-1">Created: ${new Date(key.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                                         </div>
                                         <div class="flex items-center space-x-2 ml-4 flex-shrink-0">
                                             <span class="px-3 py-1 rounded-lg text-xs font-semibold ${key.is_active || key.is_active === undefined ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}">
                                                 ${key.is_active || key.is_active === undefined ? 'Active' : 'Inactive'}
                                             </span>
-                                            <button onclick="copyToClipboard('${key.key_value || key.api_key}')" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs transition-colors border border-blue-500/30 hover:border-blue-400/50">
+                                            <button data-key="${escapeHTML(key.key_value || key.api_key)}" onclick="handleCopyKeyClick(this)" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs transition-colors border border-blue-500/30 hover:border-blue-400/50">
                                                 Copy
                                             </button>
-                                            <button onclick="regenerateApiKey(${user.id}, ${key.id}, '${key.name || `API Key #${index + 1}`}')" class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 px-3 py-1 rounded-lg text-xs transition-colors border border-purple-500/30 hover:border-purple-400/50 flex items-center gap-1">
+                                            <button data-userid="${user.id}" data-keyid="${key.id}" data-keyname="${escapeHTML(key.name || `API Key #${index + 1}`)}" onclick="handleRegenerateApiKeyClick(this)" class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 px-3 py-1 rounded-lg text-xs transition-colors border border-purple-500/30 hover:border-purple-400/50 flex items-center gap-1">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                                 </svg>
@@ -953,6 +1026,9 @@
                 // Show modal
                 document.getElementById('userModal').classList.remove('hidden');
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Error loading user details:', error);
                 await ConfirmationModal.show({
                     title: 'Load Failed',
@@ -983,6 +1059,9 @@
                     iconType: 'success'
                 });
             } catch (err) {
+                if (err.message === 'User cancelled') {
+                    return;
+                }
                 await ConfirmationModal.show({
                     title: 'Copy Failed',
                     message: 'Failed to copy to clipboard',
@@ -1025,7 +1104,7 @@
                         <h3 class="text-2xl font-bold text-white mb-6 font-space">Select New Plan</h3>
                         <div class="space-y-3">
                             ${planOptions.map(plan => `
-                                <button onclick="confirmPlanChange(${userId}, '${plan.value}', '${userEmail}')" 
+                                <button data-userid="${userId}" data-planvalue="${plan.value}" data-email="${escapeHTML(userEmail)}" onclick="handleConfirmPlanChangeClick(this)" 
                                         class="w-full glass rounded-xl p-4 border border-${plan.color}-500/30 hover:border-${plan.color}-400/50 transition-all text-left group">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -1048,6 +1127,9 @@
                 document.body.appendChild(planSelect);
 
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Change plan error:', error);
                 await ConfirmationModal.show({
                     title: 'Error',
@@ -1080,6 +1162,11 @@
                     body: JSON.stringify({ plan: newPlan })
                 });
 
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Failed to change plan');
@@ -1101,6 +1188,9 @@
                 loadStats();
 
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Confirm plan change error:', error);
                 await ConfirmationModal.show({
                     title: 'Change Failed',
@@ -1132,8 +1222,8 @@
                     throw new Error('Authentication required');
                 }
 
-                // Show loading state
-                const loadingModal = await ConfirmationModal.show({
+                // Show loading state (no await here so execution continues to fetch)
+                ConfirmationModal.show({
                     title: 'Regenerating...',
                     message: 'Please wait while we regenerate the API key...',
                     confirmText: '',
@@ -1148,6 +1238,11 @@
                         'Content-Type': 'application/json'
                     }
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -1172,6 +1267,9 @@
                 showUserDetails(userId);
 
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Regenerate API key error:', error);
                 await ConfirmationModal.show({
                     title: 'Regeneration Failed',
@@ -1316,6 +1414,11 @@
                     })
                 });
 
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (response.ok) {
@@ -1349,6 +1452,9 @@
                     throw new Error(data.message || 'Failed to create API key');
                 }
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Create API key error:', error);
                 await ConfirmationModal.show({
                     title: 'Creation Failed',
@@ -1438,6 +1544,11 @@
                     }
                 });
 
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
                 if (response.ok) {
                     const data = await response.json();
                     await ConfirmationModal.show({
@@ -1465,6 +1576,9 @@
                     });
                 }
             } catch (error) {
+                if (error.message === 'User cancelled') {
+                    return;
+                }
                 console.error('Delete user error:', error);
                 await ConfirmationModal.show({
                     title: 'Delete Failed',
@@ -1568,6 +1682,11 @@
                     },
                     body: JSON.stringify({ plan })
                 });
+                
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
                 
                 if (response.ok) {
                     const data = await response.json();
