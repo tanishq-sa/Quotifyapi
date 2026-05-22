@@ -92,7 +92,6 @@ router.post('/create', authenticateJWT, async (req, res) => {
             customer_notify: 1,
             quantity: 1,
             total_count: 120, // 10 years = 120 months of monthly billing
-            start_at: Math.ceil((Date.now() / 1000) / 60) * 60 + 60, // Start at next minute boundary + 1 minute buffer for processing
             notes: {
                 user_id: userId.toString(),
                 uid: uid || '',
@@ -109,7 +108,6 @@ router.post('/create', authenticateJWT, async (req, res) => {
             total_count: subscriptionOptions.total_count,
             billing_period: 'monthly',
             duration: '10 years (120 months)',
-            start_at: new Date(subscriptionOptions.start_at * 1000).toISOString(),
             full_options: subscriptionOptions
         });
         
@@ -533,7 +531,6 @@ router.post('/create-subscription', authenticateJWT, async (req, res) => {
             customer_notify: 1,
             quantity: 1,
             total_count: 120, // 10 years = 120 months of monthly billing
-            start_at: Math.ceil((Date.now() / 1000) / 60) * 60 + 60, // Start at next minute boundary + 1 minute buffer for processing
             notes: {
                 user_id: userId.toString(),
                 uid: uid || '',
@@ -551,7 +548,6 @@ router.post('/create-subscription', authenticateJWT, async (req, res) => {
             total_count: subscriptionOptions.total_count,
             billing_period: 'monthly',
             duration: '10 years (120 months)',
-            start_at: new Date(subscriptionOptions.start_at * 1000).toISOString(),
             razorpay_key_id: process.env.RAZORPAY_KEY_ID ? `${process.env.RAZORPAY_KEY_ID.substring(0, 8)}...` : 'NOT SET',
             full_options: subscriptionOptions
         });
