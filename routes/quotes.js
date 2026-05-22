@@ -1,6 +1,6 @@
 const express = require('express');
 const database = require('../database-adapter');
-const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('../quotes');
+const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount, quotes } = require('../quotes');
 
 const router = express.Router();
 
@@ -170,19 +170,45 @@ router.get('/search', async (req, res) => {
     }
 
     // Basic search implementation - in a real app, you'd use a proper search engine
-    const allTypes = getAvailableTypes();
     const searchResults = [];
-    
-    for (const type of allTypes) {
-      const quote = getRandomQuoteByType(type);
-      if (quote && (
-        quote.text.toLowerCase().includes(sanitizedQuery.toLowerCase()) ||
-        quote.author.toLowerCase().includes(sanitizedQuery.toLowerCase())
-      )) {
-        searchResults.push({
-          ...quote,
-          category: type
+    const searchCategory = category ? category.trim().toLowerCase() : null;
+    const lowerQuery = sanitizedQuery.toLowerCase();
+
+    if (searchCategory) {
+      if (!getAvailableTypes().includes(searchCategory)) {
+        return res.status(400).json({
+          error: 'Validation error',
+          message: `Category '${category}' is not valid`
         });
+      }
+      
+      const categoryQuotes = quotes[searchCategory];
+      for (const quote of categoryQuotes) {
+        if (
+          (quote.text && quote.text.toLowerCase().includes(lowerQuery)) ||
+          (quote.author && quote.author.toLowerCase().includes(lowerQuery))
+        ) {
+          searchResults.push({
+            ...quote,
+            category: searchCategory
+          });
+        }
+      }
+    } else {
+      const allTypes = getAvailableTypes();
+      for (const type of allTypes) {
+        const categoryQuotes = quotes[type];
+        for (const quote of categoryQuotes) {
+          if (
+            (quote.text && quote.text.toLowerCase().includes(lowerQuery)) ||
+            (quote.author && quote.author.toLowerCase().includes(lowerQuery))
+          ) {
+            searchResults.push({
+              ...quote,
+              category: type
+            });
+          }
+        }
       }
     }
     

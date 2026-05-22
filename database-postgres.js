@@ -513,7 +513,7 @@ class PostgresDatabase {
     
     if (!result.rows[0]) {
       this.logSecurityEvent('Invalid API key used', { apiKey: apiKey.substring(0, 10) + '...', clientIP });
-      throw new Error('Invalid API key');
+      return null;
     }
     
     const keyData = result.rows[0];
@@ -640,7 +640,7 @@ class PostgresDatabase {
       throw new Error('Invalid endpoint');
     }
     
-    if (!method || typeof method !== 'string' || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase())) {
+    if (!method || typeof method !== 'string' || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'INTERNAL'].includes(method.toUpperCase())) {
       throw new Error('Invalid HTTP method');
     }
     

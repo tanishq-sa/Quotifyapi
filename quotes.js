@@ -15,11 +15,17 @@ const quotes = {
 };
 
 // Function to get all quotes from all categories
+let cachedAllQuotes = null;
+
 function getAllQuotes() {
+  if (cachedAllQuotes) {
+    return cachedAllQuotes;
+  }
   const allQuotes = [];
   Object.values(quotes).forEach(categoryQuotes => {
     allQuotes.push(...categoryQuotes);
   });
+  cachedAllQuotes = allQuotes;
   return allQuotes;
 }
 

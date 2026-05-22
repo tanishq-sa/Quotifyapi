@@ -483,7 +483,7 @@ class Database {
           reject(err);
         } else if (!row) {
           this.logSecurityEvent('Invalid API key used', { apiKey: apiKey.substring(0, 10) + '...', clientIP });
-          reject(new Error('Invalid API key'));
+          resolve(null);
         } else {
           resolve(row);
         }
@@ -644,7 +644,7 @@ class Database {
         return;
       }
       
-      if (!method || typeof method !== 'string' || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase())) {
+      if (!method || typeof method !== 'string' || !['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'INTERNAL'].includes(method.toUpperCase())) {
         reject(new Error('Invalid HTTP method'));
         return;
       }
@@ -1027,12 +1027,12 @@ class Database {
           COUNT(*) as requests,
           COUNT(DISTINCT user_id) as unique_users
         FROM api_usage 
-        WHERE created_at >= DATE('now', '-${days} days')
+        WHERE created_at >= DATE('now', ?)
         GROUP BY DATE(created_at)
         ORDER BY date DESC
       `;
       
-      this.db.all(query, [], (err, rows) => {
+      this.db.all(query, [`-${days} days`], (err, rows) => {
         if (err) {
           reject(err);
         } else {
@@ -1164,15 +1164,21 @@ class Database {
 
   // Close database connection
   close() {
-    if (this.db) {
-      this.db.close((err) => {
-        if (err) {
-          console.error('Error closing database:', err);
-        } else {
-          console.log('Database connection closed');
-        }
-      });
-    }
+    return new Promise((resolve, reject) => {
+      if (this.db) {
+        this.db.close((err) => {
+          if (err) {
+            console.error('Error closing database:', err);
+            reject(err);
+          } else {
+            console.log('Database connection closed');
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
   }
 }
 

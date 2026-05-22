@@ -5,7 +5,10 @@ const slowDown = require('express-slow-down');
 const path = require('path');
 const session = require('express-session');
 const passport = require('passport');
+const helmet = require('helmet');
 require('dotenv').config();
+
+const { planLimits } = require('./config/plan-limits');
 
 const { inject } = require('@vercel/analytics');
 const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount } = require('./quotes');
@@ -92,11 +95,12 @@ app.use(async (req, res, next) => {
 });
 
 // Middleware
+app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Session configuration for OAuth
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -208,12 +212,6 @@ async function planBasedRateLimit(req, res, next) {
     const today = new Date().toISOString().split('T')[0];
     const dailyUsage = await database.getDailyUsageCount(req.user.id, today);
     
-    const planLimits = {
-      free: { daily: 50, perMinute: 3 },
-      basic: { daily: 500, perMinute: 20 },
-      pro: { daily: -1, perMinute: -1 } // -1 means unlimited
-    };
-    
     const limits = planLimits[req.user.plan] || planLimits.free;
     
     // Check daily limit
@@ -263,14 +261,7 @@ async function planBasedRateLimit(req, res, next) {
   }
 }
 
-// Security headers middleware
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
+// Security headers managed by helmet
 
 // Apply rate limiting middleware
 app.use(generalLimiter); // Apply to all requests
@@ -286,23 +277,27 @@ app.use((req, res, next) => {
 
 // Health check endpoint (no auth required)
 app.get('/api/health', (req, res) => {
-  const envCheck = {
-    NODE_ENV: process.env.NODE_ENV || 'development',
-    HAS_POSTGRES_URL: !!process.env.POSTGRES_URL,
-    HAS_DATABASE_URL: !!process.env.DATABASE_URL,
-    HAS_GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
-    HAS_JWT_SECRET: !!process.env.JWT_SECRET,
-    HAS_SESSION_SECRET: !!process.env.SESSION_SECRET,
-    DATABASE_INITIALIZED: dbInitialized,
-    TIMESTAMP: new Date().toISOString()
-  };
-  
-  res.json({
+  const isDev = process.env.NODE_ENV !== 'production';
+  const responseData = {
     status: 'ok',
     message: 'Server is running',
-    database: dbInitialized ? 'connected' : 'initializing',
-    environment: envCheck
-  });
+    database: dbInitialized ? 'connected' : 'initializing'
+  };
+  
+  if (isDev) {
+    responseData.environment = {
+      NODE_ENV: process.env.NODE_ENV || 'development',
+      HAS_POSTGRES_URL: !!process.env.POSTGRES_URL,
+      HAS_DATABASE_URL: !!process.env.DATABASE_URL,
+      HAS_GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
+      HAS_JWT_SECRET: !!process.env.JWT_SECRET,
+      HAS_SESSION_SECRET: !!process.env.SESSION_SECRET,
+      DATABASE_INITIALIZED: dbInitialized,
+      TIMESTAMP: new Date().toISOString()
+    };
+  }
+  
+  res.json(responseData);
 });
 
 // API Routes
@@ -391,8 +386,8 @@ app.get('/', (req, res) => {
         'GET /api/v1/user/usage': 'Get API usage stats (requires JWT)'
       },
       plans: {
-        free: '5 requests per day',
-        basic: '500 requests per day, 5 per minute',
+        free: `${planLimits.free.daily} requests per day, ${planLimits.free.perMinute} per minute`,
+        basic: `${planLimits.basic.daily} requests per day, ${planLimits.basic.perMinute} per minute`,
         pro: 'Unlimited requests'
       },
       availableTypes: getAvailableTypes(),
@@ -582,15 +577,6 @@ app.get('/api/stats', authenticateFlexible, planBasedRateLimit, async (req, res)
   }
 });
 
-// Debug route to check static file serving
-app.get('/debug/static', (req, res) => {
-  res.json({
-    message: 'Static file serving debug',
-    publicPath: path.join(__dirname, 'public'),
-    files: ['index.html', 'script.js'],
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -643,6 +629,22 @@ if (process.env.NODE_ENV !== 'production') {
     });
   });
 }
+
+// Graceful shutdown
+async function gracefulShutdown(signal) {
+  console.log(`Received ${signal}. Shutting down gracefully...`);
+  try {
+    await database.close();
+    console.log('Database connections closed.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during graceful shutdown:', err);
+    process.exit(1);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Export the app for serverless deployment
 module.exports = app; 

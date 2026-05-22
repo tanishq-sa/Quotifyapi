@@ -1,6 +1,7 @@
 const express = require('express');
 const { authenticateJWT, authenticateFlexible } = require('../auth');
 const database = require('../database-adapter');
+const { planLimits } = require('../config/plan-limits');
 
 const router = express.Router();
 
@@ -75,13 +76,6 @@ router.put('/profile', authenticateJWT, async (req, res) => {
       throw err;
     }
 
-    if (!success) {
-      return res.status(404).json({
-        error: 'User not found',
-        message: 'User account not found'
-      });
-    }
-
     res.json({
       message: 'Profile updated successfully',
       updated_fields: ['name']
@@ -107,12 +101,6 @@ router.get('/usage', authenticateFlexible, async (req, res) => {
     
     // Get user's current plan limits
     const user = await database.findUserByEmail(req.user.email);
-    const planLimits = {
-      free: { daily: 50, perMinute: 3 },
-      basic: { daily: 500, perMinute: 20 },
-      pro: { daily: -1, perMinute: -1 }
-    };
-    
     const currentLimits = planLimits[user.plan] || planLimits.free;
     
     res.json({
@@ -272,9 +260,18 @@ router.get('/keys', authenticateFlexible, async (req, res) => {
   try {
     const apiKeys = await database.getUserApiKeys(req.user.id);
     
+    // Remove sensitive key values for security
+    const safeApiKeys = apiKeys.map(key => ({
+      id: key.id,
+      name: key.name,
+      is_active: key.is_active,
+      created_at: key.created_at,
+      last_used: key.last_used
+    }));
+    
     res.json({
-      api_keys: apiKeys,
-      total: apiKeys.length,
+      api_keys: safeApiKeys,
+      total: safeApiKeys.length,
       message: 'API keys retrieved successfully'
     });
   } catch (error) {

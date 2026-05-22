@@ -4,20 +4,20 @@ const nodemailer = require('nodemailer');
 
 // Create transporter for sending emails
 const createTransporter = () => {
-    // For development, you can use Gmail or any SMTP service
-    // You'll need to add these to your .env file:
-    // EMAIL_HOST=smtp.gmail.com
-    // EMAIL_PORT=587
-    // EMAIL_USER=your-email@gmail.com
-    // EMAIL_PASS=your-app-password
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASS;
+    
+    if (!user || !pass) {
+        throw new Error('EMAIL_USER and EMAIL_PASS environment variables are required');
+    }
     
     const config = {
         host: process.env.EMAIL_HOST || 'smtp.titan.email',
-        port: process.env.EMAIL_PORT || 465,
-        secure: true, // true for 465, false for other ports
+        port: parseInt(process.env.EMAIL_PORT, 10) || 465,
+        secure: process.env.EMAIL_SECURE === 'false' ? false : true, // true for 465, false for other ports
         auth: {
-            user: process.env.EMAIL_USER || 'support@dazzelr.tech',
-            pass: process.env.EMAIL_PASS || 'zirdi0-sernIf-xyhbin'
+            user,
+            pass
         },
         tls: {
             rejectUnauthorized: false
@@ -37,6 +37,17 @@ const createTransporter = () => {
     return nodemailer.createTransport(config);
 };
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return '';
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Contact form submission
 router.post('/submit', async (req, res) => {
     try {
@@ -50,6 +61,14 @@ router.post('/submit', async (req, res) => {
             });
         }
         
+        // Validate input lengths to prevent mega-payloads
+        if (firstName.length > 50 || lastName.length > 50 || email.length > 100 || subject.length > 150 || message.length > 5000) {
+            return res.status(400).json({
+                success: false,
+                error: 'Input exceeds maximum allowed length'
+            });
+        }
+        
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -59,11 +78,18 @@ router.post('/submit', async (req, res) => {
             });
         }
         
+        // Sanitize inputs for HTML template to prevent XSS
+        const safeFirstName = escapeHtml(firstName);
+        const safeLastName = escapeHtml(lastName);
+        const safeEmail = escapeHtml(email);
+        const safeSubject = escapeHtml(subject);
+        const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
+        
         // Create email content
         const emailContent = {
-            from: `"${firstName} ${lastName}" <${email}>`,
+            from: `"${safeFirstName} ${safeLastName}" <${safeEmail}>`,
             to: 'support@dazzelr.tech',
-            subject: `Contact Form: ${subject}`,
+            subject: `Contact Form: ${safeSubject}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">
@@ -72,14 +98,14 @@ router.post('/submit', async (req, res) => {
                     
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <h3 style="color: #333; margin-top: 0;">Contact Details</h3>
-                        <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Subject:</strong> ${subject}</p>
+                        <p><strong>Name:</strong> ${safeFirstName} ${safeLastName}</p>
+                        <p><strong>Email:</strong> ${safeEmail}</p>
+                        <p><strong>Subject:</strong> ${safeSubject}</p>
                     </div>
                     
                     <div style="background: #fff; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px;">
                         <h3 style="color: #333; margin-top: 0;">Message</h3>
-                        <p style="line-height: 1.6; color: #555;">${message.replace(/\n/g, '<br>')}</p>
+                        <p style="line-height: 1.6; color: #555;">${safeMessage}</p>
                     </div>
                     
                     <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
@@ -105,18 +131,16 @@ This message was sent from the Quotify API contact form.
             `
         };
         
-        // For now, we'll log the contact form submission instead of sending emails
-        // This ensures the contact form works while we fix the email configuration
-        console.log('=== NEW CONTACT FORM SUBMISSION ===');
-        console.log('Name:', `${firstName} ${lastName}`)
+        // Send email via transporter
+        const transporter = createTransporter();
+        await transporter.sendMail(emailContent);
+        
+        console.log('=== CONTACT FORM EMAIL SENT ===');
+        console.log('Name:', `${firstName} ${lastName}`);
         console.log('Email:', email);
         console.log('Subject:', subject);
-        console.log('Message:', message);
         console.log('Timestamp:', new Date().toISOString());
-        console.log('=====================================');
-        
-        // TODO: Fix email configuration to actually send emails
-        // The email service is currently failing due to authentication issues
+        console.log('=================================');
         
         res.json({
             success: true,

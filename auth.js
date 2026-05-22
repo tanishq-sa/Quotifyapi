@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const database = require('./database-adapter');
+const { getLimitsByPlan } = require('./config/plan-limits');
 
 // JWT Configuration
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -179,22 +180,7 @@ async function authenticateApiKey(req, res, next) {
 
 // Rate limiting based on user plan
 function getRateLimitByPlan(plan) {
-  const limits = {
-    free: {
-      daily: 50,
-      perMinute: 3
-    },
-    basic: {
-      daily: 500,
-      perMinute: 20
-    },
-    pro: {
-      daily: -1, // unlimited
-      perMinute: -1 // unlimited
-    }
-  };
-
-  return limits[plan] || limits.free;
+  return getLimitsByPlan(plan);
 }
 
 // Check if user has exceeded rate limits
@@ -297,10 +283,11 @@ function configurePassport() {
   // Deserialize user from session
   passport.deserializeUser(async (id, done) => {
     try {
-      // This would need to be implemented in database.js
-      // const user = await database.findUserById(id);
-      // done(null, user);
-      done(null, { id });
+      const user = await database.findUserById(id);
+      if (!user) {
+        return done(null, false);
+      }
+      done(null, user);
     } catch (error) {
       done(error, null);
     }
