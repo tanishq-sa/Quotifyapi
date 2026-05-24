@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const database = require('../database-adapter');
 
 // Create transporter for sending emails
 const createTransporter = () => {
@@ -81,6 +82,15 @@ router.post('/submit', async (req, res) => {
                 error: 'Please provide a valid email address'
             });
         }
+
+        // Check rate limit: 1 submission per day per email/IP
+        const isRateLimited = await database.checkContactRateLimit(email, req.ip);
+        if (isRateLimited) {
+            return res.status(429).json({
+                success: false,
+                error: 'You have already sent a message in the last 24 hours. Please try again tomorrow.'
+            });
+        }
         
         // Sanitize inputs for HTML template to prevent XSS
         const safeFirstName = escapeHtml(firstName);
@@ -139,6 +149,9 @@ This message was sent from the Quotify API contact form.
         // Send email via transporter
         const transporter = createTransporter();
         await transporter.sendMail(emailContent);
+        
+        // Record the submission in the database to enforce the rate limit
+        await database.createContactSubmission(email, req.ip);
         
         console.log('=== CONTACT FORM EMAIL SENT ===');
         console.log('Name:', `${firstName} ${lastName}`);

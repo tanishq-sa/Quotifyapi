@@ -119,6 +119,18 @@ class PostgresDatabase {
   async createTables() {
     const client = await this.pool.connect();
     try {
+      // Ensure contact_submissions table and indexes exist (run regardless of other tables)
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS contact_submissions (
+          id SERIAL PRIMARY KEY,
+          email TEXT NOT NULL,
+          ip_address TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      await client.query('CREATE INDEX IF NOT EXISTS idx_contact_submissions_email_ip ON contact_submissions(email, ip_address)');
+      await client.query('CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at)');
+
       // Check if tables already exist to avoid race conditions
       const checkResult = await client.query(`
         SELECT EXISTS (
@@ -209,6 +221,16 @@ class PostgresDatabase {
           )
         `);
 
+        // Contact submissions table
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS contact_submissions (
+            id SERIAL PRIMARY KEY,
+            email TEXT NOT NULL,
+            ip_address TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
         // Create indices for better performance
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id)');
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_keys_user_active ON api_keys(user_id, is_active)');
@@ -217,6 +239,8 @@ class PostgresDatabase {
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_created_at ON api_usage(created_at)');
         await client.query('CREATE INDEX IF NOT EXISTS idx_api_usage_user_date ON api_usage(user_id, created_at)');
         await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_contact_submissions_email_ip ON contact_submissions(email, ip_address)');
+        await client.query('CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at)');
 
         console.log('✅ All database tables created successfully');
       } finally {
@@ -962,6 +986,28 @@ class PostgresDatabase {
     } catch (error) {
       console.error('Error setting up admin:', error);
     }
+  }
+
+  async checkContactRateLimit(email, ipAddress) {
+    const result = await this.pool.query(
+      `SELECT COUNT(*) as count 
+       FROM contact_submissions 
+       WHERE (email = $1 OR ip_address = $2) 
+         AND created_at >= NOW() - INTERVAL '1 day'`,
+      [email, ipAddress]
+    );
+    const count = parseInt(result.rows[0]?.count || 0, 10);
+    return count > 0;
+  }
+
+  async createContactSubmission(email, ipAddress) {
+    const result = await this.pool.query(
+      `INSERT INTO contact_submissions (email, ip_address)
+       VALUES ($1, $2)
+       RETURNING id`,
+      [email, ipAddress]
+    );
+    return result.rows[0].id;
   }
 
   // Close database connection

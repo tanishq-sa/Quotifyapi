@@ -95,6 +95,14 @@ class Database {
           quote_category TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        )`,
+        
+        // Contact submissions table
+        `CREATE TABLE IF NOT EXISTS contact_submissions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          ip_address TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`
       ];
 
@@ -1160,6 +1168,40 @@ class Database {
     } catch (error) {
       console.error('Error setting up admin:', error);
     }
+  }
+
+  async checkContactRateLimit(email, ipAddress) {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT COUNT(*) as count 
+        FROM contact_submissions 
+        WHERE (email = ? OR ip_address = ?) 
+          AND created_at >= datetime('now', '-1 day')
+      `;
+      this.db.get(query, [email, ipAddress], (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row ? row.count > 0 : false);
+        }
+      });
+    });
+  }
+
+  async createContactSubmission(email, ipAddress) {
+    return new Promise((resolve, reject) => {
+      const query = `
+        INSERT INTO contact_submissions (email, ip_address)
+        VALUES (?, ?)
+      `;
+      this.db.run(query, [email, ipAddress], function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
+      });
+    });
   }
 
   // Close database connection
