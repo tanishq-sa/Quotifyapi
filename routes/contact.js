@@ -11,10 +11,14 @@ const createTransporter = () => {
         throw new Error('EMAIL_USER and EMAIL_PASS environment variables are required');
     }
     
+    const host = process.env.EMAIL_HOST || 'smtp.titan.email';
+    const port = parseInt(process.env.EMAIL_PORT, 10) || 465;
+    const secure = process.env.EMAIL_SECURE ? (process.env.EMAIL_SECURE === 'true') : (port === 465);
+    
     const config = {
-        host: process.env.EMAIL_HOST || 'smtp.titan.email',
-        port: parseInt(process.env.EMAIL_PORT, 10) || 465,
-        secure: process.env.EMAIL_SECURE === 'false' ? false : true, // true for 465, false for other ports
+        host,
+        port,
+        secure,
         auth: {
             user,
             pass
@@ -87,7 +91,8 @@ router.post('/submit', async (req, res) => {
         
         // Create email content
         const emailContent = {
-            from: `"${safeFirstName} ${safeLastName}" <${safeEmail}>`,
+            from: `"${safeFirstName} ${safeLastName}" <${process.env.EMAIL_USER}>`,
+            replyTo: `"${safeFirstName} ${safeLastName}" <${safeEmail}>`,
             to: 'support@dazzelr.tech',
             subject: `Contact Form: ${safeSubject}`,
             html: `

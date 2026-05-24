@@ -49,3 +49,6 @@ build/
 
 # Cloudflare
 .wrangler/ 
+
+openspec/
+.agent/
