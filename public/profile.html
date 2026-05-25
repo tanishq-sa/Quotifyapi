@@ -1020,8 +1020,9 @@
                         // For admin users, try to fetch the API key directly
                         if (isAdmin) {
                             console.log('Admin user detected, fetching API key directly...');
+                            const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
                             fetch('/api/v1/admin/keys', { 
-                                headers: { 'x-api-key': 'qapi_0ec69653cfbbd303ad61b04ff1e344a4f1568cb44a730114274ee557bc731493' }
+                                headers: authHeaders
                             })
                             .then(response => response.json())
                             .then(data => {
@@ -1093,16 +1094,49 @@
         document.getElementById('copyApiKey').addEventListener('click', function() {
             const apiKey = document.getElementById('apiKeyDisplay').textContent;
             if (apiKey && apiKey !== 'No API key found') {
-                navigator.clipboard.writeText(apiKey).then(() => {
-                    const originalText = this.textContent;
-                    this.textContent = 'Copied!';
-                    this.classList.add('text-green-400');
+                const button = this;
+                const originalText = button.textContent;
+                
+                function handleSuccess() {
+                    button.textContent = 'Copied!';
+                    button.classList.add('text-green-400');
                     
                     setTimeout(() => {
-                        this.textContent = originalText;
-                        this.classList.remove('text-green-400');
+                        button.textContent = originalText;
+                        button.classList.remove('text-green-400');
                     }, 2000);
-                });
+                }
+
+                function fallbackCopy(text) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            handleSuccess();
+                        } else {
+                            console.error('Fallback copy command was unsuccessful');
+                        }
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(apiKey).then(handleSuccess).catch(err => {
+                        fallbackCopy(apiKey);
+                    });
+                } else {
+                    fallbackCopy(apiKey);
+                }
             }
         });
 

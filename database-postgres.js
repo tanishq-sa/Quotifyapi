@@ -383,12 +383,13 @@ class PostgresDatabase {
     
     const isAdmin = email === this.ADMIN_EMAIL;
     const api_key = isAdmin ? null : this.generateApiKey();
+    const role = isAdmin ? 'admin' : 'user';
     
     const result = await this.pool.query(
-      `INSERT INTO users (email, name, provider, provider_id, plan, api_key)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO users (email, name, provider, provider_id, plan, api_key, role)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, email, name, provider, provider_id, plan, plan_expiry, role, created_at, updated_at`,
-      [email, name, provider, provider_id, plan, api_key]
+      [email, name, provider, provider_id, plan, api_key, role]
     );
     
     // Invalidate user cache

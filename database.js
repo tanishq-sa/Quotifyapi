@@ -283,13 +283,14 @@ class Database {
       // Check if this is an admin user - don't generate API key automatically
       const isAdmin = email === this.ADMIN_EMAIL;
       const api_key = isAdmin ? null : this.generateApiKey();
+      const role = isAdmin ? 'admin' : 'user';
       
       const query = `
-        INSERT INTO users (email, name, provider, provider_id, plan, api_key)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO users (email, name, provider, provider_id, plan, api_key, role)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
       
-      this.db.run(query, [email, name, provider, provider_id, plan, api_key], function(err) {
+      this.db.run(query, [email, name, provider, provider_id, plan, api_key, role], function(err) {
         if (err) {
           reject(err);
         } else {
@@ -300,6 +301,7 @@ class Database {
             provider,
             provider_id,
             plan,
+            role,
             api_key,
             created_at: new Date().toISOString()
           });

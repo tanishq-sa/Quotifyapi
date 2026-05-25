@@ -1221,6 +1221,7 @@
                 // Refresh user details and statistics
                 showUserDetails(userId);
                 loadStats();
+                loadUsers();
 
             } catch (error) {
                 if (error.message === 'User cancelled') {
@@ -1516,9 +1517,10 @@
         function copyGeneratedKey() {
             const apiKey = document.getElementById('generatedApiKey').textContent;
             if (apiKey) {
-                navigator.clipboard.writeText(apiKey).then(() => {
-                    const copyButton = document.querySelector('button[onclick="copyGeneratedKey()"]');
-                    const originalText = copyButton.textContent;
+                const copyButton = document.querySelector('button[onclick="copyGeneratedKey()"]');
+                const originalText = copyButton.textContent;
+                
+                function handleSuccess() {
                     copyButton.textContent = 'Copied!';
                     copyButton.classList.add('text-green-300');
                     
@@ -1526,7 +1528,38 @@
                         copyButton.textContent = originalText;
                         copyButton.classList.remove('text-green-300');
                     }, 2000);
-                });
+                }
+
+                function fallbackCopy(text) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            handleSuccess();
+                        } else {
+                            console.error('Fallback copy command was unsuccessful');
+                        }
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(apiKey).then(handleSuccess).catch(err => {
+                        fallbackCopy(apiKey);
+                    });
+                } else {
+                    fallbackCopy(apiKey);
+                }
             }
         }
 
