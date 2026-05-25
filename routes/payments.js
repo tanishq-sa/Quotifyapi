@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
-const { authenticateJWT } = require('../auth');
+const { authenticateJWT, generateToken } = require('../auth');
 const database = require('../database-adapter');
 
 // Initialize Razorpay
@@ -165,12 +165,17 @@ router.post('/activate', authenticateJWT, async (req, res) => {
         const expiryDate = new Date('2050-12-31');
         await database.updateUserPlan(userId, 'pro', expiryDate);
         
+        // Fetch updated user details to generate a new JWT token
+        const updatedUser = await database.findUserById(userId);
+        const newToken = generateToken(updatedUser);
+        
         res.json({
             success: true,
             message: 'Subscription activated successfully!',
             plan: 'pro',
             expiry_date: expiryDate.toISOString(),
-            isPremium: true
+            isPremium: true,
+            token: newToken
         });
         
     } catch (error) {
@@ -360,6 +365,10 @@ router.post('/verify-subscription', authenticateJWT, async (req, res) => {
         const expiryDate = new Date('2034-12-31');
         await database.updateUserPlan(userId, userPlan, expiryDate);
         
+        // Fetch updated user details to generate a new JWT token
+        const updatedUser = await database.findUserById(userId);
+        const newToken = generateToken(updatedUser);
+        
         res.json({
             success: true,
             message: `Successfully subscribed to ${frontendPlan.charAt(0).toUpperCase() + frontendPlan.slice(1)} plan! Monthly billing for 10 years (120 months).`,
@@ -368,6 +377,7 @@ router.post('/verify-subscription', authenticateJWT, async (req, res) => {
             expiry_date: expiryDate.toISOString(),
             subscription_id: subscription_id,
             type: 'subscription',
+            token: newToken,
             billing_info: {
                 period: 'monthly',
                 total_charges: 120,

@@ -861,7 +861,12 @@ class PostgresDatabase {
       );
     }
     
-    return result.rowCount > 0;
+    const success = result.rowCount > 0;
+    if (success) {
+      this.invalidateCache('user:');
+      this.invalidateCache('apikey:');
+    }
+    return success;
   }
 
   async getSystemStats() {

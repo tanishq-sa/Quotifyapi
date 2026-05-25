@@ -1860,6 +1860,10 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                             console.log('📦 Verification data:', verifyData);
                             
                             if (verifyData.success) {
+                                if (verifyData.token) {
+                                    localStorage.setItem('quotify_token', verifyData.token);
+                                    console.log('✅ Updated JWT token in localStorage');
+                                }
                                 const billingInfo = data.billingInfo || { period: 'monthly', duration: '10 years' };
                                 alert(`🎉 Subscription Successful! You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.\n\n₹${data.amount/100} will be charged monthly.`);
                                 // Redirect to profile page to see updated plan
