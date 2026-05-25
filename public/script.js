@@ -34,9 +34,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Helper to write text to clipboard with secure and insecure (fallback) support
+    function writeTextToClipboard(text, successCallback, failureCallback) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(successCallback).catch(failureCallback);
+        } else {
+            // Fallback for insecure (HTTP) contexts
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    successCallback();
+                } else {
+                    failureCallback(new Error('Fallback copy command was unsuccessful'));
+                }
+            } catch (err) {
+                failureCallback(err);
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+
     // Copy to clipboard functionality
     window.copyToClipboard = function(button, text) {
-        navigator.clipboard.writeText(text).then(function() {
+        writeTextToClipboard(text, function() {
             const originalText = button.innerHTML;
             button.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
             button.classList.add('text-green-400');
@@ -45,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.innerHTML = originalText;
                 button.classList.remove('text-green-400');
             }, 2000);
-        }).catch(function(err) {
+        }, function(err) {
             console.error('Could not copy text: ', err);
         });
     };
@@ -136,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Copy API key functionality
         if (copyApiKeyBtn && apiKeyInput) {
             copyApiKeyBtn.addEventListener('click', function() {
-                navigator.clipboard.writeText(apiKeyInput.value).then(() => {
+                writeTextToClipboard(apiKeyInput.value, () => {
                     copyApiKeyBtn.innerHTML = `
                         <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -149,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             </svg>
                         `;
                     }, 2000);
+                }, (err) => {
+                    console.error('Could not copy API key: ', err);
                 });
             });
         }
@@ -191,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     responseBody.innerHTML = `
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-lg font-semibold text-white">Response Data</h4>
-                            <button onclick="copyToClipboard(this, JSON.stringify(${JSON.stringify(data)}, null, 2))" class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-300">
+                            <button onclick="copyToClipboard(this, this.closest('.flex').nextElementSibling.querySelector('pre').textContent)" class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-300">
                                 Copy Response
                             </button>
                         </div>

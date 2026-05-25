@@ -1048,8 +1048,7 @@
 
         // Copy to clipboard
         async function copyToClipboard(text) {
-            try {
-                await navigator.clipboard.writeText(text);
+            async function showSuccess() {
                 await ConfirmationModal.show({
                     title: 'Copied!',
                     message: 'API key copied to clipboard!',
@@ -1058,7 +1057,9 @@
                     confirmClass: 'bg-green-500/80 hover:bg-green-500 border-green-500/50 hover:border-green-400',
                     iconType: 'success'
                 });
-            } catch (err) {
+            }
+
+            async function showFailure(err) {
                 if (err.message === 'User cancelled') {
                     return;
                 }
@@ -1070,6 +1071,40 @@
                     confirmClass: 'bg-red-500/80 hover:bg-red-500 border-red-500/50 hover:border-red-400',
                     iconType: 'danger'
                 });
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    await showSuccess();
+                } catch (err) {
+                    await fallbackCopy(err);
+                }
+            } else {
+                await fallbackCopy(new Error('navigator.clipboard is not available'));
+            }
+
+            async function fallbackCopy(originalErr) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                textArea.style.opacity = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        await showSuccess();
+                    } else {
+                        await showFailure(new Error('Fallback copy command was unsuccessful'));
+                    }
+                } catch (err) {
+                    await showFailure(err);
+                }
+                document.body.removeChild(textArea);
             }
         }
 
