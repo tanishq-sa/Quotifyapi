@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quotify API - Premium Quote API with Authentication</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="components/DotGrid.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
@@ -224,7 +226,7 @@
 
 <body class="font-inter min-h-screen text-white relative overflow-x-hidden">
     <!-- Animated background elements -->
-    <div class="fixed inset-0 -z-10 bg-black">
+    <div class="fixed inset-0 z-0 bg-black">
         <!-- Floating particles -->
         <div class="particle"></div>
         <div class="particle"></div>
@@ -232,11 +234,11 @@
         <div class="particle"></div>
         <div class="particle"></div>
         
-        <!-- Grid pattern -->
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+        <!-- Interactive DotGrid Background -->
+        <div id="dot-grid-bg" class="absolute inset-0 pointer-events-none"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <header id="header" class="relative py-20 text-center mb-16 overflow-hidden">
             <!-- Hero content -->
@@ -1599,10 +1601,11 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                 </div>
             </section>
         </main>
+    </div>
 
-                <!-- Footer -->
-        <footer class="mt-20 border-t border-gray-800">
-            <div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Footer -->
+    <footer class="relative z-10 w-full bg-black border-t border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 py-12">
                 <!-- Links Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                     <!-- Product -->
@@ -1676,11 +1679,10 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                 </div>
             </div>
         </footer>
-    </div>
 
     <!-- Razorpay Checkout Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    
+    <script src="/components/DotGrid.js"></script>
     <script src="script.js"></script>
     
     <script>
@@ -1978,8 +1980,9 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
         // Load user stats and current plan
         async function loadUserStats() {
             const token = localStorage.getItem('quotify_token');
+            const statsSection = document.getElementById('userStatsSection');
             if (!token) {
-                document.getElementById('userStatsSection').classList.add('hidden');
+                if (statsSection) statsSection.classList.add('hidden');
                 return;
             }
 
@@ -1997,43 +2000,50 @@ curl -H "x-api-key: YOUR_API_KEY" https://quotify.dazzelr.tech/api/stats</code><
                 const usageData = await usageRes.json();
 
                 if (profileData.profile && usageData) {
-                    // Show stats section
-                    document.getElementById('userStatsSection').classList.remove('hidden');
-                    
-                    // Get user plan
                     const userPlan = (profileData.profile.plan || 'free').toLowerCase();
                     
-                    // Calculate stats
-                    const totalRequests = usageData.usage_stats ? 
-                        usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
-                    const totalSuccessful = usageData.usage_stats ? 
-                        usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
-                    const successRate = totalRequests > 0 ? 
-                        Math.round((totalSuccessful / totalRequests) * 100) : 100;
-                    
-                    // Display stats
-                    document.getElementById('indexTotalRequests').textContent = totalRequests;
-                    document.getElementById('indexTodayRequests').textContent = usageData.today_usage || 0;
-                    document.getElementById('indexSuccessRate').textContent = `${successRate}%`;
-                    document.getElementById('indexSuccessBar').style.width = `${successRate}%`;
-                    
-                    // Display plan limit
-                    let planLimitText = '';
-                    if (userPlan === 'free') {
-                        planLimitText = 'Free: 50/day';
-                    } else if (userPlan === 'basic') {
-                        planLimitText = 'Basic: 500/day';
-                    } else if (userPlan === 'pro') {
-                        planLimitText = 'Pro: Unlimited';
+                    // Show stats section if it exists
+                    if (statsSection) {
+                        statsSection.classList.remove('hidden');
+                        
+                        // Calculate stats
+                        const totalRequests = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.total_requests, 0) : 0;
+                        const totalSuccessful = usageData.usage_stats ? 
+                            usageData.usage_stats.reduce((sum, day) => sum + day.successful_requests, 0) : 0;
+                        const successRate = totalRequests > 0 ? 
+                            Math.round((totalSuccessful / totalRequests) * 100) : 100;
+                        
+                        // Display stats
+                        const totalReqEl = document.getElementById('indexTotalRequests');
+                        const todayReqEl = document.getElementById('indexTodayRequests');
+                        const successRateEl = document.getElementById('indexSuccessRate');
+                        const successBarEl = document.getElementById('indexSuccessBar');
+                        
+                        if (totalReqEl) totalReqEl.textContent = totalRequests;
+                        if (todayReqEl) todayReqEl.textContent = usageData.today_usage || 0;
+                        if (successRateEl) successRateEl.textContent = `${successRate}%`;
+                        if (successBarEl) successBarEl.style.width = `${successRate}%`;
+                        
+                        // Display plan limit
+                        let planLimitText = '';
+                        if (userPlan === 'free') {
+                            planLimitText = 'Free: 50/day';
+                        } else if (userPlan === 'basic') {
+                            planLimitText = 'Basic: 500/day';
+                        } else if (userPlan === 'pro') {
+                            planLimitText = 'Pro: Unlimited';
+                        }
+                        const planLimitEl = document.getElementById('indexPlanLimit');
+                        if (planLimitEl) planLimitEl.textContent = planLimitText;
                     }
-                    document.getElementById('indexPlanLimit').textContent = planLimitText;
                     
                     // Mark current plan in pricing cards
                     markCurrentPlan(userPlan);
                 }
             } catch (error) {
                 console.error('Error loading user stats:', error);
-                document.getElementById('userStatsSection').classList.add('hidden');
+                if (statsSection) statsSection.classList.add('hidden');
             }
         }
 

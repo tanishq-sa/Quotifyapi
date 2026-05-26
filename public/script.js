@@ -320,4 +320,21 @@ document.addEventListener('DOMContentLoaded', function() {
             header.style.transform = 'translateY(0)';
         }
     }, 100);
+
+    // Initialize interactive background DotGrid
+    if (window.DotGrid) {
+        new DotGrid('#dot-grid-bg', {
+            dotSize: 5,
+            gap: 15,
+            baseColor: '#2F293A',
+            activeColor: '#5227FF',
+            proximity: 45,
+            speedTrigger: 100,
+            shockRadius: 50,
+            shockStrength: 2,
+            maxSpeed: 5000,
+            resistance: 750,
+            returnDuration: 1.5
+        });
+    }
 });

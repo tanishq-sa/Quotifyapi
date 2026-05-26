@@ -1,0 +1,25 @@
+db.student.insert([
+    {
+    rollno: 101,
+    name: "Nihsita",
+    class: "4BCA",
+    Subjects: [
+            {
+        name: "Maths",
+        marks: 90
+            },
+            {
+            name: "Science",
+            marks: 85
+            }
+        ]
+    }
+])
+
+db.students.find(
+  {},
+{
+    _id: 0,
+    name: 1,
+    roll_no: 0
+)
