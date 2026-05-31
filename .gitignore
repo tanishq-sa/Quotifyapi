@@ -50,5 +50,9 @@ build/
 # Cloudflare
 .wrangler/ 
 
-openspec/
-.agent/
+openspec/*
+.agents/*
+.agent/*
+.GEMINI/*
+graphify-out/*
+GEMINI.md

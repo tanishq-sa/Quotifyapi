@@ -1,3 +1,7 @@
+const http = require('http');
+const https = require('https');
+const url = require('url');
+
 // Load quotes from separate files
 const sadQuotes = require('./quotes/sad');
 const happyQuotes = require('./quotes/happy');
@@ -61,11 +65,80 @@ function getQuotesCount() {
   return counts;
 }
 
+class ApiClient {
+  constructor(apiKey, baseUrl = 'https://quotify.dazzelr.tech') {
+    if (!apiKey) {
+      throw new Error('API Key is required to initialize the ApiClient.');
+    }
+    this.apiKey = apiKey;
+    this.baseUrl = baseUrl;
+  }
+
+  _makeRequest(endpoint) {
+    return new Promise((resolve, reject) => {
+      const parsedUrl = url.parse(`${this.baseUrl}${endpoint}`);
+      const protocol = parsedUrl.protocol === 'https:' ? https : http;
+      
+      const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port,
+        path: parsedUrl.path,
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Quotify-SDK/1.3.0',
+          'x-api-key': this.apiKey
+        }
+      };
+
+      const req = protocol.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => {
+          try {
+            const parsedData = JSON.parse(data);
+            if (res.statusCode !== 200) {
+              reject(new Error(parsedData.message || parsedData.error || `Request failed with status ${res.statusCode}`));
+            } else {
+              resolve(parsedData);
+            }
+          } catch (e) {
+            reject(new Error(`Failed to parse API response: ${data.substring(0, 100)}`));
+          }
+        });
+      });
+
+      req.on('error', (err) => { reject(err); });
+      req.end();
+    });
+  }
+
+  async getRandomQuote() {
+    const res = await this._makeRequest('/api/v1/quotes');
+    return res.quote;
+  }
+
+  async getRandomQuoteByType(type) {
+    const res = await this._makeRequest(`/api/v1/quotes/category/${type.toLowerCase()}`);
+    return res.quote;
+  }
+
+  async getAvailableTypes() {
+    const res = await this._makeRequest('/api/v1/quotes/types');
+    return res.availableTypes;
+  }
+
+  async getQuotesCount() {
+    const res = await this._makeRequest('/api/v1/quotes/stats');
+    return res.counts;
+  }
+}
+
 module.exports = {
   quotes,
   getAllQuotes,
   getRandomQuoteByType,
   getRandomQuote,
   getAvailableTypes,
-  getQuotesCount
+  getQuotesCount,
+  ApiClient
 }; 

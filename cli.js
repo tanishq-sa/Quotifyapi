@@ -3,6 +3,7 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const readline = require('readline');
 
 // Colors for terminal output
 const colors = {
@@ -20,6 +21,20 @@ const colors = {
 // Helper function to colorize text
 function colorize(text, color) {
     return `${colors[color]}${text}${colors.reset}`;
+}
+
+// Prompt the user for their API key
+function askApiKey() {
+    return new Promise((resolve) => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.question(colorize('🔑 Enter your QUOTIFY_API_KEY: ', 'cyan'), (answer) => {
+            rl.close();
+            resolve(answer.trim());
+        });
+    });
 }
 
 // Display banner
@@ -172,23 +187,36 @@ async function main() {
     }
     
     // Check API Key
-    const apiKey = process.env.QUOTIFY_API_KEY;
+    let apiKey = process.env.QUOTIFY_API_KEY;
     if (!apiKey) {
-        console.log(colorize('❌ Error: QUOTIFY_API_KEY environment variable is not set.', 'red'));
-        console.log('');
-        console.log('Please set your API key in your environment to authenticate CLI requests.');
-        console.log('You can get your API key from the Quotify Dashboard.');
-        console.log('');
-        console.log(colorize('On Linux/macOS:', 'bright'));
-        console.log(`  export QUOTIFY_API_KEY="your_api_key_here"`);
-        console.log('');
-        console.log(colorize('On Windows (Command Prompt):', 'bright'));
-        console.log(`  set QUOTIFY_API_KEY="your_api_key_here"`);
-        console.log('');
-        console.log(colorize('On Windows (PowerShell):', 'bright'));
-        console.log(`  $env:QUOTIFY_API_KEY="your_api_key_here"`);
-        console.log('');
-        process.exit(1);
+        if (process.stdout.isTTY) {
+            showBanner();
+            console.log(colorize('⚠️  QUOTIFY_API_KEY environment variable is not set.', 'yellow'));
+            console.log('You can set it in your environment or enter it below to proceed.');
+            console.log('');
+            apiKey = await askApiKey();
+            if (!apiKey) {
+                console.log(colorize('❌ Error: API key is required to make requests.', 'red'));
+                process.exit(1);
+            }
+            console.log('');
+        } else {
+            console.log(colorize('❌ Error: QUOTIFY_API_KEY environment variable is not set.', 'red'));
+            console.log('');
+            console.log('Please set your API key in your environment to authenticate CLI requests.');
+            console.log('You can get your API key from the Quotify Dashboard.');
+            console.log('');
+            console.log(colorize('On Linux/macOS:', 'bright'));
+            console.log(`  export QUOTIFY_API_KEY="your_api_key_here"`);
+            console.log('');
+            console.log(colorize('On Windows (Command Prompt):', 'bright'));
+            console.log(`  set QUOTIFY_API_KEY="your_api_key_here"`);
+            console.log('');
+            console.log(colorize('On Windows (PowerShell):', 'bright'));
+            console.log(`  $env:QUOTIFY_API_KEY="your_api_key_here"`);
+            console.log('');
+            process.exit(1);
+        }
     }
     
     const BASE_URL = process.env.QUOTIFY_API_URL || 'https://quotify.dazzelr.tech';
