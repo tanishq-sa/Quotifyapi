@@ -1,0 +1,20 @@
+# robots.txt for Quotify API
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /refund
+Allow: /cancellation
+Allow: /shipping
+
+# Disallow private pages and API routes
+Disallow: /profile
+Disallow: /admin
+Disallow: /auth/success
+Disallow: /api/
+
+Sitemap: https://quotify.dazzelr.tech/sitemap.xml

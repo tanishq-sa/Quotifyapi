@@ -51,3 +51,25 @@ describe('Legacy Routes Redirections', () => {
     expect(response.headers.location).toBe('/api/v1/quotes/stats');
   });
 });
+
+describe('Static Files', () => {
+  it('should serve robots.txt at /robots.txt', async () => {
+    const response = await request(app)
+      .get('/robots.txt')
+      .expect(200)
+      .expect('Content-Type', /text\/plain/);
+    
+    expect(response.text).toContain('User-agent: *');
+    expect(response.text).toContain('Sitemap: https://quotify.dazzelr.tech/sitemap.xml');
+  });
+
+  it('should serve sitemap.xml at /sitemap.xml', async () => {
+    const response = await request(app)
+      .get('/sitemap.xml')
+      .expect(200)
+      .expect('Content-Type', /application\/xml|text\/xml/);
+    
+    expect(response.text).toContain('<urlset');
+    expect(response.text).toContain('https://quotify.dazzelr.tech/');
+  });
+});
