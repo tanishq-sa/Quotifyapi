@@ -87,6 +87,8 @@ openssl rand -hex 32
 - [ ] All URLs use HTTPS in production
 - [ ] Admin email is set to your actual admin email
 - [ ] .env file is in .gitignore (never commit to version control)
+- [ ] Razorpay keys are from the correct environment (test/live)
+- [ ] Email credentials use app passwords, not regular passwords
 
 ---
 
@@ -97,6 +99,51 @@ openssl rand -hex 32
 3. **NEVER use default/example secrets in production**
 4. **ALWAYS use HTTPS in production**
 5. **REGULARLY rotate secrets (every 90 days)**
+
+---
+
+## 🛡️ XSS PROTECTION
+
+Quotify API includes built-in XSS (Cross-Site Scripting) protection:
+
+### Frontend Sanitisation
+All dynamic content injected into the DOM is processed through a global `escapeHTML()` function in `public/script.js`. This covers:
+- API response payloads displayed in the try-it tool
+- API key values shown in request previews
+- Error messages rendered in the response area
+- URL strings displayed in request details
+
+### Admin Dashboard
+The admin dashboard (`public/admin.html`) escapes user-provided data (names, emails) before rendering in confirmation modals to prevent stored XSS attacks.
+
+### Best Practice
+If you extend the frontend, always use `escapeHTML()` before inserting any user- or server-sourced string into `innerHTML`:
+```javascript
+element.innerHTML = `<p>${escapeHTML(untrustedData)}</p>`;
+```
+
+---
+
+## 🚨 ERROR HANDLING SECURITY
+
+### Standardised Error Responses
+All API routes return a consistent error payload format:
+```json
+{
+  "success": false,
+  "error": "Validation error",
+  "message": "Human-readable description"
+}
+```
+
+### Production Error Masking
+In production (`NODE_ENV=production`), the global error handler in `server.js`:
+- **Masks 500-level errors** — clients only see `"Something went wrong on the server"`
+- **Preserves 400-level errors** — validation messages are passed through to help API consumers
+- **Suppresses stack traces** — the `details` field is omitted entirely
+- **Logs minimal info** — only `error.message` is logged (not the full error object)
+
+In development (`NODE_ENV=development`), full error details including stack traces are returned for debugging.
 
 ---
 
@@ -120,7 +167,10 @@ After updating your .env file, restart your server and verify:
 3. Sessions work correctly
 4. OAuth login functions properly
 5. Admin access is restricted
+6. Error responses don't leak internal details (test with `NODE_ENV=production`)
+7. XSS payloads in API responses are rendered as plain text
 
 ---
 
 **Remember: Security is not optional - it's essential!** 🔐
+

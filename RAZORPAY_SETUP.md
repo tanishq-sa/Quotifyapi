@@ -101,13 +101,33 @@ GET /api/v1/payments/current-plan
 Authorization: Bearer <jwt_token>
 ```
 
+### Error Responses
+
+All payment endpoints return standardized error payloads:
+
+```json
+{
+  "success": false,
+  "error": "Validation error",
+  "message": "Plan must be either 'basic' or 'pro'"
+}
+```
+
+| Status Code | Error Type | Example Message |
+|-------------|-----------|-----------------|
+| 400 | Validation error | `"Plan must be either 'basic' or 'pro'"` |
+| 401 | Authentication error | `"Authentication required"` |
+| 500 | Internal server error | `"Something went wrong on the server"` (production) |
+
 ## 🔒 Security Features
 
-- ✅ Payment signature verification
-- ✅ JWT authentication required
-- ✅ Plan validation
+- ✅ Payment signature verification (HMAC SHA256)
+- ✅ JWT authentication required for all endpoints
+- ✅ Plan validation against allowed values
 - ✅ Order amount validation
 - ✅ User-specific order creation
+- ✅ Standardized error responses — no internal details leaked in production
+- ✅ XSS-safe error rendering in the frontend
 
 ## 🎨 UI Features
 
@@ -137,6 +157,11 @@ Authorization: Bearer <jwt_token>
    - Ensure user is logged in with valid JWT
    - Check database connection
 
+5. **Standardized error returned but no details**
+   - This is expected in production (`NODE_ENV=production`)
+   - Check server logs for the full error message
+   - Set `NODE_ENV=development` locally to see stack traces
+
 ### Debug Mode
 
 Enable debug logging by setting:
@@ -154,3 +179,4 @@ For Quotify API issues:
 - Check server logs
 - Verify database connectivity
 - Test API endpoints individually
+

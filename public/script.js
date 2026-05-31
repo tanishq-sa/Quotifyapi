@@ -1,4 +1,15 @@
 // Enhanced functionality for QuoteAPI
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tab functionality for Examples section
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -200,8 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="text-center py-8">
                 <div class="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
                 <p class="text-gray-300">Making request to:</p>
-                <code class="bg-gray-800 px-2 py-1 rounded text-blue-400 text-sm">${fullUrl}</code>
-                <p class="text-gray-400 text-sm mt-2">Using API Key: ${apiKey.substring(0, 8)}...</p>
+                <code class="bg-gray-800 px-2 py-1 rounded text-blue-400 text-sm">${escapeHTML(fullUrl)}</code>
+                <p class="text-gray-400 text-sm mt-2">Using API Key: ${escapeHTML(apiKey.substring(0, 8))}...</p>
             </div>
         `;
         
@@ -227,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </button>
                         </div>
                         <div class="bg-gray-900/50 rounded-xl p-4 overflow-auto max-h-[400px]">
-                            <pre class="text-green-400 text-sm font-mono whitespace-pre-wrap break-words">${JSON.stringify(data, null, 2)}</pre>
+                            <pre class="text-green-400 text-sm font-mono whitespace-pre-wrap break-words">${escapeHTML(JSON.stringify(data, null, 2))}</pre>
                         </div>
                     `;
             } else {
@@ -246,9 +257,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                         <div class="flex-1 min-w-0">
                             <h4 class="font-semibold text-red-400 mb-2">Request Failed</h4>
-                            <p class="text-red-200 text-sm leading-relaxed mb-3 break-words">${error.message}</p>
+                            <p class="text-red-200 text-sm leading-relaxed mb-3 break-words">${escapeHTML(error.message)}</p>
                             <div class="bg-gray-800/50 rounded-lg p-3">
-                                <p class="text-gray-300 text-xs font-mono break-all">URL: ${fullUrl}</p>
+                                <p class="text-gray-300 text-xs font-mono break-all">URL: ${escapeHTML(fullUrl)}</p>
                             </div>
                         </div>
                     </div>

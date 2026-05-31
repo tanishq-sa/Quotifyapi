@@ -1,5 +1,32 @@
 const express = require('express');
 const router = express.Router();
+
+// Middleware to ensure all error responses contain both 'error' and 'message' properties
+router.use((req, res, next) => {
+    const originalJson = res.json;
+    res.json = function(obj) {
+        if (res.statusCode >= 400 && obj && typeof obj === 'object') {
+            if (obj.error && !obj.message) {
+                // If message is missing, fallback to error description
+                obj.message = obj.error;
+                
+                // Map generic categories if error is a known short code
+                if (res.statusCode === 400 && obj.error !== 'Validation error' && !obj.error.includes('mismatch') && !obj.error.includes('signature')) {
+                    obj.message = obj.error;
+                    obj.error = 'Validation error';
+                } else if (res.statusCode === 404 && obj.error !== 'User not found' && obj.error !== 'Not found') {
+                    obj.message = obj.error;
+                    obj.error = 'Not found';
+                } else if (res.statusCode === 500 && obj.error !== 'Internal server error' && obj.error !== 'Configuration error') {
+                    obj.message = obj.error;
+                    obj.error = 'Internal server error';
+                }
+            }
+        }
+        return originalJson.call(this, obj);
+    };
+    next();
+});
 const Razorpay = require('razorpay');
 const { authenticateJWT, generateToken } = require('../auth');
 const database = require('../database-adapter');

@@ -62,7 +62,8 @@ router.post('/submit', async (req, res) => {
         if (!firstName || !lastName || !email || !subject || !message) {
             return res.status(400).json({
                 success: false,
-                error: 'All fields are required'
+                error: 'Validation error',
+                message: 'All fields are required'
             });
         }
         
@@ -70,7 +71,8 @@ router.post('/submit', async (req, res) => {
         if (firstName.length > 50 || lastName.length > 50 || email.length > 100 || subject.length > 150 || message.length > 5000) {
             return res.status(400).json({
                 success: false,
-                error: 'Input exceeds maximum allowed length'
+                error: 'Validation error',
+                message: 'Input exceeds maximum allowed length'
             });
         }
         
@@ -79,7 +81,8 @@ router.post('/submit', async (req, res) => {
         if (!emailRegex.test(email)) {
             return res.status(400).json({
                 success: false,
-                error: 'Please provide a valid email address'
+                error: 'Validation error',
+                message: 'Please provide a valid email address'
             });
         }
 
@@ -88,7 +91,8 @@ router.post('/submit', async (req, res) => {
         if (isRateLimited) {
             return res.status(429).json({
                 success: false,
-                error: 'You have already sent a message in the last 24 hours. Please try again tomorrow.'
+                error: 'Rate limit exceeded',
+                message: 'You have already sent a message in the last 24 hours. Please try again tomorrow.'
             });
         }
         
@@ -180,7 +184,8 @@ This message was sent from the Quotify API contact form.
         
         res.status(500).json({
             success: false,
-            error: errorMessage
+            error: 'Internal server error',
+            message: errorMessage
         });
     }
 });

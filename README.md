@@ -196,6 +196,41 @@ GET /api/stats
 }
 ```
 
+## 🛡️ Security
+
+Quotify API includes multiple layers of security protections:
+
+### XSS Protection
+All dynamic content rendered in the documentation site and admin dashboard is sanitized through a global `escapeHTML` function. This prevents cross-site scripting attacks from malicious data in API responses, user names, or error messages.
+
+### Standardized Error Responses
+All API endpoints return a consistent error format, making it easy to handle errors programmatically:
+
+```json
+{
+  "success": false,
+  "error": "Validation error",
+  "message": "All fields are required"
+}
+```
+
+In **production mode**, internal server errors (500) are masked to prevent information leakage:
+```json
+{
+  "error": "Error",
+  "message": "Something went wrong on the server"
+}
+```
+
+In **development mode**, full error details including stack traces are returned for debugging.
+
+### Additional Protections
+- 🔒 **Helmet** - Security headers (CSP, HSTS, X-Frame-Options, etc.)
+- 🔑 **JWT Authentication** - Secure token-based API access
+- 🛡️ **Rate Limiting** - Protection against abuse and DDoS
+- 🔐 **Payment Signature Verification** - Razorpay HMAC validation
+- 🚫 **Input Validation** - All user inputs are validated before processing
+
 ## 🛡️ Rate Limits
 
 To ensure fair usage and protect against abuse, the following rate limits are enforced:
@@ -301,9 +336,20 @@ The API works on any Node.js hosting platform:
 
 ```
 quotifyapi/
-├── server.js          # Express server
+├── server.js          # Express server with global error handler
 ├── quotes.js          # Quote management functions
-├── cli.js            # Command-line interface
+├── auth.js            # Authentication & passport config
+├── database-adapter.js # Database abstraction layer
+├── cli.js             # Command-line interface
+├── config/
+│   └── plan-limits.js # Rate limit plans
+├── routes/            # API route modules
+│   ├── admin.js       # Admin management endpoints
+│   ├── auth.js        # OAuth & login endpoints
+│   ├── contact.js     # Contact form handler
+│   ├── payments.js    # Razorpay payment routes
+│   ├── quotes.js      # Quote API endpoints
+│   └── user.js        # User profile endpoints
 ├── quotes/            # Quote data files
 │   ├── happy.js
 │   ├── sad.js
@@ -312,9 +358,14 @@ quotifyapi/
 │   └── wisdom.js
 ├── public/            # Documentation website
 │   ├── index.html
-│   └── script.js
+│   ├── admin.html     # Admin dashboard (XSS-safe)
+│   └── script.js      # Frontend with escapeHTML protection
 ├── package.json
 ├── README.md
+├── DEPLOYMENT.md
+├── SECURE_ENV_GUIDE.md
+├── RAZORPAY_SETUP.md
+├── EMAIL_SETUP.md
 └── vercel.json
 ```
 

@@ -89,6 +89,24 @@ EMAIL_PASS=your-password
 - **Clear message structure**
 - **Contact details included**
 
+### Contact Form Error Responses
+
+The contact form endpoint (`POST /api/v1/contact`) returns standardized error payloads:
+
+```json
+{
+  "success": false,
+  "error": "Validation error",
+  "message": "All fields are required"
+}
+```
+
+| Status Code | Error Type | Example Message |
+|-------------|-----------|-----------------|
+| 400 | Validation error | `"All fields are required"` |
+| 400 | Validation error | `"Please provide a valid email address"` |
+| 500 | Internal server error | `"Something went wrong on the server"` (production) |
+
 ## 🚨 Troubleshooting
 
 ### Common Issues
@@ -107,6 +125,14 @@ EMAIL_PASS=your-password
    - Double-check EMAIL_USER and EMAIL_PASS
    - Make sure app password is correct
    - Test with email client first
+
+4. **"All fields are required" (400 error)**
+   - Ensure `name`, `email`, and `message` fields are all provided
+   - Verify the form data is sent as JSON with `Content-Type: application/json`
+
+5. **Generic error in production**
+   - Set `NODE_ENV=development` locally to see detailed error messages
+   - Check server console logs for the full error
 
 ### Debug Mode
 
@@ -128,3 +154,6 @@ If you need help with email configuration:
 - **Use app passwords** instead of regular passwords
 - **Keep credentials secure** and rotate them regularly
 - **Monitor email logs** for suspicious activity
+- **Error responses are sanitized** in production — internal details are never exposed to the client
+- **XSS protection** — all user-submitted form data displayed in the frontend is HTML-escaped
+

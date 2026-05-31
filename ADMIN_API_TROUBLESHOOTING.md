@@ -20,6 +20,28 @@ The admin API is mounted at `/api/v1/admin/` and requires authentication. Here a
 - `POST /api/v1/admin/keys/generate` - Generate new admin API key
 - `PUT /api/v1/admin/keys/regenerate` - Regenerate admin API key
 
+### **Error Response Format**
+
+All admin endpoints return standardized error payloads:
+
+```json
+{
+  "success": false,
+  "error": "Authentication error",
+  "message": "Admin access required"
+}
+```
+
+| Status Code | Error Type | Example Message |
+|-------------|-----------|------------------|
+| 401 | Authentication error | `"Authentication required"` |
+| 403 | Authorization error | `"Admin access required"` |
+| 404 | Not found | `"User not found"` |
+| 429 | Rate limit | `"Too many requests, please try again later"` |
+| 500 | Internal server error | `"Something went wrong on the server"` (production) |
+
+> **Note**: In production (`NODE_ENV=production`), 500-level errors are masked. Set `NODE_ENV=development` for detailed error messages and stack traces.
+
 ---
 
 ## 🔍 Common Issues & Solutions
@@ -156,9 +178,14 @@ curl -X POST \
 
 ### **1. Check Server Logs**
 ```bash
-# Look for error messages in server console
-# Check for authentication failures
-# Verify route mounting
+# In development mode, full error details are logged:
+# Error: { name, message, stack }
+
+# In production mode, only the message is logged:
+# Error: "Something went wrong"
+
+# Tip: Run with NODE_ENV=development for full diagnostics
+NODE_ENV=development npm start
 ```
 
 ### **2. Verify Environment Variables**
@@ -168,6 +195,9 @@ echo $ADMIN_EMAIL
 
 # Check if JWT_SECRET is set
 echo $JWT_SECRET
+
+# Check NODE_ENV (affects error detail level)
+echo $NODE_ENV
 ```
 
 ### **3. Test Database Connection**
@@ -183,6 +213,13 @@ echo $JWT_SECRET
 # Check for any middleware conflicts
 # Ensure proper error handling
 ```
+
+### **5. Understand Error Response Modes**
+
+| Environment | Error Detail | Stack Trace | Logging |
+|-------------|-------------|-------------|----------|
+| `development` | Full message | Included in `details` | Full error object |
+| `production` | Generic message for 500s | Hidden | Only `error.message` |
 
 ---
 
@@ -210,6 +247,15 @@ npm start
 
 ---
 
+## 🛡️ XSS Safety
+
+The admin dashboard (`admin.html`) includes XSS protection:
+- User names and emails are HTML-escaped before rendering in confirmation modals
+- All dynamic content injected via `innerHTML` is sanitized through `escapeHTML()`
+- This prevents stored XSS attacks from malicious user profile data
+
+---
+
 ## 📞 Need Help?
 
 If you're still having issues:
@@ -219,5 +265,7 @@ If you're still having issues:
 3. **Test with curl** commands above
 4. **Check environment variables** are set correctly
 5. **Ensure you're using the correct URL** format
+6. **Set `NODE_ENV=development`** for detailed error diagnostics
+7. **Check the standardized error response** for `error` and `message` fields
 
 The admin API should be working at `/api/v1/admin/` with proper authentication! 🚀

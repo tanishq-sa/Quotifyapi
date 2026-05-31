@@ -130,6 +130,35 @@ vercel --prod
 - Regularly rotate your Vercel token
 - Review deployment logs for any security concerns
 
+### Production Error Handling
+
+When `NODE_ENV=production`, the API automatically:
+- **Masks internal errors** — 500-level responses show `"Something went wrong on the server"` instead of raw error messages
+- **Hides stack traces** — the `details` field is omitted from error responses
+- **Logs safely** — only `error.message` is logged (not the full error object with stack trace)
+
+Ensure `NODE_ENV=production` is set in your hosting platform's environment variables.
+
+### XSS Protection
+
+The frontend documentation site and admin dashboard include built-in XSS protection via `escapeHTML()`. No additional configuration is required — it works automatically on all dynamically rendered content.
+
+### Vercel Environment Variables
+
+Set these in your Vercel project's **Settings → Environment Variables**:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NODE_ENV` | ✅ | Must be `production` for error masking |
+| `JWT_SECRET` | ✅ | 32+ character random string |
+| `SESSION_SECRET` | ✅ | 32+ character random string |
+| `DATABASE_URL` | ✅ | PostgreSQL connection string |
+| `ADMIN_EMAIL` | ✅ | Admin user's email address |
+| `RAZORPAY_KEY_ID` | Optional | Razorpay API Key ID |
+| `RAZORPAY_KEY_SECRET` | Optional | Razorpay API Key Secret |
+
+For a complete list, see [SECURE_ENV_GUIDE.md](./SECURE_ENV_GUIDE.md).
+
 ## Support
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)

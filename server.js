@@ -599,9 +599,15 @@ app.use((error, req, res, next) => {
     console.error('Error:', error);
   }
   
-  res.status(500).json({
-    error: 'Internal server error',
-    message: 'Something went wrong on the server'
+  const statusCode = error.status || error.statusCode || 500;
+  const isProd = process.env.NODE_ENV === 'production';
+  
+  res.status(statusCode).json({
+    error: error.name || 'Internal server error',
+    message: statusCode >= 500 && isProd
+      ? 'Something went wrong on the server'
+      : (error.message || 'Something went wrong on the server'),
+    details: !isProd ? error.stack : undefined
   });
 });
 
