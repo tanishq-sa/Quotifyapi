@@ -32,6 +32,10 @@ npm install quotifyapi
 
 ### Use in Your Code
 
+The SDK supports both **Offline Mode** (using bundled local quotes) and **Online Mode** (querying the live Quote API server).
+
+#### Offline Mode (No API key required)
+
 ```javascript
 const { getRandomQuote, getRandomQuoteByType } = require('quotifyapi');
 
@@ -43,6 +47,31 @@ console.log(randomQuote.author); // "John Lennon"
 // Get a motivational quote
 const motivationalQuote = getRandomQuoteByType('motivational');
 console.log(motivationalQuote.text); // "The only way to do great work is to love what you do."
+```
+
+#### Online Mode (Requires API key)
+
+```javascript
+const { ApiClient } = require('quotifyapi');
+
+// Initialize the API client
+const client = new ApiClient('your_api_key_here');
+
+async function getOnlineQuotes() {
+  try {
+    // Get a random quote
+    const quote = await client.getRandomQuote();
+    console.log(`${quote.text} — ${quote.author}`);
+
+    // Get a quote by category
+    const wisdomQuote = await client.getRandomQuoteByType('wisdom');
+    console.log(`${wisdomQuote.text} — ${wisdomQuote.author}`);
+  } catch (error) {
+    console.error('Error fetching quotes:', error.message);
+  }
+}
+
+getOnlineQuotes();
 ```
 
 ### CLI Usage
@@ -64,6 +93,8 @@ npx quotifyapi stats
 # Get help
 npx quotifyapi help
 ```
+
+> **Note**: The CLI requires authentication. If the `QUOTIFY_API_KEY` environment variable is not configured, the CLI will interactively prompt you to input your API key when running commands in a terminal.
 
 ## 🚀 GitHub Actions & CI/CD
 
