@@ -130,16 +130,19 @@ For detailed setup instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 ## 🌐 API Endpoints
 
 ### Base URL
+
 ```
 https://quotify.dazzelr.tech
 ```
 
 ### Get Random Quote
+
 ```http
 GET /api
 ```
 
 **Response:**
+
 ```json
 {
   "quote": {
@@ -147,16 +150,18 @@ GET /api
     "author": "John Lennon"
   },
   "type": "random",
-  "timestamp": "2025-01-15T10:30:00.000Z"
+  "timestamp": "2026-01-15T10:30:00.000Z"
 }
 ```
 
 ### Get Quote by Category
+
 ```http
 GET /api?type=motivational
 ```
 
 **Available Categories:**
+
 - `happy` - Uplifting and joyful quotes
 - `sad` - Thoughtful and reflective quotes
 - `love` - Romantic and affectionate quotes
@@ -164,11 +169,13 @@ GET /api?type=motivational
 - `wisdom` - Philosophical and insightful quotes
 
 ### Get Available Categories
+
 ```http
 GET /api/types
 ```
 
 **Response:**
+
 ```json
 {
   "availableTypes": ["happy", "sad", "love", "motivational", "wisdom"],
@@ -177,11 +184,13 @@ GET /api/types
 ```
 
 ### Get Statistics
+
 ```http
 GET /api/stats
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Quote statistics by category",
@@ -201,9 +210,11 @@ GET /api/stats
 Quotify API includes multiple layers of security protections:
 
 ### XSS Protection
+
 All dynamic content rendered in the documentation site and admin dashboard is sanitized through a global `escapeHTML` function. This prevents cross-site scripting attacks from malicious data in API responses, user names, or error messages.
 
 ### Standardized Error Responses
+
 All API endpoints return a consistent error format, making it easy to handle errors programmatically:
 
 ```json
@@ -215,6 +226,7 @@ All API endpoints return a consistent error format, making it easy to handle err
 ```
 
 In **production mode**, internal server errors (500) are masked to prevent information leakage:
+
 ```json
 {
   "error": "Error",
@@ -225,6 +237,7 @@ In **production mode**, internal server errors (500) are masked to prevent infor
 In **development mode**, full error details including stack traces are returned for debugging.
 
 ### Additional Protections
+
 - 🔒 **Helmet** - Security headers (CSP, HSTS, X-Frame-Options, etc.)
 - 🔑 **JWT Authentication** - Secure token-based API access
 - 🛡️ **Rate Limiting** - Protection against abuse and DDoS
@@ -327,6 +340,7 @@ vercel
 ### Other Platforms
 
 The API works on any Node.js hosting platform:
+
 - Heroku
 - Railway
 - DigitalOcean App Platform
@@ -419,4 +433,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Made with ❤️ by [Tanishq Saini](https://github.com/tanishq-sa)
 
-If this project helps you, please give it a ⭐️! 
+If this project helps you, please give it a ⭐️!

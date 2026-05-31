@@ -36,6 +36,7 @@ Look for these patterns in your Vercel/server logs:
 ### **Error 1: "Missing subscription verification data"**
 
 **Symptom:**
+
 ```json
 {
   "success": false,
@@ -51,6 +52,7 @@ Look for these patterns in your Vercel/server logs:
 **Cause:** Razorpay didn't return all required fields
 
 **Solution:**
+
 1. Check if Razorpay Checkout is properly initialized
 2. Verify `subscription_id` is passed in the options
 3. Make sure you're using subscription flow, not orders
@@ -60,6 +62,7 @@ Look for these patterns in your Vercel/server logs:
 ### **Error 2: "Invalid payment signature"**
 
 **Symptom:**
+
 ```
 ❌ Signature mismatch with payment_id|subscription_id!
 ```
@@ -67,6 +70,7 @@ Look for these patterns in your Vercel/server logs:
 **Causes & Solutions:**
 
 #### **A. Wrong Razorpay Key Secret**
+
 ```bash
 # Check your environment variables
 echo $RAZORPAY_KEY_SECRET
@@ -78,9 +82,11 @@ echo $RAZORPAY_KEY_SECRET
 **Fix:** Update with correct key from [Razorpay Dashboard](https://dashboard.razorpay.com/app/keys)
 
 #### **B. Test Mode vs Live Mode Mismatch**
+
 - Using **Test Key ID** with **Live Key Secret** (or vice versa)
 
 **Fix:** Ensure both keys are from the same mode:
+
 - Test: `rzp_test_XXXXX` + `test_secret_XXXXX`
 - Live: `rzp_live_XXXXX` + `live_secret_XXXXX`
 
@@ -89,6 +95,7 @@ echo $RAZORPAY_KEY_SECRET
 ### **Error 3: "Subscription is not active"**
 
 **Symptom:**
+
 ```json
 {
   "success": false,
@@ -98,11 +105,13 @@ echo $RAZORPAY_KEY_SECRET
 ```
 
 **Causes:**
+
 - Subscription was cancelled before verification
 - Payment failed during authorization
 - Subscription expired
 
 **Solution:**
+
 1. Check subscription status in [Razorpay Dashboard](https://dashboard.razorpay.com/app/subscriptions)
 2. If cancelled, create a new subscription
 3. If payment failed, ask user to retry with different payment method
@@ -112,6 +121,7 @@ echo $RAZORPAY_KEY_SECRET
 ### **Error 4: "Failed to update subscription in database"**
 
 **Symptom:**
+
 ```json
 {
   "success": false,
@@ -121,14 +131,17 @@ echo $RAZORPAY_KEY_SECRET
 ```
 
 **Causes:**
+
 - Database connection timeout
 - Invalid user ID
 - Database permissions issue
 
 **Solution:**
+
 1. Check PostgreSQL connection in Vercel logs
 2. Verify `DATABASE_URL` environment variable
 3. Test database connection:
+
 ```bash
 psql $DATABASE_URL -c "SELECT 1;"
 ```
@@ -138,6 +151,7 @@ psql $DATABASE_URL -c "SELECT 1;"
 ### **Error 5: "Payment not successful. Status: refunded"**
 
 **Symptom:**
+
 ```
 ⚠️ Payment refunded but subscription is active
 ```
@@ -155,6 +169,7 @@ Razorpay uses a ₹5 authorization charge to verify the payment method. This cha
 ### **Enable Development Mode Logging**
 
 Add to your `.env`:
+
 ```bash
 NODE_ENV=development
 ```
@@ -182,6 +197,7 @@ const planConfigs = {
 ```
 
 **Verify these plan IDs exist in your Razorpay Dashboard:**
+
 1. Go to [Subscriptions → Plans](https://dashboard.razorpay.com/app/subscriptions/plans)
 2. Check if plan IDs match
 3. Verify amounts are correct (₹39 = 3900 paise, ₹199 = 19900 paise)
@@ -252,6 +268,7 @@ curl -X POST https://your-domain.vercel.app/api/v1/payments/create \
 Email: [Your Support Email]
 
 Include:
+
 - User email
 - Timestamp of failed payment
 - Subscription ID (if available)
@@ -265,6 +282,7 @@ Include:
 When payment works correctly, you should see:
 
 **Browser Console:**
+
 ```
 💳 Payment completed, verifying...
 📡 Verification response status: 200
@@ -273,6 +291,7 @@ When payment works correctly, you should see:
 ```
 
 **Server Logs:**
+
 ```
 🔍 Verifying subscription payment: { subscription_id: 'sub_...', ... }
 ✅ Signature verified successfully
@@ -284,6 +303,7 @@ When payment works correctly, you should see:
 ```
 
 **User Experience:**
+
 1. Razorpay checkout opens
 2. User completes payment
 3. Alert shows "🎉 Subscription Successful!"
@@ -313,6 +333,5 @@ When payment works correctly, you should see:
 
 ---
 
-**Last Updated:** November 21, 2025
+**Last Updated:** November 21, 2026
 **Version:** 1.0.0
-
