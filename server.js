@@ -420,173 +420,25 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Main quote API endpoint - NOW REQUIRES API KEY AND PLAN-BASED RATE LIMITING
-app.get('/api', authenticateFlexible, planBasedRateLimit, async (req, res) => {
-  const startTime = Date.now();
-  try {
-    const { type } = req.query;
-    
-    if (type) {
-      // Get quote by specific type
-      const quote = getRandomQuoteByType(type);
-      
-      if (!quote) {
-        // Log failed request
-        await database.logApiUsage({
-          user_id: req.user.id,
-          api_key_id: req.user.api_key_id,
-          endpoint: req.path,
-          method: req.method,
-          ip_address: req.ip,
-          user_agent: req.get('User-Agent'),
-          response_status: 404,
-          response_time: Date.now() - startTime
-        });
-        
-        return res.status(404).json({
-          error: 'Quote type not found',
-          message: `No quotes found for type: ${type}`,
-          availableTypes: getAvailableTypes()
-        });
-      }
-      
-      // Log successful request
-      await database.logApiUsage({
-        user_id: req.user.id,
-        api_key_id: req.user.api_key_id,
-        endpoint: req.path,
-        method: req.method,
-        ip_address: req.ip,
-        user_agent: req.get('User-Agent'),
-        response_status: 200,
-        response_time: Date.now() - startTime
-      });
-      
-      res.json({
-        quote: quote,
-        type: type.toLowerCase(),
-        timestamp: new Date().toISOString()
-      });
-    } else {
-      // Get random quote from any category
-      const quote = getRandomQuote();
-      
-      // Log successful request
-      await database.logApiUsage({
-        user_id: req.user.id,
-        api_key_id: req.user.api_key_id,
-        endpoint: req.path,
-        method: req.method,
-        ip_address: req.ip,
-        user_agent: req.get('User-Agent'),
-        response_status: 200,
-        response_time: Date.now() - startTime
-      });
-      
-      res.json({
-        quote: quote,
-        type: 'random',
-        timestamp: new Date().toISOString()
-      });
-    }
-  } catch (error) {
-    // Log error
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 500,
-      response_time: Date.now() - startTime
-    });
-    
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'An error occurred while fetching the quote'
-    });
-  }
+// Main quote API endpoint - NOW REDIRECTS TO V1 ENDPOINT
+app.get('/api', (req, res) => {
+  const queryIndex = req.originalUrl.indexOf('?');
+  const queryString = queryIndex !== -1 ? req.originalUrl.substring(queryIndex) : '';
+  res.redirect(307, '/api/v1/quotes' + queryString);
 });
 
-// Get available quote types - NOW REQUIRES API KEY AND PLAN-BASED RATE LIMITING
-app.get('/api/types', authenticateFlexible, planBasedRateLimit, async (req, res) => {
-  const startTime = Date.now();
-  try {
-    // Log successful request
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - startTime
-    });
-    
-    res.json({
-      availableTypes: getAvailableTypes(),
-      total: getAvailableTypes().length
-    });
-  } catch (error) {
-    // Log error
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 500,
-      response_time: Date.now() - startTime
-    });
-    
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'An error occurred while fetching quote types'
-    });
-  }
+// Get available quote types - NOW REDIRECTS TO V1 ENDPOINT
+app.get('/api/types', (req, res) => {
+  const queryIndex = req.originalUrl.indexOf('?');
+  const queryString = queryIndex !== -1 ? req.originalUrl.substring(queryIndex) : '';
+  res.redirect(307, '/api/v1/quotes/types' + queryString);
 });
 
-// Get quote counts by category - NOW REQUIRES API KEY AND PLAN-BASED RATE LIMITING
-app.get('/api/stats', authenticateFlexible, planBasedRateLimit, async (req, res) => {
-  const startTime = Date.now();
-  try {
-    // Log successful request
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - startTime
-    });
-    
-    res.json({
-      message: 'Quote statistics by category',
-      counts: getQuotesCount()
-    });
-  } catch (error) {
-    // Log error
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 500,
-      response_time: Date.now() - startTime
-    });
-    
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'An error occurred while fetching statistics'
-    });
-  }
+// Get quote counts by category - NOW REDIRECTS TO V1 ENDPOINT
+app.get('/api/stats', (req, res) => {
+  const queryIndex = req.originalUrl.indexOf('?');
+  const queryString = queryIndex !== -1 ? req.originalUrl.substring(queryIndex) : '';
+  res.redirect(307, '/api/v1/quotes/stats' + queryString);
 });
 
 

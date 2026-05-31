@@ -664,7 +664,7 @@
                     document.getElementById('apiKeyDisplay').textContent = apiKey;
                     
                     // Check if user is admin
-                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    isAdmin = profileData.profile.role === 'admin';
                     
                     // Show appropriate button for admin users
                     if (isAdmin) {
@@ -784,7 +784,7 @@
             })
             .then(profileData => {
                 if (profileData.profile) {
-                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    isAdmin = profileData.profile.role === 'admin';
                     
                     // Show appropriate button for admin users
                     if (isAdmin) {
@@ -827,7 +827,7 @@
                     }).then(([profileData, usageData, keysData]) => {
                         // Set admin status
                         if (profileData.profile) {
-                            isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                            isAdmin = profileData.profile.role === 'admin';
                             
                             if (isAdmin) {
                                 document.getElementById('generateNewKey').classList.add('hidden');
@@ -907,7 +907,7 @@
                     document.getElementById('userPlan').textContent = profileData.profile.plan || 'Free';
                     
                     // Check if user is admin
-                    isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    isAdmin = profileData.profile.role === 'admin';
                     
                     // Show appropriate button for admin users
                     if (isAdmin) {

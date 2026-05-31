@@ -4,6 +4,33 @@ const { getRandomQuoteByType, getRandomQuote, getAvailableTypes, getQuotesCount,
 
 const router = express.Router();
 
+// Middleware to automatically log API usage for all requests routed here
+router.use((req, res, next) => {
+  const startTime = req.startTime || Date.now();
+  
+  res.on('finish', async () => {
+    // Only log if the request was successfully authenticated
+    if (req.user) {
+      try {
+        await database.logApiUsage({
+          user_id: req.user.id,
+          api_key_id: req.user.api_key_id,
+          endpoint: req.baseUrl + req.path,
+          method: req.method,
+          ip_address: req.ip,
+          user_agent: req.get('User-Agent'),
+          response_status: res.statusCode,
+          response_time: Date.now() - startTime
+        });
+      } catch (error) {
+        console.error('Error logging API usage in middleware:', error);
+      }
+    }
+  });
+  
+  next();
+});
+
 // Get random quote
 router.get('/', async (req, res) => {
   try {
@@ -34,18 +61,6 @@ router.get('/', async (req, res) => {
     } else {
       quote = getRandomQuote();
     }
-    
-    // Log API usage
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - req.startTime
-    });
     
     res.json({
       quote: quote,
@@ -89,18 +104,6 @@ router.get('/category/:category', async (req, res) => {
         availableTypes: getAvailableTypes()
       });
     }
-    
-    // Log API usage
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - req.startTime
-    });
     
     res.json({
       quote: quote,
@@ -212,18 +215,6 @@ router.get('/search', async (req, res) => {
       }
     }
     
-    // Log API usage
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - req.startTime
-    });
-    
     res.json({
       results: searchResults,
       query: sanitizedQuery, // SECURITY: Return sanitized query
@@ -260,18 +251,6 @@ router.get('/types', async (req, res) => {
     const types = getAvailableTypes();
     const counts = getQuotesCount();
     
-    // Log API usage
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - req.startTime
-    });
-    
     res.json({
       availableTypes: types,
       counts: counts,
@@ -295,19 +274,6 @@ router.get('/types', async (req, res) => {
 router.get('/stats', async (req, res) => {
   try {
     const counts = getQuotesCount();
-    
-    // Log API usage
-    await database.logApiUsage({
-      user_id: req.user.id,
-      api_key_id: req.user.api_key_id,
-      endpoint: req.path,
-      method: req.method,
-      ip_address: req.ip,
-      user_agent: req.get('User-Agent'),
-      response_status: 200,
-      response_time: Date.now() - req.startTime
-    });
-    
     res.json({
       message: 'Quote statistics by category',
       counts: counts,

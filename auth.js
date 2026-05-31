@@ -3,6 +3,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const database = require('./database-adapter');
 const { getLimitsByPlan } = require('./config/plan-limits');
+const { ADMIN_EMAIL } = require('./config/admin');
 
 // JWT Configuration
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -81,7 +82,6 @@ async function authenticateFlexible(req, res, next) {
       const keyData = await database.validateApiKey(apiKey);
       if (keyData) {
         // SECURITY: Prevent admins from using API keys
-        const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
         if (keyData.email === ADMIN_EMAIL) {
           console.log(`🚨 SECURITY ALERT: Admin attempted API key authentication: ${keyData.email} (IP: ${req.ip})`);
           return res.status(403).json({
@@ -138,7 +138,6 @@ async function authenticateApiKey(req, res, next) {
     }
 
     // SECURITY: Prevent admins from using API keys
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
     if (keyData.email === ADMIN_EMAIL) {
       console.log(`🚨 SECURITY ALERT: Admin attempted API key authentication: ${keyData.email} (IP: ${req.ip})`);
       return res.status(403).json({
@@ -304,9 +303,6 @@ async function authenticateAdmin(req, res, next) {
       });
     }
 
-    // SECURITY: Only allow specific admin email from environment
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
-    
     // Check if user email matches the admin email
     if (req.user.email !== ADMIN_EMAIL) {
       console.log(`🚨 SECURITY ALERT: Unauthorized admin access attempt from ${req.user.email} (IP: ${req.ip})`);

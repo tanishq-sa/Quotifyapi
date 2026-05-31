@@ -51,127 +51,219 @@ if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
 }
 
 
+// Shared plan configurations for subscription creation
+// IMPORTANT: The amount is determined by the plan configuration in Razorpay Dashboard, not here!
+const planConfigs = {
+    monthly: {
+        amount: 3900, // INR 39 in paise (for reference only - actual amount comes from Razorpay plan)
+        currency: 'INR',
+        description: 'Quotify API Basic Plan - Monthly Billing',
+        plan_id: 'plan_RhsDup97U5InAI' // Quotify Basic Subscription - ₹39/month
+    },
+    yearly: {
+        amount: 19900, // INR 199 in paise (for reference only - actual amount comes from Razorpay plan)
+        currency: 'INR',
+        description: 'Quotify API Pro Plan - Monthly Billing',
+        plan_id: 'plan_RhsEUETmI3zDJN' // ⚠️ UPDATE THIS if you create a new plan with ₹199/month
+    }
+};
+
+// Plan name mapping: frontend plan name → backend (Razorpay) plan name
+const frontendToBackendPlan = {
+    'basic': 'monthly',
+    'pro': 'yearly'
+};
+
+/**
+ * Shared helper for creating Razorpay subscriptions.
+ * Used by both /create and /create-subscription endpoints.
+ * @param {object} options
+ * @param {number} options.userId - The authenticated user's ID
+ * @param {string} options.backendPlan - 'monthly' or 'yearly'
+ * @param {string} options.originalPlan - The original plan name from the request
+ * @param {string} [options.uid] - Optional user UID
+ * @param {boolean} [options.verifyPlan=false] - Whether to verify the plan exists in Razorpay before creating
+ * @returns {Promise<object>} The response payload
+ */
+async function createSubscriptionHelper({ userId, backendPlan, originalPlan, uid, verifyPlan = false }) {
+    const config = planConfigs[backendPlan];
+    
+    // Check if Razorpay is properly configured
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        const err = new Error('Payment system not configured. Please contact support.');
+        err.clientStatus = 500;
+        throw err;
+    }
+    
+    // Check if plan_id is configured
+    if (!config || !config.plan_id) {
+        const err = new Error(`${backendPlan} plan not configured. Please contact support.`);
+        err.clientStatus = 500;
+        throw err;
+    }
+    
+    // Optional: verify plan exists in Razorpay before creating subscription
+    if (verifyPlan) {
+        try {
+            const planDetails = await razorpay.plans.fetch(config.plan_id);
+            const planAmount = planDetails.item.amount / 100;
+            console.log('✅ Plan verified:', {
+                plan_id: planDetails.id,
+                amount_in_rupees: `₹${planAmount}`,
+                currency: planDetails.item.currency,
+                plan_name: planDetails.item.name
+            });
+            
+            // Warn if plan amount doesn't match expected amount
+            if (planAmount !== (config.amount / 100)) {
+                console.error('❌ CRITICAL: Plan amount mismatch!', {
+                    expected: `₹${config.amount / 100}`,
+                    actual: `₹${planAmount}`
+                });
+                const err = new Error(
+                    `Plan amount mismatch! Plan ${config.plan_id} is ₹${planAmount} but expected ₹${config.amount / 100}. Update in Razorpay Dashboard.`
+                );
+                err.clientStatus = 400;
+                err.details = {
+                    plan_id: config.plan_id,
+                    expected_amount: `₹${config.amount / 100}`,
+                    actual_amount: `₹${planAmount}`,
+                    action: 'Please update the plan amount in Razorpay Dashboard → Products → Plans'
+                };
+                throw err;
+            }
+        } catch (planError) {
+            if (planError.clientStatus) throw planError; // Re-throw our own errors
+            console.error('❌ Plan verification failed:', planError.error?.description || planError.message);
+            const err = new Error(`Plan not found: ${config.plan_id}. Verify in your Razorpay account.`);
+            err.clientStatus = 400;
+            err.details = process.env.NODE_ENV === 'development' ? {
+                plan_id: config.plan_id,
+                razorpay_error: planError.error?.description || planError.message
+            } : undefined;
+            throw err;
+        }
+    }
+    
+    // Create Razorpay subscription (120 months = 10 years)
+    const subscriptionOptions = {
+        plan_id: config.plan_id,
+        customer_notify: 1,
+        quantity: 1,
+        total_count: 120,
+        notes: {
+            user_id: userId.toString(),
+            uid: uid || '',
+            plan: backendPlan,
+            original_plan: originalPlan,
+            description: config.description,
+            billing_period: 'monthly',
+            total_months: 120,
+            valid_until: '2034-12-31'
+        }
+    };
+    
+    console.log('Creating Razorpay subscription:', {
+        plan_id: subscriptionOptions.plan_id,
+        total_count: subscriptionOptions.total_count,
+        billing_period: 'monthly',
+        duration: '10 years (120 months)'
+    });
+    
+    const subscription = await razorpay.subscriptions.create(subscriptionOptions);
+    
+    return {
+        success: true,
+        subscriptionId: subscription.id,
+        plan: backendPlan,
+        originalPlan: originalPlan,
+        amount: config.amount,
+        currency: config.currency,
+        razorpayKey: process.env.RAZORPAY_KEY_ID,
+        billingInfo: {
+            period: 'monthly',
+            total_charges: 120,
+            duration: '10 years'
+        }
+    };
+}
+
+/**
+ * Format a subscription creation error into a client response.
+ */
+function formatSubscriptionError(error, config) {
+    // If it's one of our own errors with a known status, use it
+    if (error.clientStatus) {
+        return {
+            statusCode: error.clientStatus,
+            body: {
+                success: false,
+                error: error.message,
+                details: error.details
+            }
+        };
+    }
+    
+    let errorMessage = 'Failed to create subscription';
+    let statusCode = 500;
+    
+    if (error.statusCode === 401) {
+        errorMessage = 'Payment system authentication failed. Please contact support.';
+        statusCode = 401;
+    } else if (error.statusCode === 400) {
+        if (error.error?.code === 'BAD_REQUEST_ERROR' && error.error?.description?.includes('id provided does not exist')) {
+            errorMessage = `Plan ID not found: ${config?.plan_id}. Please verify in Razorpay Dashboard.`;
+        } else {
+            errorMessage = error.error?.description || 'Invalid subscription request. Please try again.';
+        }
+        statusCode = 400;
+    } else if (error.code === 'BAD_REQUEST_ERROR') {
+        errorMessage = error.error?.description || 'Payment system configuration error. Please contact support.';
+        statusCode = 400;
+    }
+    
+    return {
+        statusCode,
+        body: {
+            success: false,
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? {
+                plan_id: config?.plan_id,
+                razorpay_error: error.error?.description || error.message,
+                error_code: error.error?.code
+            } : undefined
+        }
+    };
+}
+
 // Create subscription (monthly/yearly billing)
 router.post('/create', authenticateJWT, async (req, res) => {
     try {
         const { plan, uid } = req.body;
         const userId = req.user.id;
         
-        // Debug: Log received data
-        console.log('Received subscription request:', {
-            plan: plan,
-            uid: uid,
-            userId: userId,
-            body: req.body
-        });
+        console.log('Received subscription request:', { plan, uid, userId });
         
         // Validate plan
         if (!plan || !['monthly', 'yearly'].includes(plan)) {
-            console.log('Invalid plan received:', plan);
             return res.status(400).json({ 
                 success: false, 
                 error: `Invalid plan. Must be monthly or yearly. Received: ${plan}` 
             });
         }
         
-        // Plan configurations - using correct plan IDs from Razorpay dashboard
-        // IMPORTANT: The amount is determined by the plan configuration in Razorpay Dashboard, not here!
-        // Make sure the plan_id points to a plan with the correct amount (₹39 for basic, ₹199 for pro)
-        const planConfigs = {
-            monthly: {
-                amount: 3900, // INR 39 in paise (for reference only - actual amount comes from Razorpay plan)
-                currency: 'INR',
-                description: 'Quotify API Basic Plan - Monthly Billing',
-                plan_id: 'plan_RhsDup97U5InAI' // Quotify Basic Subscription - ₹39/month (Note: '0' not 'O')
-                // Fixed: Changed 'O' to '0' to match Razorpay Dashboard plan ID
-            },
-            yearly: {
-                amount: 19900, // INR 199 in paise (for reference only - actual amount comes from Razorpay plan)
-                currency: 'INR',
-                description: 'Quotify API Pro Plan - Monthly Billing',
-                plan_id: 'plan_RhsEUETmI3zDJN' // ⚠️ UPDATE THIS if you create a new plan with ₹199/month
-                // Make sure this plan_id points to a plan with ₹199/month in Razorpay Dashboard
-            }
-        };
-        
-        const config = planConfigs[plan];
-        
-        // Check if Razorpay is properly configured
-        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-            return res.status(500).json({
-                success: false,
-                error: 'Payment system not configured. Please contact support.'
-            });
-        }
-        
-        // Check if plan_id is configured
-        if (!config.plan_id) {
-            return res.status(500).json({
-                success: false,
-                error: `${plan} plan not configured. Please contact support.`
-            });
-        }
-        
-        // Create Razorpay subscription for monthly recurring billing
-        // 10 years = 120 months of monthly billing
-        const subscriptionOptions = {
-            plan_id: config.plan_id,
-            customer_notify: 1,
-            quantity: 1,
-            total_count: 120, // 10 years = 120 months of monthly billing
-            notes: {
-                user_id: userId.toString(),
-                uid: uid || '',
-                plan: plan,
-                description: config.description,
-                billing_period: 'monthly',
-                total_months: 120,
-                valid_until: '2034-12-31' // 10 years from now
-            }
-        };
-        
-        console.log('Creating Razorpay subscription:', {
-            plan_id: subscriptionOptions.plan_id,
-            total_count: subscriptionOptions.total_count,
-            billing_period: 'monthly',
-            duration: '10 years (120 months)',
-            full_options: subscriptionOptions
+        const result = await createSubscriptionHelper({
+            userId,
+            backendPlan: plan,
+            originalPlan: plan,
+            uid
         });
         
-        const subscription = await razorpay.subscriptions.create(subscriptionOptions);
-        
-        res.json({
-            success: true,
-            subscriptionId: subscription.id,
-            plan: plan,
-            amount: config.amount,
-            currency: config.currency,
-            razorpayKey: process.env.RAZORPAY_KEY_ID, // Include key in response
-            billingInfo: {
-                period: 'monthly',
-                total_charges: 120,
-                duration: '10 years'
-            }
-        });
-        
+        res.json(result);
     } catch (error) {
         console.error('Error creating Razorpay subscription:', error);
-        
-        // Provide specific error messages based on the error type
-        let errorMessage = 'Failed to create subscription';
-        if (error.statusCode === 401) {
-            errorMessage = 'Payment system authentication failed. Please contact support.';
-        } else if (error.statusCode === 400) {
-            errorMessage = 'Invalid subscription request. Please try again.';
-        } else if (error.code === 'BAD_REQUEST_ERROR') {
-            errorMessage = 'Payment system configuration error. Please contact support.';
-        }
-        
-        res.status(500).json({ 
-            success: false, 
-            error: errorMessage,
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        const { statusCode, body } = formatSubscriptionError(error, planConfigs[req.body.plan]);
+        res.status(statusCode).json(body);
     }
 });
 
@@ -491,202 +583,39 @@ router.get('/razorpay-key', (req, res) => {
     }
 });
 
-// Create subscription endpoint (alias for compatibility)
+// Create subscription endpoint (alias for compatibility — maps frontend plan names)
 router.post('/create-subscription', authenticateJWT, async (req, res) => {
-    // Reuse the same logic as /create endpoint
     try {
         const { plan, uid } = req.body;
         const userId = req.user.id;
         
-        // Debug: Log received data
-        console.log('Received subscription request (create-subscription):', {
-            plan: plan,
-            uid: uid,
-            userId: userId,
-            body: req.body
-        });
+        console.log('Received subscription request (create-subscription):', { plan, uid, userId });
         
         // Map frontend plan names to backend plan names
-        const planMapping = {
-            'basic': 'monthly',
-            'pro': 'yearly'
-        };
-        
-        const backendPlan = planMapping[plan] || plan;
+        const backendPlan = frontendToBackendPlan[plan] || plan;
         
         // Validate plan
         if (!backendPlan || !['monthly', 'yearly'].includes(backendPlan)) {
-            console.log('Invalid plan received:', plan, 'mapped to:', backendPlan);
             return res.status(400).json({ 
                 success: false, 
                 error: `Invalid plan. Must be basic/monthly or pro/yearly. Received: ${plan}` 
             });
         }
         
-        // Plan configurations - using Razorpay Subscriptions for monthly recurring billing
-        // IMPORTANT: The amount is determined by the plan configuration in Razorpay Dashboard, not here!
-        // Make sure the plan_id points to a plan with the correct amount (₹39 for basic, ₹199 for pro)
-        const planConfigs = {
-            monthly: {
-                amount: 3900, // INR 39 in paise (for reference only - actual amount comes from Razorpay plan)
-                currency: 'INR',
-                description: 'Quotify API Basic Plan - Monthly Billing',
-                plan_id: 'plan_RhsDup97U5InAI' // Quotify Basic Subscription - ₹39/month (Note: '0' not 'O')
-                // Fixed: Changed 'O' to '0' to match Razorpay Dashboard plan ID
-            },
-            yearly: {
-                amount: 19900, // INR 199 in paise (for reference only - actual amount comes from Razorpay plan)
-                currency: 'INR',
-                description: 'Quotify API Pro Plan - Monthly Billing',
-                plan_id: 'plan_RhsEUETmI3zDJN' // ⚠️ UPDATE THIS if you create a new plan with ₹199/month
-                // Make sure this plan_id points to a plan with ₹199/month in Razorpay Dashboard
-            }
-        };
-        
-        const config = planConfigs[backendPlan];
-        
-        // Check if Razorpay is properly configured
-        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-            return res.status(500).json({
-                success: false,
-                error: 'Payment system not configured. Please contact support.'
-            });
-        }
-        
-        // Check if plan_id is configured
-        if (!config.plan_id) {
-            return res.status(500).json({
-                success: false,
-                error: `${backendPlan} plan not configured. Please contact support.`
-            });
-        }
-        
-        // Create Razorpay Subscription for monthly recurring billing
-        // 10 years = 120 months of monthly billing
-        const subscriptionOptions = {
-            plan_id: config.plan_id,
-            customer_notify: 1,
-            quantity: 1,
-            total_count: 120, // 10 years = 120 months of monthly billing
-            notes: {
-                user_id: userId.toString(),
-                uid: uid || '',
-                plan: backendPlan,
-                original_plan: plan,
-                description: config.description,
-                billing_period: 'monthly',
-                total_months: 120,
-                valid_until: '2034-12-31' // 10 years from now
-            }
-        };
-        
-        console.log('Creating Razorpay subscription (create-subscription endpoint):', {
-            plan_id: subscriptionOptions.plan_id,
-            total_count: subscriptionOptions.total_count,
-            billing_period: 'monthly',
-            duration: '10 years (120 months)',
-            razorpay_key_id: process.env.RAZORPAY_KEY_ID ? `${process.env.RAZORPAY_KEY_ID.substring(0, 8)}...` : 'NOT SET',
-            full_options: subscriptionOptions
-        });
-        
-        // Verify plan exists before creating subscription
-        try {
-            const planDetails = await razorpay.plans.fetch(subscriptionOptions.plan_id);
-            const planAmount = planDetails.item.amount / 100; // Convert from paise to rupees
-            console.log('✅ Plan verified:', {
-                plan_id: planDetails.id,
-                amount: planDetails.item.amount,
-                amount_in_rupees: `₹${planAmount}`,
-                currency: planDetails.item.currency,
-                interval: planDetails.interval,
-                plan_name: planDetails.item.name
-            });
-            
-            // Warn if plan amount doesn't match expected amount
-            if (planAmount !== (config.amount / 100)) {
-                console.error('❌ CRITICAL: Plan amount mismatch!', {
-                    expected: `₹${config.amount / 100}`,
-                    actual: `₹${planAmount}`,
-                    plan_id: subscriptionOptions.plan_id,
-                    message: 'The plan in Razorpay Dashboard has a different amount than expected!'
-                });
-                return res.status(400).json({
-                    success: false,
-                    error: `Plan amount mismatch! The plan ${subscriptionOptions.plan_id} is configured for ₹${planAmount} but expected ₹${config.amount / 100}. Please update the plan amount in Razorpay Dashboard.`,
-                    details: {
-                        plan_id: subscriptionOptions.plan_id,
-                        expected_amount: `₹${config.amount / 100}`,
-                        actual_amount: `₹${planAmount}`,
-                        action: 'Please update the plan amount in Razorpay Dashboard → Products → Plans'
-                    }
-                });
-            }
-        } catch (planError) {
-            console.error('❌ Plan verification failed:', {
-                plan_id: subscriptionOptions.plan_id,
-                error: planError.error?.description || planError.message,
-                statusCode: planError.statusCode,
-                code: planError.error?.code
-            });
-            return res.status(400).json({
-                success: false,
-                error: `Plan not found: ${subscriptionOptions.plan_id}. The plan ID does not exist in your Razorpay account.`,
-                details: process.env.NODE_ENV === 'development' ? {
-                    plan_id: subscriptionOptions.plan_id,
-                    razorpay_error: planError.error?.description || planError.message,
-                    hint: 'Please verify the plan ID exists in your Razorpay Dashboard → Products → Plans'
-                } : undefined
-            });
-        }
-        
-        const subscription = await razorpay.subscriptions.create(subscriptionOptions);
-        
-        res.json({
-            success: true,
-            subscriptionId: subscription.id,
-            plan: backendPlan,
+        const result = await createSubscriptionHelper({
+            userId,
+            backendPlan,
             originalPlan: plan,
-            amount: config.amount,
-            currency: config.currency,
-            razorpayKey: process.env.RAZORPAY_KEY_ID, // Include key in response
-            billingInfo: {
-                period: 'monthly',
-                total_charges: 120,
-                duration: '10 years'
-            }
+            uid,
+            verifyPlan: true // This endpoint verifies the plan exists in Razorpay first
         });
         
+        res.json(result);
     } catch (error) {
         console.error('Error creating Razorpay subscription:', error);
-        
-        // Provide specific error messages based on the error type
-        let errorMessage = 'Failed to create subscription';
-        let statusCode = 500;
-        
-        if (error.statusCode === 401) {
-            errorMessage = 'Payment system authentication failed. Please contact support.';
-            statusCode = 401;
-        } else if (error.statusCode === 400) {
-            if (error.error?.code === 'BAD_REQUEST_ERROR' && error.error?.description?.includes('id provided does not exist')) {
-                errorMessage = `Plan ID not found: ${config.plan_id}. Please verify the plan exists in your Razorpay Dashboard.`;
-            } else {
-                errorMessage = error.error?.description || 'Invalid subscription request. Please try again.';
-            }
-            statusCode = 400;
-        } else if (error.code === 'BAD_REQUEST_ERROR') {
-            errorMessage = error.error?.description || 'Payment system configuration error. Please contact support.';
-            statusCode = 400;
-        }
-        
-        res.status(statusCode).json({ 
-            success: false, 
-            error: errorMessage,
-            details: process.env.NODE_ENV === 'development' ? {
-                plan_id: config.plan_id,
-                razorpay_error: error.error?.description || error.message,
-                error_code: error.error?.code
-            } : undefined
-        });
+        const backendPlan = frontendToBackendPlan[req.body.plan] || req.body.plan;
+        const { statusCode, body } = formatSubscriptionError(error, planConfigs[backendPlan]);
+        res.status(statusCode).json(body);
     }
 });
 
@@ -717,15 +646,6 @@ router.post('/cancel-subscription', authenticateJWT, async (req, res) => {
             });
         }
         
-        // Check if already canceled
-        if (user.subscription_status === 'canceled') {
-            return res.status(400).json({
-                success: false,
-                error: 'Your subscription is already canceled',
-                expiryDate: user.plan_expiry
-            });
-        }
-        
         console.log('Canceling subscription for user:', {
             userId,
             currentPlan,
@@ -733,32 +653,22 @@ router.post('/cancel-subscription', authenticateJWT, async (req, res) => {
             currentExpiry: user.plan_expiry
         });
         
-        // Mark subscription as canceled but keep plan active until expiry
-        // The plan will remain active until the plan_expiry date
-        const client = await database.pool.connect();
-        try {
-            await client.query(
-                `UPDATE users 
-                 SET updated_at = CURRENT_TIMESTAMP 
-                 WHERE id = $1`,
-                [userId]
-            );
-            client.release();
-        } catch (err) {
-            client.release();
-            throw err;
-        }
+        // Downgrade user to free plan via the database adapter
+        // This works with both SQLite and PostgreSQL adapters
+        await database.updateUserPlan(userId, 'free');
         
-        // Get the expiry date to return to user
-        const expiryDate = user.plan_expiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        console.log('✅ Subscription canceled for user:', userId, 'Plan set to free');
         
-        console.log('✅ Subscription marked as canceled for user:', userId, 'Will expire on:', expiryDate);
+        // Generate a new token reflecting the plan change
+        const updatedUser = await database.findUserById(userId);
+        const newToken = generateToken(updatedUser);
         
         res.json({
             success: true,
-            message: `Subscription canceled. You will retain ${currentPlan} access until ${new Date(expiryDate).toLocaleDateString()}.`,
-            currentPlan: currentPlan,
-            expiryDate: expiryDate,
+            message: `Subscription canceled. Your plan has been changed from ${currentPlan} to free.`,
+            previousPlan: currentPlan,
+            currentPlan: 'free',
+            token: newToken,
             status: 'canceled'
         });
         

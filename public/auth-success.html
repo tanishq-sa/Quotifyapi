@@ -191,7 +191,7 @@
             .then(response => response.json())
             .then(profileData => {
                 if (profileData.profile) {
-                    const isAdmin = profileData.profile.role === 'admin' || profileData.profile.email === 'tanishqsaini872@gmail.com';
+                    const isAdmin = profileData.profile.role === 'admin';
                     
                     if (isAdmin) {
                         // Admin user - fetch from admin endpoint

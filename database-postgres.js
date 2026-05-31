@@ -1,11 +1,12 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
+const { ADMIN_EMAIL } = require('./config/admin');
 
 class PostgresDatabase {
   constructor() {
     this.pool = null;
     // SECURITY: Use environment variable for admin email
-    this.ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
+    this.ADMIN_EMAIL = ADMIN_EMAIL;
     
     // SECURITY: Rate limiting protection
     this.rateLimitMap = new Map();

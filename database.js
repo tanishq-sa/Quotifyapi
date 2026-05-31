@@ -1,12 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const crypto = require('crypto');
+const { ADMIN_EMAIL } = require('./config/admin');
 
 class Database {
   constructor() {
     this.db = null;
     // SECURITY: Use environment variable for admin email
-    this.ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tanishqsaini872@gmail.com';
+    this.ADMIN_EMAIL = ADMIN_EMAIL;
     
     // SECURITY: Rate limiting protection
     this.rateLimitMap = new Map();
@@ -1047,20 +1048,6 @@ class Database {
           reject(err);
         } else {
           resolve(rows);
-        }
-      });
-    });
-  }
-
-  async findUserById(userId) {
-    return new Promise((resolve, reject) => {
-      const query = `SELECT * FROM users WHERE id = ?`;
-      
-      this.db.get(query, [userId], (err, row) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(row);
         }
       });
     });

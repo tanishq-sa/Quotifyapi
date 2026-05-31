@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const { generateToken, authenticateJWT, authenticateFlexible } = require('../auth');
 const database = require('../database-adapter');
+const { ADMIN_EMAIL } = require('../config/admin');
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get('/google/callback',
       try {
         const hasKeys = await database.hasApiKeys(req.user.id);
         if (!hasKeys) {
-          const isAdmin = req.user.email === process.env.ADMIN_EMAIL || req.user.email === 'tanishqsaini872@gmail.com';
+          const isAdmin = req.user.email === ADMIN_EMAIL;
           const keyName = isAdmin ? 'Admin Default Key' : 'Personal Key';
           const apiKey = await database.createApiKey(req.user.id, keyName);
           console.log(`✅ Created first API key for user ${req.user.email}`);
